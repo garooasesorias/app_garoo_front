@@ -9,6 +9,7 @@ function Clientes() {
       <Button className="shadow mb-5 ms-auto mr-5" color="success">Crear Cliente +</Button>
       <Table>
         <Table.Head>
+        <Table.HeadCell>Id</Table.HeadCell>
           <Table.HeadCell>Identificación</Table.HeadCell>
           <Table.HeadCell>Nombre</Table.HeadCell>
           <Table.HeadCell>Celular</Table.HeadCell>
@@ -17,7 +18,7 @@ function Clientes() {
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+          <Table.Row className="bg-white dark:border-gray-500 dark:bg-gray-800">
             <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
               Apple MacBook Pro 17"
             </Table.Cell>
