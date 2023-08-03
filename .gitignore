@@ -8,6 +8,7 @@ yarn-error.log*
 .nyc_output
 *.lock
 
+.parcel-cache
 build
 coverage
 node_modules
