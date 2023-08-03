@@ -3,12 +3,16 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Avatar, Dropdown, Card } from "flowbite-react";
 import { Progress } from "flowbite-react";
+import { Link } from "react-router-dom";
+
 
 function Asesores() {
   // Contenido del componente Asesores
   return (
     <>
+    <Link to="/modal">
       <Button className="shadow mb-5 ms-auto mr-5" color="success">Crear Asesor +</Button>
+      </Link>
       <Card class="width:200%">
       <div className="flex justify-end px-4 pt-4 ">
         <Dropdown

@@ -1,4 +1,4 @@
-21084
+21085
 74C:\Users\WIN10\Documents\webappgaroo\node_modules\json5\dist\index.min.mjs133353796029565736 0
 96C:\Users\WIN10\Documents\webappgaroo\node_modules\css-select\node_modules\entities\lib\decode.js133353795994636149 0
 64C:\Users\WIN10\Documents\webappgaroo\node_modules\is-core-module133353795985953918 1
@@ -129,7 +129,7 @@
 97C:\Users\WIN10\Documents\webappgaroo\node_modules\@swc\helpers\lib\_object_destructuring_empty.js133353796399338006 0
 99C:\Users\WIN10\Documents\webappgaroo\node_modules\csso\node_modules\css-tree\lib\convertor\index.js133353796389612881 0
 69C:\Users\WIN10\Documents\webappgaroo\node_modules\google-auth-library133353796117973393 1
-48C:\Users\WIN10\Documents\webappgaroo\apps-script133354682048312990 1
+48C:\Users\WIN10\Documents\webappgaroo\apps-script133355529393077671 1
 104C:\Users\WIN10\Documents\webappgaroo\node_modules\googleapis\build\src\apis\servicemanagement\index.d.ts133353796844660508 0
 49C:\Users\WIN10\Documents\webappgaroo\package.json133354679610247943 0
 101C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\util\isReadableStreamLike.js133353796443025834 0
@@ -230,7 +230,7 @@
 142C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\_esm5\internal\operators\switchMap.js.map133353796896412318 0
 80C:\Users\WIN10\Documents\webappgaroo\node_modules\typescript\lib\typescript.d.ts133353796587253580 0
 93C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm5\internal\operators\concat.js133353796356585237 0
-47C:\Users\WIN10\Documents\webappgaroo\src\App.js133353792606274996 0
+47C:\Users\WIN10\Documents\webappgaroo\src\App.js133355506421145234 0
 90C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\config.d.ts.map133353796559875240 0
 128C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\internal\operators\delay.js133353796400790643 0
 68C:\Users\WIN10\Documents\webappgaroo\node_modules\svgo\lib\svgo.d.ts133353796221860283 0
@@ -262,7 +262,7 @@
 58C:\Users\WIN10\Documents\webappgaroo\node_modules\escalade133353795980931749 1
 99C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\operators\dematerialize.js133353796391331546 0
 64C:\Users\WIN10\Documents\webappgaroo\node_modules\fastq\bench.js133350467385539521 0
-51C:\Users\WIN10\Documents\webappgaroo\src\components133353792606325029 1
+51C:\Users\WIN10\Documents\webappgaroo\src\components133355487327620923 1
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\decompress-response\readme.md133353795942081168 0
 101C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\scheduler\timerHandle.js.map133353796854567515 0
 75C:\Users\WIN10\Documents\webappgaroo\node_modules\@parcel\fs-search\LICENSE133353795910850850 0
@@ -341,7 +341,7 @@
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\weak-lru-cache\LRFUExpirer.js133353795949353001 0
 66C:\Users\WIN10\Documents\webappgaroo\node_modules\uuid\wrapper.mjs133353796169221374 0
 73C:\Users\WIN10\Documents\webappgaroo\node_modules\lodash\fp\upperFirst.js133353796551058619 0
-58C:\Users\WIN10\Documents\webappgaroo\src\pages\Asesores.js133353982437111483 0
+58C:\Users\WIN10\Documents\webappgaroo\src\pages\Asesores.js133355513727435307 0
 73C:\Users\WIN10\Documents\webappgaroo\node_modules\react-icons\gr\index.js133350473544269598 0
 84C:\Users\WIN10\Documents\webappgaroo\node_modules\@swc\helpers\cjs\_to_primitive.cjs133353796215525279 0
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\sucrase\dist\parser\tokenizer133350467525827464 1
@@ -371,6 +371,16 @@
 72C:\Users\WIN10\Documents\webappgaroo\node_modules\lodash\fp\isWeakMap.js133353796493324675 0
 98C:\Users\WIN10\Documents\webappgaroo\node_modules\@popperjs\core\dist\esm\utils\expandToHashMap.js133350473422992429 0
 61C:\Users\WIN10\Documents\webappgaroo\src\components\Footer.js133350537295160057 0
+116C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\util\isArray.js133353796463062291 0
+92C:\Users\WIN10\Documents\webappgaroo\node_modules\node-gyp-build-optional-packages\README.md133353795972001029 0
+62C:\Users\WIN10\Documents\webappgaroo\node_modules\wcwidth\test133353795981565647 1
+67C:\Users\WIN10\Documents\webappgaroo\node_modules\lodash\_baseLt.js133353796210248195 0
+107C:\Users\WIN10\Documents\webappgaroo\node_modules\@popperjs\core\dist\esm\utils\getMainAxisFromPlacement.js133350473423202356 0
+57C:\Users\WIN10\Documents\webappgaroo\node_modules\tmp\lib133353795938886938 1
+82C:\Users\WIN10\Documents\webappgaroo\node_modules\yaml\dist\schema\yaml-1.1\int.js133350467469683951 0
+95C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\observable\race.d.ts133353796939849283 0
+87C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\Brackets.cjs133353796015788112 0
+60C:\Users\WIN10\Documents\webappgaroo\src\components\Modal.js133355520933936841 0
 96C:\Users\WIN10\Documents\webappgaroo\node_modules\postcss-selector-parser\dist\selectors\root.js133350467430610262 0
 85C:\Users\WIN10\Documents\webappgaroo\node_modules\svgo\node_modules\commander\LICENSE133353795911070919 0
 110C:\Users\WIN10\Documents\webappgaroo\node_modules\read-pkg\node_modules\type-fest\ts41\last-array-element.d.ts133353796094102173 0
@@ -441,8 +451,6 @@
 55C:\Users\WIN10\Documents\webappgaroo\node_modules\react133353796059670646 1
 124C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\observable\range.js.map133353796858447256 0
 59C:\Users\WIN10\Documents\webappgaroo\node_modules\@popperjs133350473188689508 1
-90C:\Users\WIN10\Documents\webappgaroo\node_modules\dom-serializer\node_modules\entities\lib133353796047976282 1
-64C:\Users\WIN10\Documents\webappgaroo\node_modules\source-map\lib133353796025239336 1
 70C:\Users\WIN10\Documents\webappgaroo\node_modules\postcss-js\index.mjs133350467408429755 0
 82C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\CDO.cjs133353796022029122 0
 56C:\Users\WIN10\Documents\webappgaroo\node_modules\@alloc133350467375241776 1
@@ -604,7 +612,6 @@
 105C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm5\internal\scheduler\QueueScheduler.js.map133353796786563565 0
 82C:\Users\WIN10\Documents\webappgaroo\node_modules\flowbite\lib\esm\dom\events.d.ts133350473454371091 0
 63C:\Users\WIN10\Documents\webappgaroo\node_modules\utility-types133353796028247493 1
-89C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\lastValueFrom.js133353796446459456 0
 98C:\Users\WIN10\Documents\webappgaroo\node_modules\@popperjs\core\dist\esm\modifiers\applyStyles.js133350473408298229 0
 99C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\operators\mergeWith.js.map133353796739787870 0
 80C:\Users\WIN10\Documents\webappgaroo\node_modules\ts-interface-checker\README.md133350467393519527 0
@@ -1149,12 +1156,12 @@
 71C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\testing133353796669195419 1
 70C:\Users\WIN10\Documents\webappgaroo\node_modules\path-parse\README.md133350467395006089 0
 56C:\Users\WIN10\Documents\webappgaroo\node_modules\extend133353795986492455 1
+79C:\Users\WIN10\Documents\webappgaroo\node_modules\sucrase\dist\parser\traverser133350467586987750 1
 140C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\_esm5\internal\operators\switchMapTo.js133353796549015524 0
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\fast-glob\out\utils\stream.js133350467435501566 0
 62C:\Users\WIN10\Documents\webappgaroo\node_modules\dlv\index.js133350467387539505 0
 75C:\Users\WIN10\Documents\webappgaroo\node_modules\util-deprecate\browser.js133353795938986949 0
 130C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\internal\util\TimeoutError.js133353796560095069 0
-79C:\Users\WIN10\Documents\webappgaroo\node_modules\sucrase\dist\parser\traverser133350467586987750 1
 112C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm5\internal\scheduled\scheduleAsyncIterable.js.map133353796817768007 0
 74C:\Users\WIN10\Documents\webappgaroo\node_modules\js-yaml\lib\type\bool.js133353795934512228 0
 65C:\Users\WIN10\Documents\webappgaroo\node_modules\external-editor133353795958598381 1
@@ -1228,8 +1235,6 @@
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\tailwindcss\lib\util\color.js133350467439800661 0
 97C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\features\fieldset-disabled.js133353796429568619 0
 97C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\util\subscribeToArray.js133353796501892002 0
-58C:\Users\WIN10\Documents\webappgaroo\node_modules\get-port133353795952571999 1
-62C:\Users\WIN10\Documents\webappgaroo\node_modules\gcp-metadata133353795967155152 1
 79C:\Users\WIN10\Documents\webappgaroo\node_modules\yaml\dist\doc\directives.d.ts133350467590345681 0
 97C:\Users\WIN10\Documents\webappgaroo\node_modules\googleapis\build\src\apis\cloudchannel\index.js133353796356035203 0
 89C:\Users\WIN10\Documents\webappgaroo\node_modules\@floating-ui\react\src\safePolygon.d.ts133350473271606415 0
@@ -1237,6 +1242,8 @@
 98C:\Users\WIN10\Documents\webappgaroo\node_modules\@types\google-apps-script\apis\classroom_v1.d.ts133353796157518895 0
 71C:\Users\WIN10\Documents\webappgaroo\node_modules\json5\lib\register.js133353795980021769 0
 126C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\internal\observable\of.js133353796492109013 0
+58C:\Users\WIN10\Documents\webappgaroo\node_modules\get-port133353795952571999 1
+62C:\Users\WIN10\Documents\webappgaroo\node_modules\gcp-metadata133353795967155152 1
 75C:\Users\WIN10\Documents\webappgaroo\node_modules\responselike\package.json133353795931500355 0
 88C:\Users\WIN10\Documents\webappgaroo\node_modules\svgo\plugins\convertEllipseToCircle.js133353796049158083 0
 93C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\operators\flatMap.js133353796410493943 0
@@ -2430,13 +2437,6 @@
 95C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\operators\mergeScan.js133353796455534705 0
 72C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\index.js133353796424317704 0
 85C:\Users\WIN10\Documents\webappgaroo\node_modules\yaml\dist\schema\yaml-1.1\binary.js133350467419181054 0
-116C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\util\isArray.js133353796463062291 0
-92C:\Users\WIN10\Documents\webappgaroo\node_modules\node-gyp-build-optional-packages\README.md133353795972001029 0
-62C:\Users\WIN10\Documents\webappgaroo\node_modules\wcwidth\test133353795981565647 1
-67C:\Users\WIN10\Documents\webappgaroo\node_modules\lodash\_baseLt.js133353796210248195 0
-107C:\Users\WIN10\Documents\webappgaroo\node_modules\@popperjs\core\dist\esm\utils\getMainAxisFromPlacement.js133350473423202356 0
-57C:\Users\WIN10\Documents\webappgaroo\node_modules\tmp\lib133353795938886938 1
-82C:\Users\WIN10\Documents\webappgaroo\node_modules\yaml\dist\schema\yaml-1.1\int.js133350467469683951 0
 89C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\util\pipe.js.map133353796773453017 0
 86C:\Users\WIN10\Documents\webappgaroo\node_modules\yaml\dist\schema\yaml-1.1\pairs.d.ts133350467598453555 0
 99C:\Users\WIN10\Documents\webappgaroo\node_modules\googleapis\build\src\apis\streetviewpublish\v1.js133353796528460166 0
@@ -3207,7 +3207,6 @@
 87C:\Users\WIN10\Documents\webappgaroo\node_modules\tailwindcss\lib\lib\remap-bitfield.js133350467592351233 0
 102C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\esm\internal\operators\timeInterval.js.map133353796852903872 0
 69C:\Users\WIN10\Documents\webappgaroo\node_modules\wrap-ansi\readme.md133353795938636941 0
-81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\GA.js133353796443185811 0
 91C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\observable\race.js133353796479216526 0
 93C:\Users\WIN10\Documents\webappgaroo\node_modules\googleapis\build\src\apis\mybusinesslodging133353796943210944 1
 93C:\Users\WIN10\Documents\webappgaroo\node_modules\wrap-ansi\node_modules\string-width\license133353795910980901 0
@@ -6048,6 +6047,8 @@
 75C:\Users\WIN10\Documents\webappgaroo\node_modules\source-map-js\lib\util.js133353796022139131 0
 74C:\Users\WIN10\Documents\webappgaroo\node_modules\css-select\lib\sort.d.ts133353796224657853 0
 73C:\Users\WIN10\Documents\webappgaroo\node_modules\restore-cursor\index.js133353795926919277 0
+90C:\Users\WIN10\Documents\webappgaroo\node_modules\dom-serializer\node_modules\entities\lib133353796047976282 1
+64C:\Users\WIN10\Documents\webappgaroo\node_modules\source-map\lib133353796025239336 1
 94C:\Users\WIN10\Documents\webappgaroo\node_modules\dom-serializer\node_modules\entities\LICENSE133353795911483302 0
 68C:\Users\WIN10\Documents\webappgaroo\node_modules\source-map\LICENSE133353795931322890 0
 99C:\Users\WIN10\Documents\webappgaroo\node_modules\dom-serializer\node_modules\entities\package.json133353795989504177 0
@@ -7623,7 +7624,6 @@
 70C:\Users\WIN10\Documents\webappgaroo\node_modules\path-type\index.d.ts133353795916202144 0
 100C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\observable\partition.d.ts133353796938225924 0
 104C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\observable\partition.d.ts.map133353796772333462 0
-95C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\observable\race.d.ts133353796939849283 0
 103C:\Users\WIN10\Documents\webappgaroo\node_modules\lmdb\dependencies\lmdb\libraries\liblmdb\mtest_enc2.c133353796166039714 0
 101C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\types\internal\observable\throwError.d.ts133353796958199226 0
 82C:\Users\WIN10\Documents\webappgaroo\node_modules\@swc\helpers\_\_get\package.json133353796430808598 0
@@ -8782,6 +8782,7 @@
 120C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\src\internal\symbol133353797021468299 1
 77C:\Users\WIN10\Documents\webappgaroo\node_modules\ora\node_modules\cli-cursor133353795953732027 1
 82C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\config.js133353796376197669 0
+89C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\lastValueFrom.js133353796446459456 0
 93C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\lastValueFrom.js.map133353796692820758 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\ajax\index.js.map133353796663993529 0
 88C:\Users\WIN10\Documents\webappgaroo\node_modules\rxjs\dist\cjs\internal\Notification.js133353796463192250 0
@@ -14678,7 +14679,7 @@
 133C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\observable\fromEventPattern.d.ts133353796986847373 0
 131C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\observable\fromEventPattern.js133353796431815548 0
 143C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\observable\FromEventPatternObservable.d.ts133353796987047369 0
-59C:\Users\WIN10\Documents\webappgaroo\apps-script\index.html133354680181988035 0
+59C:\Users\WIN10\Documents\webappgaroo\apps-script\index.html133355529392967709 0
 92C:\Users\WIN10\Documents\webappgaroo\node_modules\@babel\helper-validator-identifier\scripts133353795999802214 1
 121C:\Users\WIN10\Documents\webappgaroo\node_modules\@parcel\workers\test\integration\workerfarm\resolve-shared-reference.js133353796094492182 0
 141C:\Users\WIN10\Documents\webappgaroo\node_modules\inquirer-autocomplete-prompt-ipt\node_modules\rxjs\observable\FromEventPatternObservable.js133353796432252009 0
@@ -17945,7 +17946,6 @@
 85C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\scope\value.cjs133353796324659097 0
 114C:\Users\WIN10\Documents\webappgaroo\node_modules\@parcel\optimizer-svgo\node_modules\css-select\lib\sort.d.ts.map133353796061831269 0
 84C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\Block.cjs133353796009647870 0
-87C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\Brackets.cjs133353796015788112 0
 82C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\CDC.cjs133353796018654772 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\common133353796121095745 1
 88C:\Users\WIN10\Documents\webappgaroo\node_modules\css-tree\cjs\syntax\node\Condition.cjs133353796049558077 0
@@ -18233,6 +18233,7 @@
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\FI.js133353796429298629 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\FJ.js133353796430518613 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\FR.js133353796442766082 0
+81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\GA.js133353796443185811 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\GB.js133353796443645839 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\GG.js133353796445748179 0
 81C:\Users\WIN10\Documents\webappgaroo\node_modules\caniuse-lite\data\regions\GH.js133353796446429428 0
