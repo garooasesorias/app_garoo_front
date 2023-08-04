@@ -1,12 +1,16 @@
 import React from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
+import { Link } from "react-router-dom";
+
 
 function Clientes() {
   // Contenido del componente Asesores
   return (
     <>
+      <Link to="/modalservice">
       <Button className="shadow mb-5 ms-auto mr-5" color="success">Crear Cliente +</Button>
+      </Link>
       <Table>
         <Table.Head>
         <Table.HeadCell>Id</Table.HeadCell>
