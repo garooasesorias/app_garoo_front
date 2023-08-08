@@ -55,7 +55,7 @@ function Sidebar() {
                     ></path>
                   </svg>
                   <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                    ClientesA
+                    Clientes
                   </span>
                   <svg
                     aria-hidden="true"
