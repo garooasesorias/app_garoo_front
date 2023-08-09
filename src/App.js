@@ -9,7 +9,7 @@ import Layout from "./layaout/Layout";
 import Asesores from "./pages/Asesores";
 import Clientes from "./pages/Clientes";
 import ModalService from "./components/ModalService";
-
+import Cotizaciones from "./pages/Cotizaciones";
 
 function App() {
   return (
@@ -22,6 +22,7 @@ function App() {
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/modalservice" element={<ModalService />} />
         <Route path="/sidebar" element={<Sidebar />} />
+        <Route path="/cotizaciones" element={<Cotizaciones />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="*" element={<Home />} />
       </Routes>
