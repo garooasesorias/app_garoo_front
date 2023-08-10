@@ -2,13 +2,15 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import Sidebar from "./components/Sidebar";
-import ModalClientes from "./pages/Clientes/components/Form";
-import ModalAsesores from "./pages/Asesores/components/Form";
+import FormClientes from "./pages/Clientes/components/Form";
+import FormAsesores from "./pages/Asesores/components/Form";
+import FormActividades from "./pages/Actividades/components/Form";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import Layout from "./layouts/layout";
 import Asesores from "./pages/Asesores";
 import Clientes from "./pages/Clientes";
+import Actividades from "./pages/Actividades";
 
 function App() {
   return (
@@ -17,9 +19,11 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/asesores" element={<Asesores />} />
-        <Route path="/formAsesores" element={<ModalAsesores />} />
-        <Route path="/formClientes" element={<ModalClientes />} />
         <Route path="/clientes" element={<Clientes />} />
+        <Route path="/actividades" element={<Actividades />} />
+        <Route path="/formAsesores" element={<FormAsesores />} />
+        <Route path="/formClientes" element={<FormClientes />} />
+        <Route path="/formActividades" element={<FormActividades />} />
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="*" element={<Home />} />

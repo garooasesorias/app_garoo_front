@@ -1,19 +1,18 @@
-function insertCliente() {
-
-  const result = new MongoDBLib("clientes").insertDocument("insertOne", {
-    id: 1,
-    nombre: "Alberto Diaz",
-    identificacion: "304013456",
-  });
+function insertCliente(document) {
+  const result = new MongoDBLib("clientes").insertDocument(
+    "insertOne",
+    document
+  );
   return result;
 }
 
 function getClientes() {
-  const query = { business_name: { $regex: `American`, $options: "i" } };
-  const order = { business_name: 1, date: -1 };
+  const query = {};
+  // const order = { business_name: 1, date: -1 };
+  const order = {};
   const limit = 100;
 
-  const result = new MongoDBLib("inspections").getDocuments(
+  const result = new MongoDBLib("clientes").getDocuments(
     "find",
     query,
     order,
