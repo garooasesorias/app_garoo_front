@@ -4,6 +4,7 @@ import { Button, Label, TextInput } from "flowbite-react";
 function Form() {
   const [formData, setFormData] = useState({
     nombre: "",
+    tipo: "",
     precio: "",
   });
 
@@ -26,13 +27,26 @@ function Form() {
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="nombre" value="Username" />
+            <Label htmlFor="nombre" value="nombre" />
           </div>
           <TextInput
             addon="Nombre"
             id="nombre"
             name="nombre"
             value={formData.nombre}
+            onChange={handleInputChange}
+            required
+          />
+        </div>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="tipo" value="tipo" />
+          </div>
+          <TextInput
+            addon="Tipo"
+            id="tipo"
+            name="tipo"
+            value={formData.tipo}
             onChange={handleInputChange}
             required
           />

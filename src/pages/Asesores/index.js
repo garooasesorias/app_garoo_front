@@ -219,8 +219,6 @@ function Asesores() {
             </Link>
             <div className="flex flex-col items-center pb-4">
               <Avatar
-                display
-                Name
                 alt={`${asesor.name} image`}
                 className="mb-2 rounded-full shadow-lg"
                 height="auto" // Cambio de "64" a "auto" para mantener proporciones
@@ -266,7 +264,6 @@ function Asesores() {
               {asesor.skills.map((skill, index) => (
                 <Progress
                   key={index}
-                  labelProgres
                   labelText
                   textLabel={skill.label}
                   size="lg"
