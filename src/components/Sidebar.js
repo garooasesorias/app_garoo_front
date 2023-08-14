@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
 import { FaCog } from "react-icons/fa";
 
@@ -129,14 +129,10 @@ function Sidebar() {
             <li>
               <CollapsibleDropdown buttonText="Actividades" icon={<FaCog />}>
                 <li>
-                  <Link to="/tipoActividades">
-                    <a
-                      href="#"
-                      className="flex items-center p-2 pl-11 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                    >
-                      Tipo
-                    </a>
-                  </Link>
+                  <NavLink to="/actividades">Actividades</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/tipoActividades">Tipo de Actividades</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
