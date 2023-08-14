@@ -25,7 +25,7 @@ function App() {
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formActividades" element={<FormActividades />} />
         <Route path="/sidebar" element={<Sidebar />} />
-        <Route path="/cotizaciones" element={<Cotizaciones />} />
+      { /* <Route path="/cotizaciones" element={<Cotizaciones />} />*/}
         <Route path="/footer" element={<Footer />} />
         <Route path="*" element={<Home />} />
       </Routes>
