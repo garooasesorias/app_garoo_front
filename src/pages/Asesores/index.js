@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
 import { Link } from "react-router-dom";
 
@@ -168,7 +168,8 @@ const asesoresData = [
 
 function Asesores() {
   const [searchQuery, setSearchQuery] = useState(""); // Estado para la búsqueda
-  //const [collapsedIndex, setCollapsedIndex] = useState(null);
+  const [collapsedIndex, setCollapsedIndex] = useState(null);
+
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };

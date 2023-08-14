@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
 
 function Form() {
+  const [tiposActividad, setTiposActividad] = useState([]);
   const [formData, setFormData] = useState({
     nombre: "",
     tipo: "",
     precio: "",
   });
+
+  useEffect(() => {
+    // Fetch data from an external source (assuming it's an array of objects)
+    const fetchData = async () => {
+      await google.script.run
+        .withSuccessHandler((data) => {
+          setTiposActividad(data);
+        })
+        .getTiposActividad();
+    };
+
+    fetchData();
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,12 +29,40 @@ function Form() {
       .insertActividad(formData);
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleNombreChange = (e) => {
+    const newName = e.target.value;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      nombre: newName,
     }));
+  };
+
+  const handlePrecioChange = (e) => {
+    const newPrecio = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      precio: newPrecio,
+    }));
+  };
+
+  const handleTipoChange = (selectedTipo) => {
+    console.log("Selected Tipo:", selectedTipo);
+
+    const selectedTipoObj = tiposActividad.find(
+      (tipo) => tipo.id === selectedTipo
+    );
+
+    console.log("Selected Tipo Object:", selectedTipoObj);
+
+    setFormData((prevData) => ({
+      ...prevData,
+      tipo: selectedTipoObj ? selectedTipoObj.id : "",
+    }));
+  };
+
+  const handleTipoSelect = (e) => {
+    const selectedValue = e.target.value;
+    handleTipoChange(selectedValue);
   };
   return (
     <>
@@ -34,7 +76,7 @@ function Form() {
             id="nombre"
             name="nombre"
             value={formData.nombre}
-            onChange={handleInputChange}
+            onChange={handleNombreChange}
             required
           />
         </div>
@@ -42,14 +84,20 @@ function Form() {
           <div className="mb-2 block">
             <Label htmlFor="tipo" value="tipo" />
           </div>
-          <TextInput
-            addon="Tipo"
+          <select
             id="tipo"
             name="tipo"
             value={formData.tipo}
-            onChange={handleInputChange}
+            onChange={handleTipoSelect}
             required
-          />
+          >
+            <option value="">Selecciona un tipo</option>
+            {tiposActividad.map((tipo) => (
+              <option key={tipo._id} value={tipo._id}>
+                {tipo.nombre}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -60,7 +108,7 @@ function Form() {
             id="precio"
             name="precio"
             value={formData.precio}
-            onChange={handleInputChange}
+            onChange={handlePrecioChange}
             required
           />
         </div>
