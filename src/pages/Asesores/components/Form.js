@@ -1,55 +1,97 @@
-import React from "react";
+import React, {useState}from "react";
 import { Button, Checkbox, Label, TextInput } from "flowbite-react";
 
 function Form() {
+  const [formData, setFormData] = useState({
+    identificacion:"",
+    nombre: "",
+    cargo: "",
+    celular: "",
+    rol: "",
+
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    google.script.run
+      .withSuccessHandler((response) => {})
+      .insertAsesor(formData);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
   return (
     <>
-      <form className="flex max-w-md flex-col gap-4">
+      <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="identificacion" value="Identificacion" />
           </div>
           <TextInput
             addon="ID"
-            id="username1"
-            placeholder="123456789"
+            id="identificacion"
+            name="identificacion"
+            value={formData.identificacion}
+            onChange={handleInputChange}
             required
           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="username" value="Username" />
+            <Label htmlFor="nombre" value="nombre" />
           </div>
           <TextInput
-            addon="@"
-            id="username1"
-            placeholder="Garoo Asesorias"
-            required
+          addon="Nombre"
+          id="nombre"
+          name="nombre"
+          value={formData.nombre}
+          onChange={handleInputChange}
+          required
           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="cargo" value="Cargo" />
+            <Label htmlFor="cargo" value="cargo" />
           </div>
-          <TextInput addon="[]" id="username1" placeholder="CEO" required />
+          <TextInput 
+         addon="Cargo"
+         id="cargo"
+         name="cargo"
+         value={formData.cargo}
+         onChange={handleInputChange}
+          required
+           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="celular" value="Celular" />
+            <Label htmlFor="celular" value="celular" />
           </div>
           <TextInput
             addon="#"
-            id="username1"
-            placeholder="3000000003"
+            id="celular"
+            name="celular"
+            value={formData.celular}
+            onChange={handleInputChange}
             required
           />
         </div>
-        {/* <div className="max-w-md">
+         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="rol" value="Rol" />
           </div>
-          <TextInput addon="&" id="username1" placeholder="Asesor" required />
-        </div> */}
+          <TextInput 
+            addon="&"
+            id="rol"
+            name="rol"
+            value={formData.rol}
+            onChange={handleInputChange}
+            required />
+        </div> 
         <Button type="submit" color="dark">
           Submit
         </Button>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
 import { Link } from "react-router-dom";
 
@@ -168,8 +168,7 @@ const asesoresData = [
 
 function Asesores() {
   const [searchQuery, setSearchQuery] = useState(""); // Estado para la búsqueda
-  const [collapsedIndex, setCollapsedIndex] = useState(null);
-
+  //const [collapsedIndex, setCollapsedIndex] = useState(null);
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -183,6 +182,29 @@ function Asesores() {
       asesor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       asesor.speciality.toLowerCase().includes(searchQuery.toLowerCase())
   );
+  const [asesores, setAsesores] = useState([]);
+
+
+    useEffect(() => {
+      // Fetch data from an external source (assuming it's an array of objects)
+      const fetchData = async () => {
+        // try {
+        //   const response = await fetch("your_api_endpoint_here");
+        //   const data = await response.json();
+        //   setactividades(data);
+        // } catch (error) {
+        //   console.error("Error fetching data:", error);
+        // }
+        await google.script.run
+          .withSuccessHandler((data) => {
+            setAsesores(data);
+          })
+          .getAsesores();
+      };
+  
+      fetchData();
+    }, []);
+
 
   return (
     <>
