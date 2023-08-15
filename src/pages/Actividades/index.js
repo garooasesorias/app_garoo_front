@@ -7,20 +7,43 @@ function Actividades() {
   const [actividades, setActividades] = useState([]);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      // try {
-      //   const response = await fetch("your_api_endpoint_here");
-      //   const data = await response.json();
-      //   setactividades(data);
-      // } catch (error) {
-      //   console.error("Error fetching data:", error);
-      // }
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setActividades(data);
-        })
-        .getActividades();
+      try {
+        // const actividadesResponse = await google.script.run.getActividades();
+        // const tipoDataResponse = await google.script.run.getTiposActividad();
+        const actividadesResponse = await new Promise((resolve) => {
+          google.script.run
+            .withSuccessHandler((response) => {
+              resolve(response);
+            })
+            .getActividades();
+        });
+
+        const tipoDataResponse = await new Promise((resolve) => {
+          google.script.run
+            .withSuccessHandler((response) => {
+              resolve(response);
+            })
+            .getTiposActividad();
+        });
+
+        // Assuming tipoDataResponse contains an array of tipo objects
+        const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
+          acc[tipo._id] = tipo.nombre;
+          return acc;
+        }, {});
+
+        const actividadesWithTipoNombre = actividadesResponse.map(
+          (actividad) => ({
+            ...actividad,
+            tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
+          })
+        );
+
+        setActividades(actividadesWithTipoNombre);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchData();
@@ -50,15 +73,12 @@ function Actividades() {
                 key={actividad._id}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
-                {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-                {actividad.id}
-              </Table.Cell> */}
                 <Table.Cell>{actividad.nombre}</Table.Cell>
-                <Table.Cell>{actividad.tipo}</Table.Cell>
+                <Table.Cell>{actividad.tipoNombre}</Table.Cell>
                 <Table.Cell>{actividad.precio}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/editactividad/${actividad.id}`} // Assuming you have an edit route
+                    to={`/editactividad/${actividad.id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
