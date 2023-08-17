@@ -3,7 +3,7 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 
-function tiposActividad() {
+function TiposActividad() {
   const [tiposActividad, setTiposActividad] = useState([]);
 
   useEffect(() => {
@@ -69,4 +69,4 @@ function tiposActividad() {
   );
 }
 
-export default tiposActividad;
+export default TiposActividad;

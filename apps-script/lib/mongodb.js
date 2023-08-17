@@ -122,6 +122,6 @@ class MongoDBLib {
 
     const options = this.createOptions(payload);
     const response = this.executeAPI(endpoint, options);
-    return response.getContentText();
+    return response;
   }
 }
