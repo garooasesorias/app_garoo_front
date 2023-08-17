@@ -4,6 +4,7 @@ import { FaCog } from "react-icons/fa";
 
 function Sidebar() {
   return (
+    
     <>
       <button
         data-drawer-target="default-sidebar"
