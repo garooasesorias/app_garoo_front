@@ -1,7 +1,9 @@
-import React, {useState}from "react";
-import { Button, Checkbox, Label, TextInput } from "flowbite-react";
+import React, {useState, useEffect}from "react";
+
+import { Button, Label, TextInput } from "flowbite-react";
 
 function Form() {
+  
   const [formData, setFormData] = useState({
     identificacion:"",
     nombre: "",
@@ -17,12 +19,39 @@ function Form() {
       .withSuccessHandler((response) => {})
       .insertAsesor(formData);
   };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
+  const handleIdentificacionChange = (e) => {
+    const newIdentificacion = e.target.value;
     setFormData((prevData) => ({
       ...prevData,
-      [name]: value,
+      identificacion: newIdentificacion,
+    }));
+  };
+  const handleNombreChange = (e) => {
+    const newName = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      nombre: newName,
+    }));
+  };
+  const handleCargoChange = (e) => {
+    const newCargo = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      cargo: newCargo,
+    }));
+  };
+  const handleCelularChange = (e) => {
+    const newCelular = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      celular: newCelular,
+    }));
+  };
+  const handleRolChange = (e) => {
+    const newRol = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      rol: newRol,
     }));
   };
   return (
@@ -37,46 +66,46 @@ function Form() {
             id="identificacion"
             name="identificacion"
             value={formData.identificacion}
-            onChange={handleInputChange}
+            onChange={handleIdentificacionChange}
             required
           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="nombre" value="nombre" />
+            <Label htmlFor="nombre" value="Nombre" />
           </div>
           <TextInput
           addon="Nombre"
           id="nombre"
           name="nombre"
           value={formData.nombre}
-          onChange={handleInputChange}
+          onChange={handleNombreChange}
           required
           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="cargo" value="cargo" />
+            <Label htmlFor="cargo" value="Cargo" />
           </div>
           <TextInput 
          addon="Cargo"
          id="cargo"
          name="cargo"
          value={formData.cargo}
-         onChange={handleInputChange}
+         onChange={handleCargoChange}
           required
            />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="celular" value="celular" />
+            <Label htmlFor="celular" value="Celular" />
           </div>
           <TextInput
             addon="#"
             id="celular"
             name="celular"
             value={formData.celular}
-            onChange={handleInputChange}
+            onChange={handleCelularChange}
             required
           />
         </div>
@@ -89,7 +118,7 @@ function Form() {
             id="rol"
             name="rol"
             value={formData.rol}
-            onChange={handleInputChange}
+            onChange={handleRolChange}
             required />
         </div> 
         <Button type="submit" color="dark">
