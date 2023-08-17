@@ -25,7 +25,9 @@ function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
     google.script.run
-      .withSuccessHandler((response) => {})
+      .withSuccessHandler((response) => {
+        console.log(response);
+      })
       .insertActividad(formData);
   };
 
@@ -49,14 +51,14 @@ function Form() {
     console.log("Selected Tipo:", selectedTipo);
 
     const selectedTipoObj = tiposActividad.find(
-      (tipo) => tipo.id === selectedTipo
+      (tipo) => tipo._id === selectedTipo
     );
 
     console.log("Selected Tipo Object:", selectedTipoObj);
 
     setFormData((prevData) => ({
       ...prevData,
-      tipo: selectedTipoObj ? selectedTipoObj.id : "",
+      tipo: selectedTipoObj ? selectedTipoObj._id : "",
     }));
   };
 
