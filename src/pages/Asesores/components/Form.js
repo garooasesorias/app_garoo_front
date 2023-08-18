@@ -75,15 +75,21 @@ function Form() {
   const handleSkillsChange = (selectedOptions) => {
     setFormData((prevData) => ({
       ...prevData,
-      actividades: selectedOptions.map((option) => option.value),
+      skills: selectedOptions.map((option) => option.value),
     }));
   };
+  const selectedOptions = actividades.filter((skill) =>
+  formData.skills.includes(actividad._id)
+);
   const handleEspecialidadesChange = (selectedOptions) => {
     setFormData((prevData) => ({
       ...prevData,
-      actividades: selectedOptions.map((option) => option.value),
+      especialidades: selectedOptions.map((option) => option.value),
     }));
   };
+  const selectedOptionsEspecialidaddes = actividades.filter((especialidad) =>
+  formData.especialidades.includes(actividad._id)
+);
   
   return (
     <>
@@ -142,7 +148,7 @@ function Form() {
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="celular" value="Skills" />
+            <Label htmlFor="skills" value="Skills" />
           </div>
           <Select
             id="skills"
@@ -161,7 +167,7 @@ function Form() {
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="celular" value="Especialidades" />
+            <Label htmlFor="especialidades" value="Especialidades" />
           </div>
           <Select
             id="especialidades"
@@ -171,7 +177,7 @@ function Form() {
               value: especialidad._id,
             }))}
             isMulti
-            value={selectedOptions.map((especialidad) => ({
+            value={selectedOptionsEspecialidaddes.map((especialidad) => ({
               label: especialidad.nombre, // Display activity names instead of IDs
               value: especialidad._id,
             }))}
