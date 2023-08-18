@@ -78,8 +78,8 @@ function Form() {
       skills: selectedOptions.map((option) => option.value),
     }));
   };
-  const selectedOptions = actividades.filter((skill) =>
-  formData.skills.includes(actividad._id)
+  const selectedOptions = skills.filter((skill) =>
+  formData.skills.includes(skill._id)
 );
   const handleEspecialidadesChange = (selectedOptions) => {
     setFormData((prevData) => ({
@@ -87,8 +87,8 @@ function Form() {
       especialidades: selectedOptions.map((option) => option.value),
     }));
   };
-  const selectedOptionsEspecialidaddes = actividades.filter((especialidad) =>
-  formData.especialidades.includes(actividad._id)
+  const selectedOptionsEspecialidaddes = especialidades.filter((especialidad) =>
+  formData.especialidades.includes(especialidad._id)
 );
   
   return (
