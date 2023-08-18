@@ -1,6 +1,7 @@
 import React, {useState, useEffect}from "react";
-
 import { Button, Label, TextInput } from "flowbite-react";
+import Select from "react-select";
+
 
 function Form() {
   
@@ -9,16 +10,40 @@ function Form() {
     nombre: "",
     cargo: "",
     celular: "",
-    rol: "",
+    skills: [],
+    especialidades:[]
 
   });
+  const [skills, setSkills] = useState([]);
+  const [especialidades, setEspecialidades] = useState([]);
 
+
+  useEffect(() => {
+    // Fetch data from an external source (assuming it's an array of objects)
+    const fetchData = async () => {
+      await google.script.run
+        .withSuccessHandler((data) => {
+          setSkills(data);
+          setEspecialidades(data);
+        })
+        .getSkills().getEspecialidades();
+    };
+
+    fetchData();
+  }, []);
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    const formattedData = {
+      ...formData,
+      asesores: formData.asesores.map((activity) => ({ $oid: activity })),
+    };
+
     google.script.run
       .withSuccessHandler((response) => {})
-      .insertAsesor(formData);
+      .insertPlan(formattedData);
   };
+  
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
     setFormData((prevData) => ({
@@ -47,13 +72,19 @@ function Form() {
       celular: newCelular,
     }));
   };
-  const handleRolChange = (e) => {
-    const newRol = e.target.value;
+  const handleSkillsChange = (selectedOptions) => {
     setFormData((prevData) => ({
       ...prevData,
-      rol: newRol,
+      actividades: selectedOptions.map((option) => option.value),
     }));
   };
+  const handleEspecialidadesChange = (selectedOptions) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      actividades: selectedOptions.map((option) => option.value),
+    }));
+  };
+  
   return (
     <>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
@@ -109,18 +140,44 @@ function Form() {
             required
           />
         </div>
-         <div className="max-w-md">
+        <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="rol" value="Rol" />
+            <Label htmlFor="celular" value="Skills" />
           </div>
-          <TextInput 
-            addon="&"
-            id="rol"
-            name="rol"
-            value={formData.rol}
-            onChange={handleRolChange}
-            required />
-        </div> 
+          <Select
+            id="skills"
+            name="skills"
+            options={skills.map((skill) => ({
+              label: skill.nombre,
+              value: skill._id,
+            }))}
+            isMulti
+            value={selectedOptions.map((skill) => ({
+              label: skill.nombre, // Display activity names instead of IDs
+              value: skill._id,
+            }))}
+            onChange={handleSkillsChange}
+          />
+        </div>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="celular" value="Especialidades" />
+          </div>
+          <Select
+            id="especialidades"
+            name="especialidades"
+            options={especialidades.map((especialidad) => ({
+              label: especialidad.nombre,
+              value: especialidad._id,
+            }))}
+            isMulti
+            value={selectedOptions.map((especialidad) => ({
+              label: especialidad.nombre, // Display activity names instead of IDs
+              value: especialidad._id,
+            }))}
+            onChange={handleEspecialidadesChange}
+          />
+        </div>
         <Button type="submit" color="dark">
           Submit
         </Button>

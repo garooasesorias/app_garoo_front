@@ -1,27 +1,26 @@
 function insertAsesor(document) {
-    const result = new MongoDBLib("clientes").insertDocument(
-      "insertOne",
-      document
-    );
+    const result = new MongoDBLib("asesores").insertDocument("insertOne",document);
     return result;
   }
   
   function getAsesores() {
-    const query = {};
-    // const order = { business_name: 1, date: -1 };
-    const order = {};
-    const limit = 100;
+    const collectionName = "asesores"; // Replace with your collection name
+    const mongoDB = new MongoDBLib(collectionName);
   
-    const result = new MongoDBLib("clientes").getDocuments(
-      "find",
+    const query = {}; // Your query conditions
+    const order = { _id: 1 }; // Your sort order
+    const limit = 10; // Limit the number of documents
+  
+    const documents = mongoDB.getDocumentsWithSkillsAndEspecialidades(
+      "aggregate",
       query,
       order,
       limit
     );
-    return result;
+    console.log("Documents with related activities:", documents);
+    return documents;
   }
   
-  function getAsesorById() {}
+  function getPlanById() {}
   
-  function updateAsesorById() {}
-  
+  function updatePlanById() {}

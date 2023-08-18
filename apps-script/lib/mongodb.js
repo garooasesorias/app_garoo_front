@@ -111,6 +111,57 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
+  getDocumentsWithSkillsAndEspecialidades(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "asesores", // Name of the actividades collection
+          let: { asesoresIds: "$asesores" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$asesoresIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "asesores_relacionadas",
+        },
+      },
+      {
+        $sort: order,
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null; // or handle the error appropriately
+    }
+  }
+  
 
   insertDocument(endpoint, document) {
     const payload = {
