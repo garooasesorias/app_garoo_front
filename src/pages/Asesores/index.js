@@ -233,7 +233,10 @@ function Asesores() {
                 {asesor.speciality}
               </span>
               <div className="mt-2 flex space-x-2">
-                <Button className="rounded-lg px-3 py-1 text-sm bg-cyan-700 hover:bg-cyan-800">
+                <Button
+                  color="gray"
+                  className="rounded-lg px-3 py-1 text-sm bg-cyan-700 hover:bg-cyan-800"
+                >
                   {asesor.projects} PROYECTOS
                 </Button>
                 <Button className="rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-100">

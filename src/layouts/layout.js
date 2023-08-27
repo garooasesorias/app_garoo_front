@@ -7,7 +7,9 @@ export function Layout({ children }) {
   return (
     <>
       <Sidebar />
-      <main style={{ marginLeft: "350px" }}>{children}</main>
+      <main style={{ marginLeft: "280px", marginRight: "10px" }}>
+        {children}
+      </main>
       <Footer>{/* Contenido del pie de página */}</Footer>
     </>
   );

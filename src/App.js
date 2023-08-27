@@ -10,6 +10,7 @@ import FormPlanes from "./pages/Planes/components/Form";
 import FormMaterias from "./pages/Materias/components/Form";
 import FormTipoMaterias from "./pages/TipoMaterias/components/Form";
 import FormCotizaciones from "./pages/Cotizaciones/components/Form";
+import FormEstadosCotizaciones from "./pages/EstadosCotizaciones/components/Form";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import Layout from "./layouts/layout";
@@ -21,6 +22,7 @@ import Planes from "./pages/Planes";
 import Materias from "./pages/Materias";
 import TiposMateria from "./pages/TipoMaterias";
 import Cotizaciones from "./pages/Cotizaciones";
+import EstadosCotizaciones from "./pages/EstadosCotizaciones";
 
 function App() {
   return (
@@ -39,6 +41,7 @@ function App() {
         <Route path="/tipoMaterias" element={<TiposMateria />} />
         <Route path="/cotizaciones" element={<Cotizaciones />} />
         <Route path="/formAsesores" element={<FormAsesores />} />
+        {/* <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} /> */}
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />
         <Route path="/formMaterias" element={<FormMaterias />} />
@@ -46,6 +49,11 @@ function App() {
         <Route path="/formTipoActividades" element={<FormTipoActividades />} />
         <Route path="/formTipoMaterias" element={<FormTipoMaterias />} />
         <Route path="/formCotizaciones" element={<FormCotizaciones />} />
+        <Route path="/formCotizaciones/:id" element={<FormCotizaciones />} />
+        <Route
+          path="/formEstadosCotizaciones"
+          element={<FormEstadosCotizaciones />}
+        />
         <Route path="*" element={<Home />} />
       </Routes>
     </Layout>
