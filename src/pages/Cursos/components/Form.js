@@ -1,362 +1,254 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Label, Table } from "flowbite-react";
+import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 
-function CursosForm() {
+const FormCursos = () => {
   let { id } = useParams();
   const [formData, setFormData] = useState({
     fecha: "",
-    cliente: null,
     items: [],
-    total: 0,
-    estado: null,
   });
 
-  const [clientes, setClientes] = useState([]);
-  const [materias, setMaterias] = useState([]);
-  const [planes, setPlanes] = useState([]);
-  const [actividades, setActividades] = useState([]);
-  const [planActividades, setPlanActividades] = useState([]);
-  const [cotizacion, setCotizacion] = useState([]);
-  const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
+  const [curso, setCurso] = useState([]);
+  const [asesores, setAsesores] = useState([]);
+  const [selectedAsesores, setSelectedAsesores] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run.withSuccessHandler(setClientes).getClientes();
-      await google.script.run.withSuccessHandler(setMaterias).getMaterias();
-      await google.script.run.withSuccessHandler(setPlanes).getPlanes();
-      await google.script.run
-        .withSuccessHandler(setActividades)
-        .getActividades();
-      await google.script.run
-        .withSuccessHandler(setEstadosCotizaciones)
-        .getEstadosCotizaciones();
-
       if (id) {
+        // Cargar los datos del curso si es una edición
         await google.script.run
           .withSuccessHandler((data) => {
-            const cotizacion = data[0];
-            // Set the fetched cotizacion data to the state
-            setCotizacion(data[0]);
-
-            // Prepopulate the form fields with data from cotizacion
-            setFormData({
-              fecha: cotizacion.fecha,
-              cliente: {
-                label: cotizacion.cliente.nombre,
-                value: cotizacion.cliente._id,
-              },
-              // You can add other fields similarly
-              items: cotizacion.items.map((item) => ({
-                materia: {
-                  label: item.materia.nombre,
-                  value: item.materia._id,
-                },
-                plan: {
-                  label: item.plan.nombre,
-                  value: item.plan._id,
-                },
-                actividad: item.actividades.map((act) => ({
-                  label: act.nombre,
-                  value: act._id,
-                })),
-              })),
-              total: cotizacion.total,
-              estado: {
-                label: cotizacion.estado.nombre,
-                value: cotizacion.estado._id,
-              },
-            });
-
-            // Log the fetched cotizacion data
+            console.log(data);
+            setCurso(data[0]);
           })
-          .getCotizacionById(id);
+          .getCursoById(id);
+
+        // Cargar los datos de los asesores (debes obtenerlos de alguna fuente)
+        const asesoresData = [
+          {
+            id: 1,
+            nombre: "Bonnie Green",
+            materia: "MATEMATICAS",
+            actividades: 10,
+            estado: "ACTIVO",
+            avatarUrl:
+              "https://avatoon.net/wp-content/uploads/2022/07/Cartoon-Avatar-White-Background-300x300.png", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 75 },
+              { label: "DIS", progress: 25 },
+              { label: "LE", progress: 95 },
+              { label: "OPE", progress: 5 },
+              { label: "SIS", progress: 85 },
+            ],
+          },
+          {
+            id: 2,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          // Agregar más datos de asesores aquí...
+          {
+            id: 3,
+            nombre: "Julian Benavides",
+            materia: "CÁLCULO",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 4,
+            nombre: "Spencer Pain",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 5,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 6,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 7,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 8,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 9,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+          {
+            id: 10,
+            nombre: "Alice Smith",
+            materia: "FISICA",
+            actividades: 5,
+            estado: "INACTIVO",
+            avatarUrl:
+              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+            skills: [
+              { label: "CB", progress: 50 },
+              { label: "DIS", progress: 15 },
+              { label: "LE", progress: 80 },
+              { label: "OPE", progress: 10 },
+              { label: "SIS", progress: 70 },
+            ],
+          },
+        ];
+
+        setAsesores(asesoresData);
       }
     };
 
     fetchData();
   }, []);
 
-  const calculateTotal = () => {
-    let total = 0;
-    for (const fila of formData.items) {
-      if (fila.plan) {
-        const plan = planes.find((plan) => plan._id === fila.plan.value);
-        total += Number(plan.precio); // Supongamos que el precio del plan está almacenado en la propiedad 'precio'
-      }
-    }
-    return total;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
-    const total = calculateTotal(); // Calcular el total
-
-    setFormData((prevData) => ({
-      ...prevData,
-      fecha: currentDate,
-      total: total,
-    }));
-
-    const formattedItems = formData.items.map((item) => ({
-      materia: item.materia ? { $oid: item.materia.value } : null,
-      plan: item.plan ? { $oid: item.plan.value } : null,
-      actividades: item.actividad
-        ? item.actividad.map((act) => ({ $oid: act.value }))
-        : [],
-    }));
-
-    const formattedFormData = {
-      fecha: currentDate,
-      cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
-      estado: { $oid: "64e600985fef1743de870cbc" },
-      items: formattedItems,
-      total: total,
-    };
-
-    google.script.run.withSuccessHandler().insertCotizacion(formattedFormData);
+    // Aquí puedes enviar los datos del formulario al servidor
   };
 
-  // const handleSubmitCurso = () => {
-  //   const formatedFormData = {
-  //     fecha: currentDate,
-  //     cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
-  //     estado
-  //   }
-  // };
-
-  const handleClienteChange = (selectedOption) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      cliente: selectedOption,
+  const handleAsesorChange = (selectedOption, actividadIndex) => {
+    setSelectedAsesores((prevSelectedAsesores) => ({
+      ...prevSelectedAsesores,
+      [actividadIndex]: selectedOption,
     }));
   };
-
-  const handleMateriaChange = (selectedOption, rowIndex) => {
-    const updatedFilas = [...formData.items];
-    updatedFilas[rowIndex].materia = selectedOption;
-    setFormData((prevData) => ({
-      ...prevData,
-      items: updatedFilas,
-    }));
-  };
-
-  const handlePlanChange = (selectedOption, rowIndex) => {
-    const updatedFilas = [...formData.items];
-    updatedFilas[rowIndex].plan = selectedOption;
-
-    if (selectedOption.value !== "personalizado") {
-      const plan = planes.find((plan) => plan._id === selectedOption.value);
-      const actividadesRelacionadas = plan.actividades_relacionadas.map(
-        (actividad, actividadIndex) => ({
-          label: actividad.nombre,
-          value: actividad._id,
-          key: `${rowIndex}-${actividadIndex}`, // Usar rowIndex y actividadIndex
-        })
-      );
-
-      setPlanActividades(actividadesRelacionadas);
-
-      updatedFilas[rowIndex].actividad = actividadesRelacionadas;
-    } else {
-      setPlanActividades([]);
-      updatedFilas[rowIndex].actividad = [];
-    }
-
-    setFormData((prevData) => ({
-      ...prevData,
-      items: updatedFilas,
-    }));
-  };
-
-  const handleActividadChange = (selectedOptions, rowIndex) => {
-    const updatedFilas = [...formData.items];
-    updatedFilas[rowIndex].actividad = selectedOptions;
-    setFormData((prevData) => ({
-      ...prevData,
-      items: updatedFilas,
-    }));
-  };
-
-  const handleEstadoChange = (selectedOption) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      estado: selectedOption,
-    }));
-  };
-
-  const addRow = () => {
-    setFormData((prevData) => ({
-      ...prevData,
-      items: [
-        ...prevData.items,
-        { materia: null, plan: null, actividad: null },
-      ],
-    }));
-  };
-
-  const removeRow = (index) => {
-    const updatedFilas = [...formData.items];
-    updatedFilas.splice(index, 1);
-    setFormData((prevData) => ({
-      ...prevData,
-      items: updatedFilas,
-    }));
-  };
-
-  const isEstadoGenerada =
-    formData.estado && formData.estado.value === "64e600985fef1743de870cbc";
-
-  const isEstadoEnviada =
-    formData.estado && formData.estado.value === "64e5ffdc0bdfb8235d675878";
-
-  const isEstadoAprobada =
-    formData.estado && formData.estado.value === "64e6003c9f5475c68f9c8098";
-
-  const isEstadoRechazada =
-    formData.estado && formData.estado.value === "64e600235fef1743de86a806";
-
-  const isEstadoGestionada =
-    formData.estado && formData.estado.value === "64ea66fb83c29fa14cfa44bf";
 
   return (
     <form
       className="flex max-w-lg mx-auto flex-col gap-4"
       onSubmit={handleSubmit}
     >
-      <div className="mb-4">
-        <label>Cliente:</label>
-        <Select
-          options={clientes.map((cliente) => ({
-            label: cliente.nombre,
-            value: cliente._id,
-          }))}
-          value={formData.cliente}
-          onChange={handleClienteChange}
-        />
-      </div>
       <Table className="mb-4">
         <thead>
           <tr>
-            <th>Materia</th>
-            <th>Plan</th>
-            <th>Actividades</th>
-            <th></th>
+            <th>Actividad de Curso</th>
+            <th>Asesor</th>
           </tr>
         </thead>
         <tbody>
-          {formData.items.map((fila, index) => (
-            <tr key={index}>
-              <td>
-                <Select
-                  options={materias.map((materia) => ({
-                    label: materia.nombre,
-                    value: materia._id,
-                  }))}
-                  value={fila.materia}
-                  onChange={(selectedOption) =>
-                    handleMateriaChange(selectedOption, index)
-                  }
-                />
-              </td>
-              <td>
-                <Select
-                  options={planes.map((plan) => ({
-                    label: plan.nombre,
-                    value: plan._id,
-                  }))}
-                  value={fila.plan}
-                  onChange={(selectedOption) =>
-                    handlePlanChange(selectedOption, index)
-                  }
-                />
-              </td>
-              <td>
-                <Select
-                  options={
-                    fila.plan === "personalizado"
-                      ? actividades
-                      : planActividades
-                  }
-                  value={fila.actividad}
-                  onChange={(selectedOptions) =>
-                    handleActividadChange(selectedOptions, index)
-                  }
-                  isMulti // Habilitar el modo multiselect
-                  isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
-                />
-              </td>
-              <td>
-                <Button color="danger" onClick={() => removeRow(index)}>
-                  Eliminar
-                </Button>
-              </td>
-            </tr>
-          ))}
+          {curso.actividades &&
+            curso.actividades[0].map((actividad, index) => (
+              <tr key={index}>
+                <td>{actividad.nombre}</td>
+                <td>
+                  <Select
+                    options={asesores.map((asesor) => ({
+                      value: asesor.id,
+                      label: `${asesor.nombre} - ${asesor.materia} - ${asesor.actividades} actividades`,
+                    }))}
+                    value={selectedAsesores[index]}
+                    onChange={(selectedOption) =>
+                      handleAsesorChange(selectedOption, index)
+                    }
+                    isSearchable={true} // Permitir buscar por nombre y materia
+                  />
+                </td>
+              </tr>
+            ))}
         </tbody>
       </Table>
 
-      <div className="text-center">
-        <p>Total: {calculateTotal()} USD</p>
-      </div>
-
-      {id && (
-        <div className="mb-4">
-          <label>Estado de Cotización:</label>
-          <Select
-            options={estadosCotizaciones.map((estado) => ({
-              label: estado.nombre,
-              value: estado._id,
-            }))}
-            value={formData.estado}
-            onChange={handleEstadoChange}
-          />
-        </div>
-      )}
-
-      <Button color="success" onClick={addRow}>
-        Agregar Fila +
+      <Button type="submit" color="dark">
+        Submit
       </Button>
-
-      {!id && (
-        <Button type="submit" color="dark">
-          Submit
-        </Button>
-      )}
-
-      {isEstadoGenerada && (
-        <Button color="light">Enviar Cotización al Cliente</Button>
-      )}
-
-      {isEstadoEnviada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Aprobar Cotización</Button>
-          <Button color="light">Rechazar Cotización</Button>
-        </>
-      )}
-
-      {isEstadoAprobada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Rechazar Cotización</Button>
-          <Button color="light">Crear Curso</Button>
-        </>
-      )}
-
-      {isEstadoRechazada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Aprobar Cotización</Button>
-        </>
-      )}
-
-      {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
     </form>
   );
-}
+};
 
-export default CursosForm;
+export default FormCursos;

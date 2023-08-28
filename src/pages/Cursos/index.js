@@ -5,62 +5,68 @@ import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
 
 function Cursos() {
-  const [cotizaciones, setCotizaciones] = useState([]);
+  const [cursos, setCursos] = useState([]);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
       await google.script.run
         .withSuccessHandler((data) => {
-          setCotizaciones(data);
+          console.log(data);
+          setCursos(data);
         })
-        .getCotizaciones();
+        .getCursos();
     };
-
     fetchData();
   }, []);
 
   return (
     <>
-      <Link to="/formCotizaciones">
+      {/* <Link to="/formCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Cotización +
+          Crear Curso +
         </Button>
-      </Link>
+      </Link> */}
       <Table>
         <Table.Head>
           <Table.HeadCell>Fecha</Table.HeadCell>
+          <Table.HeadCell>Materia</Table.HeadCell>
           <Table.HeadCell>Cliente</Table.HeadCell>
-          <Table.HeadCell>Total</Table.HeadCell>
           <Table.HeadCell>Estado</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Ver Detalles</span>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {cotizaciones &&
-            cotizaciones.map((cotizacion) => (
+          {cursos &&
+            cursos.map((curso) => (
               <Table.Row
-                key={cotizacion._id}
+                key={curso._id}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
-                <TableCell>{cotizacion.fecha}</TableCell>
+                <TableCell>{curso.fecha}</TableCell>
+                {/* Renderiza el nombre de la materia */}
                 <Table.Cell>
-                  {/* Muestra la información del cliente */}
-                  {cotizacion.cliente && (
+                  {/* Renderiza la información de la materia */}
+                  {curso.materia && (
                     <>
-                      {cotizacion.cliente.nombre} -{" "}
-                      {cotizacion.cliente.identificacion}
+                      <div>Nombre: {curso.materia.nombre}</div>
+                      <div>Tipo: {curso.materia.tipo}</div>
                     </>
                   )}
                 </Table.Cell>
-                <Table.Cell>${cotizacion.total}</Table.Cell>
                 <Table.Cell>
-                  {cotizacion.estado && cotizacion.estado.nombre}
+                  {/* Muestra la información del cliente */}
+                  {curso.cliente && (
+                    <>
+                      {curso.cliente.nombre} - {curso.cliente.identificacion}
+                    </>
+                  )}
                 </Table.Cell>
+                <Table.Cell>{curso.estado && curso.estado.nombre}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/formCotizaciones/${cotizacion._id}`}
+                    to={`/formCursos/${curso._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Ver Detalles

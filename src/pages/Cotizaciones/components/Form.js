@@ -21,6 +21,8 @@ function CotizacionForm() {
   const [cotizacion, setCotizacion] = useState([]);
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
 
+  const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
+
   useEffect(() => {
     const fetchData = async () => {
       await google.script.run.withSuccessHandler(setClientes).getClientes();
@@ -92,7 +94,6 @@ function CotizacionForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
     const total = calculateTotal(); // Calcular el total
 
     setFormData((prevData) => ({
@@ -120,13 +121,24 @@ function CotizacionForm() {
     google.script.run.withSuccessHandler().insertCotizacion(formattedFormData);
   };
 
-  // const handleSubmitCurso = () => {
-  //   const formatedFormData = {
-  //     fecha: currentDate,
-  //     cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
-  //     estado
-  //   }
-  // };
+  const handleSubmitCurso = () => {
+    console.log(formData);
+    formData.items.forEach(async (item) => {
+      const formatedFormData = {
+        fecha: currentDate,
+        materia: item.materia ? { $oid: item.materia.value } : null,
+        cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
+        estado: { $oid: "64eb986d83c29fa14cbabb69" },
+        actividades: item.actividad
+          ? item.actividad.map((act) => ({ $oid: act.value }))
+          : [],
+      };
+
+      await google.script.run
+        .withSuccessHandler()
+        .insertCurso(formatedFormData);
+    });
+  };
 
   const handleClienteChange = (selectedOption) => {
     setFormData((prevData) => ({
@@ -343,7 +355,9 @@ function CotizacionForm() {
         <>
           <Button color="light">Reenviar Cotización</Button>
           <Button color="light">Rechazar Cotización</Button>
-          <Button color="light">Crear Curso</Button>
+          <Button onClick={handleSubmitCurso} color="light">
+            Crear Curso
+          </Button>
         </>
       )}
 

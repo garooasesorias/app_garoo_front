@@ -11,6 +11,7 @@ import FormMaterias from "./pages/Materias/components/Form";
 import FormTipoMaterias from "./pages/TipoMaterias/components/Form";
 import FormCotizaciones from "./pages/Cotizaciones/components/Form";
 import FormEstadosCotizaciones from "./pages/EstadosCotizaciones/components/Form";
+import FormEstadosCursos from "./pages/EstadosCursos/components/Form";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import Layout from "./layouts/layout";
@@ -23,6 +24,10 @@ import Materias from "./pages/Materias";
 import TiposMateria from "./pages/TipoMaterias";
 import Cotizaciones from "./pages/Cotizaciones";
 import EstadosCotizaciones from "./pages/EstadosCotizaciones";
+import Cursos from "./pages/Cursos";
+import EstadosCursos from "./pages/EstadosCursos";
+import CursosForm from "./pages/Cursos/components/Form";
+import FormCursos from "./pages/Cursos/components/Form";
 
 function App() {
   return (
@@ -40,8 +45,10 @@ function App() {
         <Route path="/materias" element={<Materias />} />
         <Route path="/tipoMaterias" element={<TiposMateria />} />
         <Route path="/cotizaciones" element={<Cotizaciones />} />
+        <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} />
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/estadosCursos" element={<EstadosCursos />} />
         <Route path="/formAsesores" element={<FormAsesores />} />
-        {/* <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} /> */}
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />
         <Route path="/formMaterias" element={<FormMaterias />} />
@@ -54,6 +61,9 @@ function App() {
           path="/formEstadosCotizaciones"
           element={<FormEstadosCotizaciones />}
         />
+        <Route path="/formCursos" element={<FormCursos />} />
+        <Route path="/formCursos/:id" element={<FormCursos />} />
+        <Route path="/formEstadosCursos" element={<FormEstadosCursos />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </Layout>

@@ -199,7 +199,20 @@ function Sidebar() {
                   <NavLink to="/cotizaciones">Cotizaciones</NavLink>
                 </li>
                 <li>
-                  <NavLink to="/estadosCotizaciones">Estados Cotizaciones</NavLink>
+                  <NavLink to="/estadosCotizaciones">
+                    Estados Cotizaciones
+                  </NavLink>
+                </li>
+                {/* Other sub-options for "Actividades" */}
+              </CollapsibleDropdown>
+            </li>
+            <li>
+              <CollapsibleDropdown buttonText="Cursos" icon={<FaCog />}>
+                <li>
+                  <NavLink to="/cursos">Cursos</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>

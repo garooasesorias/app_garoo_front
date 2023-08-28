@@ -3,7 +3,7 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 
-function EstadosCotizaciones() {
+function EstadosCursos() {
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
 
   useEffect(() => {
@@ -63,4 +63,4 @@ function EstadosCotizaciones() {
   );
 }
 
-export default EstadosCotizaciones;
+export default EstadosCursos;

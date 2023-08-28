@@ -20,6 +20,7 @@ function getCotizaciones() {
     order,
     limit
   );
+  console.log("Documents with related Items:", documents);
   return documents;
 }
 
@@ -39,8 +40,6 @@ function getCotizacionById(id) {
     order,
     limit
   );
-  console.log(id);
-  console.log("Documents with related Items:", documents);
   return documents;
 }
 

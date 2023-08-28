@@ -223,6 +223,78 @@ class MongoDBLib {
     }
   }
 
+  getCursos(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "materias",
+          localField: "materia",
+          foreignField: "_id",
+          as: "materia_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "actividades",
+          localField: "actividades",
+          foreignField: "_id",
+          as: "actividades_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "clientes",
+          localField: "cliente",
+          foreignField: "_id",
+          as: "cliente_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "estadosCursos",
+          localField: "estado",
+          foreignField: "_id",
+          as: "estado_info",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          fecha: { $first: "$fecha" },
+          materia: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$materia_info", 0] } },
+          },
+          cliente: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$cliente_info", 0] } },
+          },
+          estado: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$estado_info", 0] } },
+          },
+          actividades: { $push: "$actividades_info" }, // Agrupar actividades en un arreglo
+        },
+      },
+    ];
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  }
   insertDocument(endpoint, document) {
     const payload = {
       document: document,
@@ -233,89 +305,7 @@ class MongoDBLib {
 
     const options = this.createOptions(payload);
     const response = this.executeAPI(endpoint, options);
+    console.log(response);
     return response;
   }
 }
-
-const json = {
-  cliente: {
-    celular: "3343333333",
-    identificacion: "98964",
-    _id: "64d28c3227645306d79acb6e",
-    nombre: "Julian Benavides",
-    correo: "mail@mail.com",
-  },
-  fecha: "2023-08-25T15:07:46.816Z",
-  total: 400,
-  estado: {
-    nombre: "Generada",
-    _id: "64e600985fef1743de870cbc",
-  },
-  _id: "64e8c3c4ce571a977ee9a2f9",
-  items: [
-    {
-      actividades: {
-        precio: "150",
-        tipo: "64da55f2c0919e09477b59a8",
-        _id: "64dabe480add76a0a305a734",
-        nombre: "Quiz 2",
-      },
-      plan: {
-        precio: "400",
-        _id: "64dd1f111a3f8bb16e59b644",
-        actividades: ["64dabe480add76a0a305a734", "64dac5867f3ef1926f2b73a3"],
-        nombre: "Plan 3 ",
-      },
-      materia: {
-        nombre: "Calculo II",
-        tipo: "64dc1e8b1b0f1b5ea3978af8",
-        _id: "64dc206ede10c0d9a0f360a6",
-      },
-    },
-  ],
-};
-const json2 = {
-  fecha: "2023-08-25T15:07:46.816Z",
-  cliente: {
-    celular: "3343333333",
-    identificacion: "98964",
-    _id: "64d28c3227645306d79acb6e",
-    nombre: "Julian Benavides",
-    correo: "mail@mail.com",
-  },
-  estado: {
-    nombre: "Generada",
-    _id: "64e600985fef1743de870cbc",
-  },
-  total: 400,
-  _id: "64e8c3c4ce571a977ee9a2f9",
-  items: [
-    {
-      actividades: [
-        {
-          tipo: "64da55f2c0919e09477b59a8",
-          precio: "150",
-          _id: "64dabe480add76a0a305a734",
-          nombre: "Quiz 2",
-        },
-        {
-          tipo: "64da55f2c0919e09477b59a8",
-          precio: "150",
-          _id: "64dac5867f3ef1926f2b73a3",
-          nombre: "Quiz 4",
-        },
-      ],
-      plan: {
-        precio: "400",
-        _id: "64dd1f111a3f8bb16e59b644",
-        actividades: ["64dabe480add76a0a305a734", "64dac5867f3ef1926f2b73a3"],
-        nombre: "Plan 3 ",
-      },
-      materia: {
-        nombre: "Calculo II",
-        tipo: "64dc1e8b1b0f1b5ea3978af8",
-        _id: "64dc206ede10c0d9a0f360a6",
-      },
-    },
-  ],
-};

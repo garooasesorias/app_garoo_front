@@ -12,7 +12,7 @@ function Form() {
       .withSuccessHandler((response) => {
         console.log(response);
       })
-      .insertEstadoCotizacion(formData);
+      .insertEstadoCurso(formData);
   };
 
   const handleInputChange = (e) => {

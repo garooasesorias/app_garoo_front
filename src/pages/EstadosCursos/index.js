@@ -3,8 +3,8 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 
-function EstadosCotizaciones() {
-  const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
+function EstadosCursos() {
+  const [estadosCursos, setEstadosCursos] = useState([]);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -12,9 +12,9 @@ function EstadosCotizaciones() {
   
       await google.script.run
         .withSuccessHandler((data) => {
-          setEstadosCotizaciones(data);
+          setEstadosCursos(data);
         })
-        .getEstadosCotizaciones();
+        .getEstadosCursos();
     };
 
     fetchData();
@@ -22,9 +22,9 @@ function EstadosCotizaciones() {
 
   return (
     <>
-      <Link to="/formEstadosCotizaciones">
+      <Link to="/formEstadosCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Estado Cotización +
+          Crear Estado Curso +
         </Button>
       </Link>
       <Table>
@@ -36,20 +36,20 @@ function EstadosCotizaciones() {
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {estadosCotizaciones &&
-            estadosCotizaciones.map((estadoCotizacion) => (
+          {estadosCursos &&
+            estadosCursos.map((estadoCurso) => (
               <Table.Row
-                key={estadoCotizacion._id}
+                key={estadoCurso._id}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
                 {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                 {cliente.id}
               </Table.Cell> */}
-                <Table.Cell>{estadoCotizacion.nombre}</Table.Cell>
+                <Table.Cell>{estadoCurso.nombre}</Table.Cell>
 
                 <Table.Cell>
                   <Link
-                    to={`/editTipoMateria/${estadoCotizacion.id}`} // Assuming you have an edit route
+                    to={`/editTipoMateria/${estadoCurso.id}`} // Assuming you have an edit route
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
@@ -63,4 +63,4 @@ function EstadosCotizaciones() {
   );
 }
 
-export default EstadosCotizaciones;
+export default EstadosCursos;
