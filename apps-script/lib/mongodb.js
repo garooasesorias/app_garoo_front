@@ -111,28 +111,28 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
-  getDocumentsWithSkillsAndEspecialidades(endpoint, query, order, limit) {
+  getSkillsWithEspecialidades(endpoint, query, order, limit) {
     const pipeline = [
       {
         $match: query,
       },
       {
         $lookup: {
-          from: "asesores", // Name of the actividades collection
-          let: { asesoresIds: "$asesores" },
+          from: "skills", // Name of the actividades collection
+          let: { actividadIds: "$skills" },
           pipeline: [
             {
               $match: {
                 $expr: {
                   $in: [
                     { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
-                    "$$asesoresIds",
+                    "$$skillIds",
                   ],
                 },
               },
             },
           ],
-          as: "asesores_relacionadas",
+          as: "skills_relacionadas",
         },
       },
       {
@@ -161,8 +161,289 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
+  /*getAsesoresWithSkillsAndEspecialidades(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "skills",
+          localField: "skills.name",
+          foreignField: "_id",
+          as: "skills_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "especialidades",
+          localField: "especialidades.name",
+          foreignField: "_id",
+          as: "especialidades_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "identificacion",
+          localField: "identificacion",
+          foreignField: "_id",
+          as: "identificacion_info",
+        },
+      }, 
+      {
+        $project: {
+          _id: 1,
+          identificacion: 1,
+          nombre: 1,
+          cargo: 1,
+          celular: 1,
+          skills: {
+            $map: {
+              input: "$skills.nombre",
+              as: "skillsID",
+              in: { $mergeObjects: {
+                $arrayElemAt: [
+                  {
+                    $filter: {
+                      input: "$skills_info",
+                      as: "ski",
+                      cond: { $eq: ["$$ski._id", "$$skillsId"] },
+                    },
+                  },
+                  0,
+                ],
+              }, 
+              },
+            },
+          },
+          especialidades: {
+            $map: {
+              input: "$$especialidades.nombre",
+              as: "espeId",
+              in: {
+                $mergeObjects: {
+                  $arrayElemAt: [
+                    {
+                      $filter: {
+                        input: "$actividades_info",
+                        as: "espe",
+                        cond: { $eq: ["$$espe._id", "$$espeId"] },
+                      },
+                    },
+                    0,
+                  ],
+                },
+              },
+            },
+          }
+        },
+      },
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  }*/
+
   
 
+  getCotizacionesWithItems(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "materias",
+          localField: "items.materia",
+          foreignField: "_id",
+          as: "materia_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "planes",
+          localField: "items.plan",
+          foreignField: "_id",
+          as: "plan_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "actividades",
+          localField: "items.actividades",
+          foreignField: "_id",
+          as: "actividades_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "clientes", // Nombre de la colección de clientes
+          localField: "cliente", // Campo que relaciona la cotización con el cliente
+          foreignField: "_id", // Campo en la colección de clientes
+          as: "cliente_info", // Alias para la información del cliente
+        },
+      },
+      {
+        $lookup: {
+          from: "estadosCotizaciones", // Nombre de la colección de clientes
+          localField: "estado", // Campo que relaciona la cotización con el cliente
+          foreignField: "_id", // Campo en la colección de clientes
+          as: "estado_info", // Alias para la información del cliente
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          total: 1,
+          fecha: 1,
+          cliente: {
+            $mergeObjects: { $arrayElemAt: ["$cliente_info", 0] },
+          },
+          estado: {
+            $mergeObjects: { $arrayElemAt: ["$estado_info", 0] },
+          },
+          items: {
+            $map: {
+              input: "$items",
+              as: "item",
+              in: {
+                materia: {
+                  $mergeObjects: { $arrayElemAt: ["$materia_info", 0] },
+                },
+                plan: { $mergeObjects: { $arrayElemAt: ["$plan_info", 0] } },
+                actividades: {
+                  $map: {
+                    input: "$$item.actividades",
+                    as: "actId",
+                    in: {
+                      $mergeObjects: {
+                        $arrayElemAt: [
+                          {
+                            $filter: {
+                              input: "$actividades_info",
+                              as: "act",
+                              cond: { $eq: ["$$act._id", "$$actId"] },
+                            },
+                          },
+                          0,
+                        ],
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  }
+
+  getCursos(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "materias",
+          localField: "materia",
+          foreignField: "_id",
+          as: "materia_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "actividades",
+          localField: "actividades",
+          foreignField: "_id",
+          as: "actividades_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "clientes",
+          localField: "cliente",
+          foreignField: "_id",
+          as: "cliente_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "estadosCursos",
+          localField: "estado",
+          foreignField: "_id",
+          as: "estado_info",
+        },
+      },
+      {
+        $group: {
+          _id: "$_id",
+          fecha: { $first: "$fecha" },
+          materia: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$materia_info", 0] } },
+          },
+          cliente: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$cliente_info", 0] } },
+          },
+          estado: {
+            $first: { $mergeObjects: { $arrayElemAt: ["$estado_info", 0] } },
+          },
+          actividades: { $push: "$actividades_info" }, // Agrupar actividades en un arreglo
+        },
+      },
+    ];
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null;
+    }
+  }
   insertDocument(endpoint, document) {
     const payload = {
       document: document,
@@ -173,6 +454,7 @@ class MongoDBLib {
 
     const options = this.createOptions(payload);
     const response = this.executeAPI(endpoint, options);
+    console.log(response);
     return response;
   }
 }

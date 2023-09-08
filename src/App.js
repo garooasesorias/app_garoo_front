@@ -10,6 +10,8 @@ import FormPlanes from "./pages/Planes/components/Form";
 import FormMaterias from "./pages/Materias/components/Form";
 import FormTipoMaterias from "./pages/TipoMaterias/components/Form";
 import FormCotizaciones from "./pages/Cotizaciones/components/Form";
+import FormEstadosCotizaciones from "./pages/EstadosCotizaciones/components/Form";
+import FormEstadosCursos from "./pages/EstadosCursos/components/Form";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import Layout from "./layouts/layout";
@@ -21,6 +23,15 @@ import Planes from "./pages/Planes";
 import Materias from "./pages/Materias";
 import TiposMateria from "./pages/TipoMaterias";
 import Cotizaciones from "./pages/Cotizaciones";
+import EstadosCotizaciones from "./pages/EstadosCotizaciones";
+import Cursos from "./pages/Cursos";
+import EstadosCursos from "./pages/EstadosCursos";
+import CursosForm from "./pages/Cursos/components/Form";
+import FormCursos from "./pages/Cursos/components/Form";
+import Skills from "./pages/Skills";
+import FormSkills from "./pages/Skills/components/Form"
+import Especialidades from "./pages/Especialidades";
+import FormEspecialidades from "./pages/Especialidades/components/Form"
 
 function App() {
   return (
@@ -31,6 +42,10 @@ function App() {
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/asesores" element={<Asesores />} />
+        <Route path="/skills" element={<Skills />} />
+        <Route path="/formSkills" element={<FormSkills />} />
+        <Route path="/especialidades" element={<Especialidades />} />
+        <Route path="/formEspecialidades" element={<FormEspecialidades />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/actividades" element={<Actividades />} />
         <Route path="/tipoActividades" element={<TipoActividades />} />
@@ -38,6 +53,9 @@ function App() {
         <Route path="/materias" element={<Materias />} />
         <Route path="/tipoMaterias" element={<TiposMateria />} />
         <Route path="/cotizaciones" element={<Cotizaciones />} />
+        <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} />
+        <Route path="/cursos" element={<Cursos />} />
+        <Route path="/estadosCursos" element={<EstadosCursos />} />
         <Route path="/formAsesores" element={<FormAsesores />} />
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />
@@ -46,6 +64,14 @@ function App() {
         <Route path="/formTipoActividades" element={<FormTipoActividades />} />
         <Route path="/formTipoMaterias" element={<FormTipoMaterias />} />
         <Route path="/formCotizaciones" element={<FormCotizaciones />} />
+        <Route path="/formCotizaciones/:id" element={<FormCotizaciones />} />
+        <Route
+          path="/formEstadosCotizaciones"
+          element={<FormEstadosCotizaciones />}
+        />
+        <Route path="/formCursos" element={<FormCursos />} />
+        <Route path="/formCursos/:id" element={<FormCursos />} />
+        <Route path="/formEstadosCursos" element={<FormEstadosCursos />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </Layout>

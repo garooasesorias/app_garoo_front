@@ -15,3 +15,4 @@ node_modules
 tmp
 .clasp.json
 .clasprc.json
+.clasp.json

@@ -1,11 +1,13 @@
 import React, {useState, useEffect}from "react";
-import { Button, Label, TextInput } from "flowbite-react";
+import { useParams } from "react-router-dom";
+import { Button, Label, TextInput, FileInput } from "flowbite-react";
 import Select from "react-select";
 
 
 function Form() {
-  
+  //let { id } = useParams();
   const [formData, setFormData] = useState({
+    avatar:"",
     identificacion:"",
     nombre: "",
     cargo: "",
@@ -14,35 +16,99 @@ function Form() {
     especialidades:[]
 
   });
+ 
   const [skills, setSkills] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
 
-
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
+    
     const fetchData = async () => {
       await google.script.run
         .withSuccessHandler((data) => {
           setSkills(data);
+        })
+        .getSkills();
+        await google.script.run
+        .withSuccessHandler((data) => {
           setEspecialidades(data);
         })
-        .getSkills().getEspecialidades();
+        .getEspecialidades();
+
+ /*    if (id) {
+        await google.script.run
+          .withSuccessHandler((data) => {
+            const asesores = data;
+            // Set the fetched cotizacion data to the state
+            setAsesores(data);
+
+            // Prepopulate the form fields with data from cotizacion
+            setFormData({
+              identificacion: asesores.identificacion,
+              nombre: asesores.nombre,
+              // You can add other fields similarly
+              skills: asesores.skills.map((ski) => ({
+                skill: {
+                  label: ski.skill.nombre,
+                  value: ski.skill._id,
+                },
+              
+              })),
+              especialidades: asesores.especialidades.map((espe) => ({
+                especialidad: {
+                  label: espe.especialidad.nombre,
+                  value: espe.especialidad._id,
+                },
+              
+              })),
+              cargo: asesores.cargo,
+              celular: asesores.celular
+            });
+
+            // Log the fetched cotizacion data
+          })
+          .getAsesoresById(id);
+      }*/
     };
+    
 
     fetchData();
   }, []);
+  function guardarArchivo(e) {
+    var file = e.target.files[0] //the file
+    var reader = new FileReader() //this for convert to Base64 
+    reader.readAsDataURL(e.target.files[0]) //start conversion...
+    reader.onload = function (e) { //.. once finished..
+      var rawLog = reader.result.split(',')[1]; //extract only thee file data part
+      var dataSend = { dataReq: { data: rawLog, name: file.name, type: file.type }, fname: "uploadFilesToGoogleDrive" }; //preapre info to send to API
+      fetch('https://script.google.com/a/macros/garooasesorias.com/s/AKfycbxfvDi-3uPAJ3svy1C5fdGsIUWHm_QGOI3uex_koJGjyOB3bu74yoUirm1OrWXVz-4/exec', //your AppsScript URL
+        { redirect: "follow",
+        method: "POST", 
+        body: JSON.stringify(dataSend), 
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8",
+        },
+       }) //send to Api
+        .then(res => res.json()).then((a) => {
+          console.log(a) //See response
+        }).catch(e => console.log(e)) // Or Error in console
+    }
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
-
-    const formattedData = {
-      ...formData,
-      asesores: formData.asesores.map((activity) => ({ $oid: activity })),
-    };
-
     google.script.run
-      .withSuccessHandler((response) => {})
-      .insertPlan(formattedData);
+      .withSuccessHandler((response) => {
+        console.log(response);
+      })
+      .insertAsesor(formData);
   };
+  /*const handleAvatarChange = (e) => {
+    const newAvatar = e.target.value;
+    setFormData((prevData) => ({
+      ...prevData,
+      avatar: newAvatar,
+    }));
+  };*/
   
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
@@ -81,19 +147,32 @@ function Form() {
   const selectedOptions = skills.filter((skill) =>
   formData.skills.includes(skill._id)
 );
-  const handleEspecialidadesChange = (selectedOptions) => {
+  const handleEspecialidadesChange = (selectedOptionsEspecialidades) => {
     setFormData((prevData) => ({
       ...prevData,
-      especialidades: selectedOptions.map((option) => option.value),
+      especialidades: selectedOptionsEspecialidades.map((option) => option.value),
     }));
   };
-  const selectedOptionsEspecialidaddes = especialidades.filter((especialidad) =>
+  const selectedOptionsEspecialidades = especialidades.filter((especialidad) =>
   formData.especialidades.includes(especialidad._id)
 );
   
   return (
     <>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="avatar" value="Avatar" />
+          </div>
+          <FileInput
+            addon="PH"
+            id="customFile"
+            name="avatar"
+            value={formData.avatar}
+            onChange={(e) => guardarArchivo(e)}
+            required
+          />
+        </div>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="identificacion" value="Identificacion" />
@@ -177,7 +256,7 @@ function Form() {
               value: especialidad._id,
             }))}
             isMulti
-            value={selectedOptionsEspecialidaddes.map((especialidad) => ({
+            value={selectedOptionsEspecialidades.map((especialidad) => ({
               label: especialidad.nombre, // Display activity names instead of IDs
               value: especialidad._id,
             }))}
