@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { format } from "date-fns";
 
 const estadosAdm = [
   "Enviado",
@@ -27,6 +30,7 @@ const FormCursos = () => {
   const [curso, setCurso] = useState([]);
   const [asesores, setAsesores] = useState([]);
   const [selectedAsesores, setSelectedAsesores] = useState({});
+  const [selectedDates, setSelectedDates] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
@@ -223,7 +227,12 @@ const FormCursos = () => {
     }));
   };
 
-  // ... (código previo)
+  const handleDateChange = (date, actividadIndex) => {
+    setSelectedDates((prevSelectedDates) => ({
+      ...prevSelectedDates,
+      [actividadIndex]: date,
+    }));
+  };
 
   return (
     <form
@@ -250,6 +259,22 @@ const FormCursos = () => {
               <Table.HeadCell key={actividadIndex}>
                 <div className="flex flex-col">
                   <div className="mb-2">Actividad: {actividad.nombre}</div>
+                  <div className="flex items-center">
+                    <span className="mr-2">Fecha de Vencimiento:</span>
+                    <div className="ml-auto">
+                      {" "}
+                      {/* Añadir ml-auto para alinear a la derecha */}
+                      <DatePicker
+                        selected={selectedDates[actividadIndex]}
+                        onChange={(date) =>
+                          handleDateChange(date, actividadIndex)
+                        }
+                        dateFormat="dd/MM/yyyy" // Puedes personalizar el formato de fecha
+                        isClearable // Permite borrar la fecha seleccionada
+                        className="datepicker-custom"
+                      />
+                    </div>
+                  </div>
                   <div className="flex items-center">
                     <span className="mr-2">Asesor:</span>
                     <div className="ml-auto">
