@@ -33,6 +33,7 @@ function Cursos() {
           <Table.HeadCell>Materia</Table.HeadCell>
           <Table.HeadCell>Cliente</Table.HeadCell>
           <Table.HeadCell>Estado</Table.HeadCell>
+          <Table.HeadCell>Actividades</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Ver Detalles</span>
           </Table.HeadCell>
@@ -64,6 +65,9 @@ function Cursos() {
                   )}
                 </Table.Cell>
                 <Table.Cell>{curso.estado && curso.estado.nombre}</Table.Cell>
+                <Table.Cell>
+                  {curso.actividades && curso.actividades.length}
+                </Table.Cell>
                 <Table.Cell>
                   <Link
                     to={`/formCursos/${curso._id}`}

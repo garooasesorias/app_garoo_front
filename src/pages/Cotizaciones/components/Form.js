@@ -85,7 +85,7 @@ function CotizacionForm() {
     for (const fila of formData.items) {
       if (fila.plan) {
         const plan = planes.find((plan) => plan._id === fila.plan.value);
-        total += Number(plan.precio); // Supongamos que el precio del plan está almacenado en la propiedad 'precio'
+        total += Number(plan?.precio); // Supongamos que el precio del plan está almacenado en la propiedad 'precio'
       }
     }
     return total;
@@ -130,7 +130,13 @@ function CotizacionForm() {
         cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
         estado: { $oid: "64eb986d83c29fa14cbabb69" },
         actividades: item.actividad
-          ? item.actividad.map((act) => ({ $oid: act.value }))
+          ? item.actividad.map((act) => ({
+              _id: { $oid: act.value },
+              asesor: null,
+              estadoAdm: null,
+              estadoAsesor: null,
+              nota: 0,
+            }))
           : [],
       };
 

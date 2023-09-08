@@ -226,7 +226,7 @@ class MongoDBLib {
   getCursos(endpoint, query, order, limit) {
     const pipeline = [
       {
-        $match: query,
+        $match: query, // Agrega tu filtro aquí si es necesario
       },
       {
         $lookup: {
@@ -234,14 +234,6 @@ class MongoDBLib {
           localField: "materia",
           foreignField: "_id",
           as: "materia_info",
-        },
-      },
-      {
-        $lookup: {
-          from: "actividades",
-          localField: "actividades",
-          foreignField: "_id",
-          as: "actividades_info",
         },
       },
       {
@@ -261,6 +253,17 @@ class MongoDBLib {
         },
       },
       {
+        $unwind: "$actividades", // Descomponer actividades de curso.actividades
+      },
+      {
+        $lookup: {
+          from: "actividades",
+          localField: "actividades._id",
+          foreignField: "_id",
+          as: "actividad_info",
+        },
+      },
+      {
         $group: {
           _id: "$_id",
           fecha: { $first: "$fecha" },
@@ -273,10 +276,36 @@ class MongoDBLib {
           estado: {
             $first: { $mergeObjects: { $arrayElemAt: ["$estado_info", 0] } },
           },
-          actividades: { $push: "$actividades_info" }, // Agrupar actividades en un arreglo
+          actividades: {
+            $push: {
+              $mergeObjects: [
+                { $arrayElemAt: ["$actividad_info", 0] }, // Propiedades de actividades
+                {
+                  // Propiedades locales
+                  asesor: "$actividades.asesor",
+                  nota: "$actividades.nota",
+                  estadoAdm: "$actividades.estadoAdm",
+                  estadoAsesor: "$actividades.estadoAsesor",
+                },
+              ],
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          _id: 1,
+          fecha: 1,
+          materia: 1,
+          cliente: 1,
+          estado: 1,
+          actividades: 1,
         },
       },
     ];
+
+    // Ejecuta la consulta en tu base de datos
+
     const payload = {
       pipeline: pipeline,
       collection: this.collection,

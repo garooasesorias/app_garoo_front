@@ -3,6 +3,20 @@ import { useParams } from "react-router-dom";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 
+const estadosAdm = [
+  "Enviado",
+  "Pendiente",
+  "Finalizado",
+  "Pendiente - sin Aporte",
+  "Cancelado",
+  "No Requerido",
+  "Subcontratado",
+  "No entregado",
+  "Revisado",
+];
+
+const estadosAsesor = ["Enviado", "Pendiente", "Finalizado"];
+
 const FormCursos = () => {
   let { id } = useParams();
   const [formData, setFormData] = useState({
@@ -209,39 +223,104 @@ const FormCursos = () => {
     }));
   };
 
+  // ... (código previo)
+
   return (
     <form
-      className="flex max-w-lg mx-auto flex-col gap-4"
+      className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
     >
-      <Table className="mb-4">
-        <thead>
-          <tr>
-            <th>Actividad de Curso</th>
-            <th>Asesor</th>
-          </tr>
-        </thead>
-        <tbody>
+      {curso.cliente && (
+        <h2
+          style={{
+            fontSize: "24px",
+            fontWeight: "bold",
+            margin: "16px 0",
+            textAlign: "center",
+          }}
+        >
+          {curso.materia.nombre} - {curso.cliente.nombre} - {curso.fecha}
+        </h2>
+      )}
+      <Table>
+        <Table.Head>
+          <Table.HeadCell>Estudiante</Table.HeadCell>
           {curso.actividades &&
-            curso.actividades[0].map((actividad, index) => (
-              <tr key={index}>
-                <td>{actividad.nombre}</td>
-                <td>
-                  <Select
-                    options={asesores.map((asesor) => ({
-                      value: asesor.id,
-                      label: `${asesor.nombre} - ${asesor.materia} - ${asesor.actividades} actividades`,
-                    }))}
-                    value={selectedAsesores[index]}
-                    onChange={(selectedOption) =>
-                      handleAsesorChange(selectedOption, index)
-                    }
-                    isSearchable={true} // Permitir buscar por nombre y materia
-                  />
-                </td>
-              </tr>
+            curso.actividades.map((actividad, actividadIndex) => (
+              <Table.HeadCell key={actividadIndex}>
+                <div className="flex flex-col">
+                  <div className="mb-2">Actividad: {actividad.nombre}</div>
+                  <div className="flex items-center">
+                    <span className="mr-2">Asesor:</span>
+                    <div className="ml-auto">
+                      {" "}
+                      {/* Añadir ml-auto para alinear a la derecha */}
+                      <Select
+                        options={asesores.map((asesor) => ({
+                          value: asesor.id,
+                          label: asesor.nombre,
+                        }))}
+                        value={selectedAsesores[actividadIndex]}
+                        onChange={(selectedOption) =>
+                          handleAsesorChange(selectedOption, actividadIndex)
+                        }
+                        isSearchable={true}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="mr-2">Estado ADM:</span>
+                    <div className="ml-auto">
+                      {" "}
+                      {/* Añadir ml-auto para alinear a la derecha */}
+                      <Select
+                        options={estadosAdm.map((estado) => ({
+                          value: estado,
+                          label: estado,
+                        }))}
+                        // Añade aquí el estado seleccionado para los estados ADM
+                        // value={selectedEstadosADM[actividadIndex]}
+                        // onChange={(selectedOption) =>
+                        //   handleEstadoADMChange(selectedOption, actividadIndex)
+                        // }
+                        isSearchable={true}
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center">
+                    <span className="mr-2">Estado Asesor:</span>
+                    <div className="ml-auto">
+                      {" "}
+                      {/* Añadir ml-auto para alinear a la derecha */}
+                      <Select
+                        options={estadosAsesor.map((estado) => ({
+                          value: estado,
+                          label: estado,
+                        }))}
+                        // Añade aquí el estado seleccionado para los estados Asesor
+                        // value={selectedEstadosAsesor[actividadIndex]}
+                        // onChange={(selectedOption) =>
+                        //   handleEstadoAsesorChange(selectedOption, actividadIndex)
+                        // }
+                        isSearchable={true}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Table.HeadCell>
             ))}
-        </tbody>
+        </Table.Head>
+        <Table.Body>
+          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+              {curso.cliente && curso.cliente.nombre}
+            </Table.Cell>
+            {curso.actividades &&
+              curso.actividades.map((actividad, actividadIndex) => (
+                <Table.Cell key={actividadIndex}>0</Table.Cell>
+              ))}
+          </Table.Row>
+        </Table.Body>
       </Table>
 
       <Button type="submit" color="dark">
