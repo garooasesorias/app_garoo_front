@@ -1,40 +1,37 @@
-import React, {useState, useEffect}from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Label, TextInput, FileInput } from "flowbite-react";
 import Select from "react-select";
 
-
 function Form() {
   //let { id } = useParams();
   const [formData, setFormData] = useState({
-    avatar:"",
-    identificacion:"",
+    avatar: "",
+    identificacion: "",
     nombre: "",
     cargo: "",
     celular: "",
     skills: [],
-    especialidades:[]
-
+    especialidades: [],
   });
- 
+
   const [skills, setSkills] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
 
   useEffect(() => {
-    
     const fetchData = async () => {
       await google.script.run
         .withSuccessHandler((data) => {
           setSkills(data);
         })
         .getSkills();
-        await google.script.run
+      await google.script.run
         .withSuccessHandler((data) => {
           setEspecialidades(data);
         })
         .getEspecialidades();
 
- /*    if (id) {
+      /*    if (id) {
         await google.script.run
           .withSuccessHandler((data) => {
             const asesores = data;
@@ -69,29 +66,41 @@ function Form() {
           .getAsesoresById(id);
       }*/
     };
-    
 
     fetchData();
   }, []);
   function guardarArchivo(e) {
-    var file = e.target.files[0] //the file
-    var reader = new FileReader() //this for convert to Base64 
-    reader.readAsDataURL(e.target.files[0]) //start conversion...
-    reader.onload = function (e) { //.. once finished..
-      var rawLog = reader.result.split(',')[1]; //extract only thee file data part
-      var dataSend = { dataReq: { data: rawLog, name: file.name, type: file.type }, fname: "uploadFilesToGoogleDrive" }; //preapre info to send to API
-      fetch('https://script.google.com/a/macros/garooasesorias.com/s/AKfycbxfvDi-3uPAJ3svy1C5fdGsIUWHm_QGOI3uex_koJGjyOB3bu74yoUirm1OrWXVz-4/exec', //your AppsScript URL
-        { redirect: "follow",
-        method: "POST", 
-        body: JSON.stringify(dataSend), 
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8",
-        },
-       }) //send to Api
-        .then(res => res.json()).then((a) => {
-          console.log(a) //See response
-        }).catch(e => console.log(e)) // Or Error in console
-    }
+    var file = e.target.files[0]; //the file
+    var reader = new FileReader(); //this for convert to Base64
+    reader.readAsDataURL(e.target.files[0]); //start conversion...
+    reader.onload = function (e) {
+      //.. once finished..
+      var rawLog = reader.result.split(",")[1]; //extract only thee file data part
+      var dataSend = {
+        dataReq: { data: rawLog, name: file.name, type: file.type },
+        fname: "uploadFilesToGoogleDrive",
+      }; //preapre info to send to API
+      fetch(
+        "https://script.google.com/a/macros/garooasesorias.com/s/AKfycbwXUFvLqesoMAD3e05inAZyt5152TYLagcS7z_W8TnYFqOTeEcVgY0glU_Jnr6m0kQ/exec",
+        {
+          method: "POST",
+          mode: "no-cors", // Establece el modo 'no-cors' aquí
+          redirect: "follow",
+          body: JSON.stringify(dataSend),
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8",
+          },
+        }
+      )
+        // .then((res) => res.json())
+        .then((a) => {
+          console.log(a); // Ver respuesta
+        })
+        .catch((e) => {
+          console.log("Dentro error funcion guardar Archivo");
+          console.log(e);
+        }); // O error en la consola
+    };
   }
 
   const handleSubmit = (e) => {
@@ -109,7 +118,7 @@ function Form() {
       avatar: newAvatar,
     }));
   };*/
-  
+
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
     setFormData((prevData) => ({
@@ -145,18 +154,20 @@ function Form() {
     }));
   };
   const selectedOptions = skills.filter((skill) =>
-  formData.skills.includes(skill._id)
-);
+    formData.skills.includes(skill._id)
+  );
   const handleEspecialidadesChange = (selectedOptionsEspecialidades) => {
     setFormData((prevData) => ({
       ...prevData,
-      especialidades: selectedOptionsEspecialidades.map((option) => option.value),
+      especialidades: selectedOptionsEspecialidades.map(
+        (option) => option.value
+      ),
     }));
   };
   const selectedOptionsEspecialidades = especialidades.filter((especialidad) =>
-  formData.especialidades.includes(especialidad._id)
-);
-  
+    formData.especialidades.includes(especialidad._id)
+  );
+
   return (
     <>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
@@ -191,26 +202,26 @@ function Form() {
             <Label htmlFor="nombre" value="Nombre" />
           </div>
           <TextInput
-          addon="Nombre"
-          id="nombre"
-          name="nombre"
-          value={formData.nombre}
-          onChange={handleNombreChange}
-          required
+            addon="Nombre"
+            id="nombre"
+            name="nombre"
+            value={formData.nombre}
+            onChange={handleNombreChange}
+            required
           />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="cargo" value="Cargo" />
           </div>
-          <TextInput 
-         addon="Cargo"
-         id="cargo"
-         name="cargo"
-         value={formData.cargo}
-         onChange={handleCargoChange}
-          required
-           />
+          <TextInput
+            addon="Cargo"
+            id="cargo"
+            name="cargo"
+            value={formData.cargo}
+            onChange={handleCargoChange}
+            required
+          />
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
