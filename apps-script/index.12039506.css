@@ -459,6 +459,37 @@
   color: green;
 }
 
+.react-datepicker__day--holidays, .react-datepicker__month-text--holidays, .react-datepicker__quarter-text--holidays, .react-datepicker__year-text--holidays {
+  color: #fff;
+  background-color: #ff6803;
+  border-radius: .3rem;
+  position: relative;
+}
+
+.react-datepicker__day--holidays .holiday-overlay, .react-datepicker__month-text--holidays .holiday-overlay, .react-datepicker__quarter-text--holidays .holiday-overlay, .react-datepicker__year-text--holidays .holiday-overlay {
+  color: #fff;
+  white-space: nowrap;
+  visibility: hidden;
+  opacity: 0;
+  background-color: #333;
+  border-radius: 4px;
+  padding: 4px;
+  transition: visibility, opacity .3s ease-in-out;
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.react-datepicker__day--holidays:hover, .react-datepicker__month-text--holidays:hover, .react-datepicker__quarter-text--holidays:hover, .react-datepicker__year-text--holidays:hover {
+  background-color: #cf5300;
+}
+
+.react-datepicker__day--holidays:hover .holiday-overlay, .react-datepicker__month-text--holidays:hover .holiday-overlay, .react-datepicker__quarter-text--holidays:hover .holiday-overlay, .react-datepicker__year-text--holidays:hover .holiday-overlay {
+  visibility: visible;
+  opacity: 1;
+}
+
 .react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range, .react-datepicker__quarter-text--selected, .react-datepicker__quarter-text--in-selecting-range, .react-datepicker__quarter-text--in-range, .react-datepicker__year-text--selected, .react-datepicker__year-text--in-selecting-range, .react-datepicker__year-text--in-range {
   color: #fff;
   background-color: #216ba5;
