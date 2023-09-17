@@ -17,15 +17,15 @@ function doPost(request = {}) {
 
   const response = {
     status: "function not found: " + fname, // prepare response in function not found
-    data2: dataReq,
+    data2: dataReq
   };
   switch (
     fname //function selection
   ) {
     case "uploadFilesToGoogleDrive":
-      var output = JSON.stringify(
-        uploadFilesToGoogleDrive(dataReq.data, dataReq.name, dataReq.type)
-      ); //call function with data, name and type from request
+      var output = 
+      JSON.stringify(uploadFilesToGoogleDrive(dataReq.data, dataReq.name, dataReq.type))
+      ; //call function with data, name and type from request
       break;
     default:
       var output = JSON.stringify(response);
@@ -42,7 +42,7 @@ function uploadFilesToGoogleDrive(data, name, type) {
   var folder = DriveApp.getFolderById("14lYRccoOW7AOqp-_lKOwr_ynFvl0LXym"); //select folder to save
   var newFile = folder.createFile(blob); // create and save
   newFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); // set permision to anyone to view
-  var url = newFile.getUrl(); //get the file URL to share
+  var url = newFile.getUrl(data);  //get the file URL to share
   var id = newFile.getId();
   let obj = { url, id }; //prepare object to response
   return obj;

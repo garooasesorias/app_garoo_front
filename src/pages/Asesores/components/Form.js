@@ -31,60 +31,33 @@ function Form() {
         })
         .getEspecialidades();
 
-      /*    if (id) {
-        await google.script.run
-          .withSuccessHandler((data) => {
-            const asesores = data;
-            // Set the fetched cotizacion data to the state
-            setAsesores(data);
-
-            // Prepopulate the form fields with data from cotizacion
-            setFormData({
-              identificacion: asesores.identificacion,
-              nombre: asesores.nombre,
-              // You can add other fields similarly
-              skills: asesores.skills.map((ski) => ({
-                skill: {
-                  label: ski.skill.nombre,
-                  value: ski.skill._id,
-                },
-              
-              })),
-              especialidades: asesores.especialidades.map((espe) => ({
-                especialidad: {
-                  label: espe.especialidad.nombre,
-                  value: espe.especialidad._id,
-                },
-              
-              })),
-              cargo: asesores.cargo,
-              celular: asesores.celular
-            });
-
-            // Log the fetched cotizacion data
-          })
-          .getAsesoresById(id);
-      }*/
     };
 
     fetchData();
   }, []);
+  
   function guardarArchivo(e) {
-    var file = e.target.files[0]; //the file
+    var file = e.target.files[0];
+    if (file) {
+      // Actualizar el nombre del archivo en el estado
+      setFormData({
+        ...formData,
+        avatar: file.name
+      });
+    } //the file
     var reader = new FileReader(); //this for convert to Base64
-    reader.readAsDataURL(e.target.files[0]); //start conversion...
-    reader.onload = function (e) {
-      //.. once finished..
+    reader.readAsDataURL(e.target.files[0]);   //start conversion...
+    reader.onload = function (e) { //.. once finished..
       var rawLog = reader.result.split(",")[1]; //extract only thee file data part
       var dataSend = {
-        dataReq: { data: rawLog, name: file.name, type: file.type },
+        dataReq: { data: rawLog, name: file.name, type: file.type},
         fname: "uploadFilesToGoogleDrive",
       }; //preapre info to send to API
       fetch(
         "https://script.google.com/a/macros/garooasesorias.com/s/AKfycbwXUFvLqesoMAD3e05inAZyt5152TYLagcS7z_W8TnYFqOTeEcVgY0glU_Jnr6m0kQ/exec",
         {
           method: "POST",
-          mode: "no-cors", // Establece el modo 'no-cors' aquí
+          mode: "no-cors", 
           redirect: "follow",
           body: JSON.stringify(dataSend),
           headers: {
@@ -92,17 +65,16 @@ function Form() {
           },
         }
       )
-        // .then((res) => res.json())
-        .then((a) => {
-          console.log(a); // Ver respuesta
+      //.then(res => res.json())
+      .then((a) => {
+        console.log(a); // Ver respuesta
         })
         .catch((e) => {
-          console.log("Dentro error funcion guardar Archivo");
           console.log(e);
         }); // O error en la consola
     };
   }
-
+  //https://drive.google.com/file/d/1WDgTpoWQdjy_BiCuladN3Cs4bAPBePp3/view?usp=drive_link
   const handleSubmit = (e) => {
     e.preventDefault();
     google.script.run
@@ -173,16 +145,23 @@ function Form() {
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="avatar" value="Avatar" />
+            <Label htmlFor="avatar" value="Avatar" className="cursor-pointer" />
           </div>
           <FileInput
             addon="PH"
             id="customFile"
             name="avatar"
-            value={formData.avatar}
+            accept="image/*"
             onChange={(e) => guardarArchivo(e)}
             required
           />
+         <Label htmlFor="avatar" className="cursor-pointer">
+        {formData.avatar ? (
+          <span>{formData.avatar}</span>
+        ) : (
+          <span className=""> </span>
+        )}
+      </Label>
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
