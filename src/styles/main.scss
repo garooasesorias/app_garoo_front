@@ -1,13 +1,22 @@
-h1{
-    color: green;
-    font-size: 2rem;
+h1 {
+  color: green;
+  font-size: 2rem;
 }
 p {
-    color: purple;
+  color: purple;
 }
 
 main {
-    margin-left: 300px;
-    margin-top: 30px;
+  margin-left: 300px;
+  margin-top: 30px;
 }
 
+/* styles.css */
+.datepicker-custom {
+  /* Personaliza los estilos aquí */
+  font-size: 14px;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  /* Añade otros estilos según tus preferencias */
+}
