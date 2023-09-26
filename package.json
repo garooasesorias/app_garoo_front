@@ -20,14 +20,27 @@
     "@google/clasp": "^2.4.2",
     "@parcel/transformer-sass": "^2.9.3",
     "@types/google-apps-script": "^1.0.65",
+ 
+ 
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.3.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
     "parcel": "^2.9.3",
+    
     "postcss": "^8.4.27",
     "process": "^0.11.10",
-    "tailwindcss": "^3.3.3"
+    
+    
+    "stream-http": "^3.2.0",
+    "tailwindcss": "^3.3.3",
+    "url": "^0.11.3",
+    "util": "^0.12.5"
   },
   "dependencies": {
     "flowbite": "^1.7.0",
     "flowbite-react": "^0.5.0",
+    "googleapis": "^126.0.1",
     "immutable": "^4.3.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

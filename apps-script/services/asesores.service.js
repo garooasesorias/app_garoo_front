@@ -21,6 +21,18 @@ function getAsesores() {
   return documents;
 }
 
+function guardarImagenEnGoogleDrive(data, name, type) {
+  
+  var folder = DriveApp.getFolderById("14lYRccoOW7AOqp-_lKOwr_ynFvl0LXym");
+  var newFile = folder.createFile(blob);
+  newFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT);
+
+  var imageUrl = newFile.getUrl(); // Obtén la URL de la imagen
+
+  // Devuelve la URL como respuesta
+  return imageUrl;
+}
+
 function getAsesoresById(id) {
  /* const collectionName = "asesores"; // Replace with your collection name
   const mongoDB = new MongoDBLib(collectionName);

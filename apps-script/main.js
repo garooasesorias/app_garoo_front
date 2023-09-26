@@ -42,7 +42,7 @@ function uploadFilesToGoogleDrive(data, name, type) {
   var folder = DriveApp.getFolderById("14lYRccoOW7AOqp-_lKOwr_ynFvl0LXym"); //select folder to save
   var newFile = folder.createFile(blob); // create and save
   newFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); // set permision to anyone to view
-  var url = newFile.getUrl(data);  //get the file URL to share
+  var url = newFile.getUrl();  //get the file URL to share
   var id = newFile.getId();
   let obj = { url, id }; //prepare object to response
   return obj;
