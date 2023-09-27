@@ -80,26 +80,29 @@ function Form() {
         dataReq: { data: rawLog, name: file.name, type: file.type },
         fname: "uploadFilesToGoogleDrive",
       }; //preapre info to send to API
-      fetch(
-        "https://script.google.com/a/macros/garooasesorias.com/s/AKfycbwXUFvLqesoMAD3e05inAZyt5152TYLagcS7z_W8TnYFqOTeEcVgY0glU_Jnr6m0kQ/exec",
-        {
-          method: "POST",
-          mode: "no-cors", // Establece el modo 'no-cors' aquí
-          redirect: "follow",
-          body: JSON.stringify(dataSend),
-          headers: {
-            "Content-Type": "text/plain;charset=utf-8",
-          },
-        }
-      )
-        // .then((res) => res.json())
-        .then((a) => {
-          console.log(a); // Ver respuesta
-        })
-        .catch((e) => {
-          console.log("Dentro error funcion guardar Archivo");
-          console.log(e);
-        }); // O error en la consola
+      google.script.run.withSuccessHandler((response)=>{
+        console.log(response);
+      }).uploadFilesToGoogleDrive(dataSend.dataReq.data, dataSend.dataReq.name, dataSend.dataReq.type);
+      // fetch(
+      //   "https://script.google.com/a/macros/garooasesorias.com/s/AKfycbwXUFvLqesoMAD3e05inAZyt5152TYLagcS7z_W8TnYFqOTeEcVgY0glU_Jnr6m0kQ/exec",
+      //   {
+      //     method: "POST",
+      //     mode: "no-cors", // Establece el modo 'no-cors' aquí
+      //     redirect: "follow",
+      //     body: JSON.stringify(dataSend),
+      //     headers: {
+      //       "Content-Type": "text/plain;charset=utf-8",
+      //     },
+      //   }
+      // )
+      //   // .then((res) => res.json())
+      //   .then((a) => {
+      //     console.log(a); // Ver respuesta
+      //   })
+      //   .catch((e) => {
+      //     console.log("Dentro error funcion guardar Archivo");
+      //     console.log(e);
+      //   }); // O error en la consola
     };
   }
 

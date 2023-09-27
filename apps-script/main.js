@@ -1,8 +1,8 @@
-const findEndpoint =
-  "https://us-east-1.aws.data.mongodb-api.com/app/data-wrmqs/endpoint/data/v1/action/find";
-const clusterName = "Cluster0";
-const apiKey =
-  "FUQ2alqUudxvlD7vmU2cTDdUhtYdBnWf8WOEyRFCDk9APPPPtefutF1579Pf0lMi";
+// const findEndpoint =
+//   "https://us-east-1.aws.data.mongodb-api.com/app/data-wrmqs/endpoint/data/v1/action/find";
+// const clusterName = "Cluster0";
+// const apiKey =
+//   "FUQ2alqUudxvlD7vmU2cTDdUhtYdBnWf8WOEyRFCDk9APPPPtefutF1579Pf0lMi";
 
 function doGet() {
   return HtmlService.createTemplateFromFile("index")
@@ -34,18 +34,6 @@ function doPost(request = {}) {
   return ContentService.createTextOutput(output).setMimeType(
     ContentService.MimeType.JSON
   ); //response to frontend
-}
-
-function uploadFilesToGoogleDrive(data, name, type) {
-  var datafile = Utilities.base64Decode(data); // convert to Binary (from Base4) Utilities is native from AppsScript
-  var blob = Utilities.newBlob(datafile, type, name); // structure the file
-  var folder = DriveApp.getFolderById("14lYRccoOW7AOqp-_lKOwr_ynFvl0LXym"); //select folder to save
-  var newFile = folder.createFile(blob); // create and save
-  newFile.setSharing(DriveApp.Access.ANYONE, DriveApp.Permission.EDIT); // set permision to anyone to view
-  var url = newFile.getUrl(); //get the file URL to share
-  var id = newFile.getId();
-  let obj = { url, id }; //prepare object to response
-  return obj;
 }
 
 // function getClientes() {
