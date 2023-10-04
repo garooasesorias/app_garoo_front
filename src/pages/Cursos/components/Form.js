@@ -3,36 +3,22 @@ import { useParams } from "react-router-dom";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
-
-//TESTING
-
-const estadosAdm = [
-  "Enviado",
-  "Pendiente",
-  "Finalizado",
-  "Pendiente - sin Aporte",
-  "Cancelado",
-  "No Requerido",
-  "Subcontratado",
-  "No entregado",
-  "Revisado",
-];
-
-const estadosAsesor = ["Enviado", "Pendiente", "Finalizado"];
 
 const FormCursos = () => {
   let { id } = useParams();
   const [formData, setFormData] = useState({
     fecha: "",
     items: [],
+    actividades: [],
   });
 
   const [curso, setCurso] = useState([]);
   const [asesores, setAsesores] = useState([]);
   const [selectedAsesores, setSelectedAsesores] = useState({});
   const [selectedDates, setSelectedDates] = useState({});
+  const [estadosAdm, setEstadosAdm] = useState([]);
+  const [estadosAsesor, setEstadosAsesores] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,175 +28,182 @@ const FormCursos = () => {
           .withSuccessHandler((data) => {
             console.log(data);
             setCurso(data[0]);
+            
           })
           .getCursoById(id);
 
         // Cargar los datos de los asesores (debes obtenerlos de alguna fuente)
-        const asesoresData = [
-          {
-            id: 1,
-            nombre: "Bonnie Green",
-            materia: "MATEMATICAS",
-            actividades: 10,
-            estado: "ACTIVO",
-            avatarUrl:
-              "https://avatoon.net/wp-content/uploads/2022/07/Cartoon-Avatar-White-Background-300x300.png", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 75 },
-              { label: "DIS", progress: 25 },
-              { label: "LE", progress: 95 },
-              { label: "OPE", progress: 5 },
-              { label: "SIS", progress: 85 },
-            ],
-          },
-          {
-            id: 2,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          // Agregar más datos de asesores aquí...
-          {
-            id: 3,
-            nombre: "Julian Benavides",
-            materia: "CÁLCULO",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 4,
-            nombre: "Spencer Pain",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 5,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 6,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 7,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 8,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 9,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 10,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-        ];
+        // const asesoresData = [
+        //   {
+        //     id: 1,
+        //     nombre: "Bonnie Green",
+        //     materia: "MATEMATICAS",
+        //     actividades: 10,
+        //     estado: "ACTIVO",
+        //     avatarUrl:
+        //       "https://avatoon.net/wp-content/uploads/2022/07/Cartoon-Avatar-White-Background-300x300.png", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 75 },
+        //       { label: "DIS", progress: 25 },
+        //       { label: "LE", progress: 95 },
+        //       { label: "OPE", progress: 5 },
+        //       { label: "SIS", progress: 85 },
+        //     ],
+        //   },
+        //   {
+        //     id: 2,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   // Agregar más datos de asesores aquí...
+        //   {
+        //     id: 3,
+        //     nombre: "Julian Benavides",
+        //     materia: "CÁLCULO",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 4,
+        //     nombre: "Spencer Pain",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 5,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 6,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 7,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 8,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 9,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        //   {
+        //     id: 10,
+        //     nombre: "Alice Smith",
+        //     materia: "FISICA",
+        //     actividades: 5,
+        //     estado: "INACTIVO",
+        //     avatarUrl:
+        //       "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
+        //     skills: [
+        //       { label: "CB", progress: 50 },
+        //       { label: "DIS", progress: 15 },
+        //       { label: "LE", progress: 80 },
+        //       { label: "OPE", progress: 10 },
+        //       { label: "SIS", progress: 70 },
+        //     ],
+        //   },
+        // ];
 
-        setAsesores(asesoresData);
+        google.script.run.withSuccessHandler(setAsesores).getAsesores();
+
+        google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
+
+        google.script.run
+          .withSuccessHandler(setEstadosAsesores)
+          .getEstadosAsesores();
       }
     };
 
@@ -302,8 +295,8 @@ const FormCursos = () => {
                       {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={estadosAdm.map((estado) => ({
-                          value: estado,
-                          label: estado,
+                          value: estado.nombre,
+                          label: estado.nombre,
                         }))}
                         // Añade aquí el estado seleccionado para los estados ADM
                         // value={selectedEstadosADM[actividadIndex]}
@@ -321,8 +314,8 @@ const FormCursos = () => {
                       {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={estadosAsesor.map((estado) => ({
-                          value: estado,
-                          label: estado,
+                          value: estado.nombre,
+                          label: estado.nombre,
                         }))}
                         // Añade aquí el estado seleccionado para los estados Asesor
                         // value={selectedEstadosAsesor[actividadIndex]}
@@ -358,3 +351,30 @@ const FormCursos = () => {
 };
 
 export default FormCursos;
+
+const actividades = [
+  {
+    nota: { $numberInt: "0" },
+    asesor: null,
+    _id: { $oid: "64dabe480add76a0a305a734" },
+    estadoAdm: null,
+    estadoAsesor: null,
+    fechaVencimiento: null
+  },
+  {
+    _id: { $oid: "64dac56473243a87dde43fc1" },
+    estadoAdm: null,
+    estadoAsesor: null,
+    nota: { $numberInt: "0" },
+    asesor: null,
+    fechaVencimiento: null
+  },
+  {
+    nota: { $numberInt: "0" },
+    _id: { $oid: "64dac5867f3ef1926f2b73a3" },
+    estadoAsesor: null,
+    estadoAdm: null,
+    asesor: null,
+    fechaVencimiento: null
+  },
+];

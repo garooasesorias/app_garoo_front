@@ -12,7 +12,7 @@ function insertAsesor(document) {
     const order = {};
     const limit = 100;
   
-    const result = new MongoDBLib("clientes").getDocuments(
+    const result = new MongoDBLib("asesores").getDocuments(
       "find",
       query,
       order,
