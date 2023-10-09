@@ -61,6 +61,27 @@ class MongoDBLib {
     }
   }
 
+  updateDocument(endpoint, filter, update) {
+    const payload = {
+      dataSource: this.dataSource,
+      database: this.dataBase,
+      collection: this.collection,
+      filter: filter, // El criterio para seleccionar qué documentos actualizar
+      update: update, // Las operaciones de actualización a aplicar
+    };
+
+    const options = this.createOptions(payload); // Usamos POST como en el ejemplo de curl
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData; // Retornamos la respuesta directamente
+    } catch (error) {
+      console.error("Error updating document:", error);
+      return null; // o manejar el error adecuadamente
+    }
+  }
+
   getDocumentsWithActivities(endpoint, query, order, limit) {
     const pipeline = [
       {

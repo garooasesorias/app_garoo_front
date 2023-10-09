@@ -31,4 +31,18 @@ function getCursoById(id) {
   return documents;
 }
 
-function updateCursoById() {}
+function updateCursoById(id, data) {
+  const filter = {
+    _id: { $oid: id },
+  };
+  const update = {
+    $set: data,
+  };
+
+  const result = new MongoDBLib("cursos").updateDocument(
+    "updateOne",
+    filter,
+    update
+  );
+  return result;
+}
