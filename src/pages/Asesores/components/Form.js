@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { Button, Label, TextInput, FileInput } from "flowbite-react";
 import Select from "react-select";
 
 function Form() {
-  //let { id } = useParams();
+  //const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     avatar: "",
     identificacion: "",
@@ -18,6 +17,11 @@ function Form() {
   const [skills, setSkills] = useState([]);
   const [especialidades, setEspecialidades] = useState([]);
 
+  /*const handleFileInputChange = (event) => {
+    const file = event.target.files[0];
+    setSelectedFile(file ? file.name : null);
+  };*/
+
   useEffect(() => {
     const fetchData = async () => {
       await google.script.run
@@ -30,97 +34,55 @@ function Form() {
           setEspecialidades(data);
         })
         .getEspecialidades();
-
-      /*    if (id) {
-        await google.script.run
-          .withSuccessHandler((data) => {
-            const asesores = data;
-            // Set the fetched cotizacion data to the state
-            setAsesores(data);
-
-            // Prepopulate the form fields with data from cotizacion
-            setFormData({
-              identificacion: asesores.identificacion,
-              nombre: asesores.nombre,
-              // You can add other fields similarly
-              skills: asesores.skills.map((ski) => ({
-                skill: {
-                  label: ski.skill.nombre,
-                  value: ski.skill._id,
-                },
-              
-              })),
-              especialidades: asesores.especialidades.map((espe) => ({
-                especialidad: {
-                  label: espe.especialidad.nombre,
-                  value: espe.especialidad._id,
-                },
-              
-              })),
-              cargo: asesores.cargo,
-              celular: asesores.celular
-            });
-
-            // Log the fetched cotizacion data
-          })
-          .getAsesoresById(id);
-      }*/
     };
 
     fetchData();
   }, []);
+
   function guardarArchivo(e) {
-    var file = e.target.files[0]; //the file
-    var reader = new FileReader(); //this for convert to Base64
-    reader.readAsDataURL(e.target.files[0]); //start conversion...
-    reader.onload = function (e) {
-      //.. once finished..
-      var rawLog = reader.result.split(",")[1]; //extract only thee file data part
-      var dataSend = {
-        dataReq: { data: rawLog, name: file.name, type: file.type },
-        fname: "uploadFilesToGoogleDrive",
-      }; //preapre info to send to API
-      google.script.run.withSuccessHandler((response)=>{
-        console.log(response);
-      }).uploadFilesToGoogleDrive(dataSend.dataReq.data, dataSend.dataReq.name, dataSend.dataReq.type);
-      // fetch(
-      //   "https://script.google.com/a/macros/garooasesorias.com/s/AKfycbwXUFvLqesoMAD3e05inAZyt5152TYLagcS7z_W8TnYFqOTeEcVgY0glU_Jnr6m0kQ/exec",
-      //   {
-      //     method: "POST",
-      //     mode: "no-cors", // Establece el modo 'no-cors' aquí
-      //     redirect: "follow",
-      //     body: JSON.stringify(dataSend),
-      //     headers: {
-      //       "Content-Type": "text/plain;charset=utf-8",
-      //     },
-      //   }
-      // )
-      //   // .then((res) => res.json())
-      //   .then((a) => {
-      //     console.log(a); // Ver respuesta
-      //   })
-      //   .catch((e) => {
-      //     console.log("Dentro error funcion guardar Archivo");
-      //     console.log(e);
-      //   }); // O error en la consola
+    var file = e.target.files[0]; // El archivo seleccionado
+    //setSelectedFile(file ? file.name : null);  
+      var reader = new FileReader(); // Para convertir a Base64
+      reader.readAsDataURL(e.target.files[0]); // Inicia la conversión...
+  
+      reader.onload = function (e) {
+        // Una vez terminada la conversión...
+        var rawLog = reader.result.split(",")[1]; // Extrae solo los datos del archivo
+        var dataSend = {
+          dataReq: { data: rawLog, name: file.name, type: file.type },
+          fname: "uploadFilesToGoogleDrive",
+        }; // Prepara la información para enviar a la API
+  
+        google.script.run.withSuccessHandler((response) => {
+           console.log(response);
+           const fileId = response.id; 
+           const baseUrl = "https://drive.google.com/uc?export=view&id=";
+           const nuevaUrl = baseUrl + fileId;
+
+           console.log('Nueva URL formateada:', nuevaUrl);
+    
+          setFormData((prevData) => ({
+          ...prevData,
+          avatar: nuevaUrl,
+        }));
+        }).uploadFilesToGoogleDrive(
+          dataSend.dataReq.data,
+          dataSend.dataReq.name,
+          dataSend.dataReq.type
+        );
     };
   }
+  
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
     google.script.run
       .withSuccessHandler((response) => {
-        console.log(response);
       })
       .insertAsesor(formData);
   };
-  /*const handleAvatarChange = (e) => {
-    const newAvatar = e.target.value;
-    setFormData((prevData) => ({
-      ...prevData,
-      avatar: newAvatar,
-    }));
-  };*/
 
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
@@ -176,16 +138,18 @@ function Form() {
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="avatar" value="Avatar" />
+          <Label htmlFor="customFile" value="Avatar"/>
           </div>
           <FileInput
             addon="PH"
             id="customFile"
             name="avatar"
-            value={formData.avatar}
+            accept="image/*"
             onChange={(e) => guardarArchivo(e)}
             required
           />
+          <input type="hidden" name="avatar" value={formData.avatar} />
+           {/* <p >Archivo seleccionado: {selectedFile || 'Ningún archivo seleccionado'}</p>*/}
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -277,8 +241,10 @@ function Form() {
             onChange={handleEspecialidadesChange}
           />
         </div>
-        <Button type="submit" color="dark">
-          Submit
+        <Button type="submit" color="dark"  
+       // value={formData.avatar} 
+       // onChange={(e) => guardarArchivo(e)}
+        >  Submit
         </Button>
       </form>
     </>

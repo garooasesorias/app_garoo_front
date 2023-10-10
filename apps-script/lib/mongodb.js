@@ -119,7 +119,7 @@ class MongoDBLib {
       {
         $lookup: {
           from: "skills", // Name of the actividades collection
-          let: { actividadIds: "$skills" },
+          let: { skillIds: "$skills" },
           pipeline: [
             {
               $match: {
@@ -133,6 +133,25 @@ class MongoDBLib {
             },
           ],
           as: "skills_relacionadas",
+        },
+      },
+      {
+        $lookup: {
+          from: "especialidades", // Name of the actividades collection
+          let: { especialidadIds: "$especialidades" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$especialidadIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "especialidades_relacionadas",
         },
       },
       {
@@ -161,103 +180,7 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
-  /*getAsesoresWithSkillsAndEspecialidades(endpoint, query, order, limit) {
-    const pipeline = [
-      {
-        $match: query,
-      },
-      {
-        $lookup: {
-          from: "skills",
-          localField: "skills.name",
-          foreignField: "_id",
-          as: "skills_info",
-        },
-      },
-      {
-        $lookup: {
-          from: "especialidades",
-          localField: "especialidades.name",
-          foreignField: "_id",
-          as: "especialidades_info",
-        },
-      },
-      {
-        $lookup: {
-          from: "identificacion",
-          localField: "identificacion",
-          foreignField: "_id",
-          as: "identificacion_info",
-        },
-      }, 
-      {
-        $project: {
-          _id: 1,
-          identificacion: 1,
-          nombre: 1,
-          cargo: 1,
-          celular: 1,
-          skills: {
-            $map: {
-              input: "$skills.nombre",
-              as: "skillsID",
-              in: { $mergeObjects: {
-                $arrayElemAt: [
-                  {
-                    $filter: {
-                      input: "$skills_info",
-                      as: "ski",
-                      cond: { $eq: ["$$ski._id", "$$skillsId"] },
-                    },
-                  },
-                  0,
-                ],
-              }, 
-              },
-            },
-          },
-          especialidades: {
-            $map: {
-              input: "$$especialidades.nombre",
-              as: "espeId",
-              in: {
-                $mergeObjects: {
-                  $arrayElemAt: [
-                    {
-                      $filter: {
-                        input: "$actividades_info",
-                        as: "espe",
-                        cond: { $eq: ["$$espe._id", "$$espeId"] },
-                      },
-                    },
-                    0,
-                  ],
-                },
-              },
-            },
-          }
-        },
-      },
-    ];
-
-    const payload = {
-      pipeline: pipeline,
-      collection: this.collection,
-      dataSource: this.dataSource,
-      database: this.dataBase,
-    };
-
-    const options = this.createOptions(payload);
-
-    try {
-      const responseData = this.executeAPI(endpoint, options);
-      this.handleError(responseData);
-      return responseData.documents;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-  }*/
+ 
 
   
 
