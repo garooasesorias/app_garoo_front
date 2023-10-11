@@ -30,11 +30,13 @@ function Clientes() {
   return (
     <>
       <h1 class="PagesTitles">Clientes</h1>
-      <Link to="/formClientes">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Cliente +
-        </Button>
-      </Link>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formClientes">
+          <Button className="shadow mb-5" color="success">
+            Crear Cliente +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}

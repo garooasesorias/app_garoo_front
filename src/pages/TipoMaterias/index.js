@@ -30,11 +30,13 @@ function TiposMateria() {
   return (
     <>
     <h1 class="PagesTitles">Tipos de Materias</h1>
-      <Link to="/formTipoMaterias">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Tipo de Materia +
-        </Button>
-      </Link>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formTipoMaterias">
+          <Button className="shadow mb-5" color="success">
+            Crear Tipo De Materia +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}

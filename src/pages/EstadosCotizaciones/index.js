@@ -24,11 +24,13 @@ function EstadosCursos() {
   return (
     <>
     <h1 class="PagesTitles">Estados Cotizaciones</h1>
-      <Link to="/formEstadosCotizaciones">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Estado Cotización +
-        </Button>
-      </Link>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formEstadosCotizaciones">
+          <Button className="shadow mb-5" color="success">
+            Crear Estado Cotización +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
