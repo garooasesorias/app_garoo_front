@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
 
 function Actividades() {
   const [actividades, setActividades] = useState([]);
@@ -50,13 +51,14 @@ function Actividades() {
   }, []);
 
   return (
-    <>
-      <Link to="/formActividades">
+    <>     
+        <h1 class="PagesTitles">Actividades</h1>
+        <Link to="/formActividades">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Actividad +
         </Button>
       </Link>
-      <Table>
+      <Table>        
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
           <Table.HeadCell>Nombre</Table.HeadCell>

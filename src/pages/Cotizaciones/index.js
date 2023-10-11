@@ -3,6 +3,7 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
+import styles from '../../styles/main.scss';
 
 function Cotizaciones() {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -22,6 +23,7 @@ function Cotizaciones() {
 
   return (
     <>
+    <h1 class="PagesTitles">Cotizaciones</h1>
       <Link to="/formCotizaciones">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Cotización +

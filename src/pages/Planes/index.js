@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -37,6 +38,7 @@ function Planes() {
 
   return (
     <>
+    <h1 class="PagesTitles">Planes</h1>
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4 items-center">

@@ -1,5 +1,62 @@
 
 
+h1 {
+  color: green;
+  font-size: 2rem;
+}
+
+p {
+  color: purple;
+}
+
+main {
+  margin-top: 30px;
+  margin-left: 300px;
+}
+
+.datepicker-custom {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 14px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.PagesTitles {
+  color: #333;
+  letter-spacing: 1px;
+  opacity: 0;
+  margin: 2%;
+  font-size: 33px;
+  font-weight: bold;
+  animation: 1s ease-in-out forwards slideIn;
+  transform: translateY(20px);
+}
+
+.link {
+  color: green;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.Title-Button {
+  justify-content: space-between;
+  display: flex;
+}
+
 .react-datepicker__year-read-view--down-arrow, .react-datepicker__month-read-view--down-arrow, .react-datepicker__month-year-read-view--down-arrow, .react-datepicker__navigation-icon:before {
   content: "";
   border: 3px solid #ccc;

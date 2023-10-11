@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
 
 function Materias() {
   const [materias, setMaterias] = useState([]);
@@ -49,6 +50,7 @@ function Materias() {
 
   return (
     <>
+    <h1 class="PagesTitles">Materias</h1>
       <Link to="/formMaterias">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Materia +
@@ -57,8 +59,8 @@ function Materias() {
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
-          <Table.HeadCell>Tipo</Table.HeadCell>
+          <Table.HeadCell>Nombre de Materia</Table.HeadCell>
+          <Table.HeadCell>Tipo de Materia</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>

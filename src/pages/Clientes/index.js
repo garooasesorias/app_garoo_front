@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
-
+import styles from '../../styles/main.scss';
+  
 function Clientes() {
   const [clientes, setClientes] = useState([]);
 
@@ -28,6 +29,7 @@ function Clientes() {
 
   return (
     <>
+      <h1 class="PagesTitles">Clientes</h1>
       <Link to="/formClientes">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Cliente +
@@ -40,6 +42,7 @@ function Clientes() {
           <Table.HeadCell>Nombre</Table.HeadCell>
           <Table.HeadCell>Celular</Table.HeadCell>
           <Table.HeadCell>Correo</Table.HeadCell>
+          <Table.HeadCell>Cédula</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
@@ -58,6 +61,7 @@ function Clientes() {
                 <Table.Cell>{cliente.nombre}</Table.Cell>
                 <Table.Cell>{cliente.celular}</Table.Cell>
                 <Table.Cell>{cliente.correo}</Table.Cell>
+                <Table.Cell>{cliente.cedula}</Table.Cell>
                 <Table.Cell>
                   <Link
                     to={`/editCliente/${cliente.id}`} // Assuming you have an edit route

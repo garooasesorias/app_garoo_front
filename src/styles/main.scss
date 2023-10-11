@@ -20,3 +20,39 @@ main {
   border-radius: 4px;
   /* Añade otros estilos según tus preferencias */
 }
+
+@keyframes slideIn {
+  from{
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.PagesTitles{
+  font-size: 33px;
+  font-weight: bold;
+  color:#333;
+  letter-spacing: 1px;
+  margin: 2%;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideIn 1s ease-in-out forwards;
+}
+
+.link{
+
+height: fit-content;
+width: fit-content;
+color: green;
+
+}
+
+.Title-Button{
+  display: flex;
+  justify-content: space-between;
+}
+
