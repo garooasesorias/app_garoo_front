@@ -26,16 +26,16 @@ const FormCursos = () => {
         // Cargar los datos del curso si es una edición
         await google.script.run
           .withSuccessHandler((data) => {
-            console.log(data);
+            console.log(data[0]);
             setCurso(data[0]);
 
             const initialActividades = data[0].actividades.map((actividad) => ({
               nota: { $numberInt: "0" },
-              asesor: null,
+              asesor: actividad.asesor,
               _id: { $oid: actividad._id.$oid || actividad._id },
-              estadoAdm: null,
-              estadoAsesor: null,
-              fechaVencimiento: null,
+              estadoAdm: actividad.estadoAdm,
+              estadoAsesor: actividad.estadoAsesor,
+              fechaVencimiento: actividad.fechaVencimiento,
             }));
             setFormData((prev) => ({
               ...prev,
@@ -54,7 +54,11 @@ const FormCursos = () => {
           })
           .getCursoById(id);
 
-        google.script.run.withSuccessHandler(setAsesores).getAsesores();
+        google.script.run
+          .withSuccessHandler((response) => {
+            setAsesores(response);
+          })
+          .getAsesores();
 
         google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
 
@@ -68,8 +72,8 @@ const FormCursos = () => {
   }, []);
 
   const handleSubmit = (e) => {
+    console.log(formData.actividades);
     e.preventDefault();
-    console.log(formData);
     google.script.run
       .withSuccessHandler((response) => {
         console.log(response);
@@ -94,10 +98,10 @@ const FormCursos = () => {
 
     setFormData((prevFormData) => {
       const newActividades = [...prevFormData.actividades];
-      newActividades[actividadIndex].fechaVencimiento = format(
-        date,
-        "yyyy-MM-dd"
-      );
+      // Comprobar si la fecha es nula o indefinida antes de intentar formatearla
+      newActividades[actividadIndex].fechaVencimiento = date
+        ? format(date, "yyyy-MM-dd")
+        : null;
       return { ...prevFormData, actividades: newActividades };
     });
   };
@@ -146,15 +150,13 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Fecha de Vencimiento:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <DatePicker
                         selected={selectedDates[actividadIndex]}
                         onChange={(date) =>
                           handleDateChange(date, actividadIndex)
                         }
-                        dateFormat="dd/MM/yyyy" // Puedes personalizar el formato de fecha
-                        isClearable // Permite borrar la fecha seleccionada
+                        dateFormat="dd/MM/yyyy"
+                        isClearable
                         className="datepicker-custom"
                       />
                     </div>
@@ -162,14 +164,17 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Asesor:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={asesores.map((asesor) => ({
-                          value: asesor.id,
+                          value: asesor._id,
                           label: asesor.nombre,
                         }))}
-                        value={selectedAsesores[actividadIndex]}
+                        value={{
+                          value: actividad.asesor,
+                          label: asesores.find(
+                            (asesor) => asesor._id === actividad.asesor
+                          )?.nombre,
+                        }}
                         onChange={(selectedOption) =>
                           handleAsesorChange(selectedOption, actividadIndex)
                         }
@@ -180,13 +185,15 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Estado ADM:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={estadosAdm.map((estado) => ({
                           value: estado.nombre,
                           label: estado.nombre,
                         }))}
+                        value={{
+                          value: actividad.estadoAdm,
+                          label: actividad.estadoAdm,
+                        }}
                         onChange={(selectedOption) =>
                           handleEstadoADMChange(selectedOption, actividadIndex)
                         }
@@ -202,6 +209,10 @@ const FormCursos = () => {
                           value: estado.nombre,
                           label: estado.nombre,
                         }))}
+                        value={{
+                          value: actividad.estadoAsesor,
+                          label: actividad.estadoAsesor,
+                        }}
                         onChange={(selectedOption) =>
                           handleEstadoAsesorChange(
                             selectedOption,

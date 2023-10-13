@@ -307,6 +307,7 @@ class MongoDBLib {
                   nota: "$actividades.nota",
                   estadoAdm: "$actividades.estadoAdm",
                   estadoAsesor: "$actividades.estadoAsesor",
+                  fechaVencimiento: "$actividades.fechaVencimiento",
                 },
               ],
             },
