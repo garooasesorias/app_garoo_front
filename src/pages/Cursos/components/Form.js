@@ -31,7 +31,7 @@ const FormCursos = () => {
 
             const initialActividades = data[0].actividades.map((actividad) => ({
               nota: actividad.nota || { $numberInt: "0" },
-              asesor: actividad.asesor,
+              asesor: actividad.asesor ? actividad.asesor._id : null,
               _id: actividad._id,
               estadoAdm: actividad.estadoAdm,
               estadoAsesor: actividad.estadoAsesor,
@@ -75,11 +75,11 @@ const FormCursos = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Convertir las IDs de los asesores al formato deseado
     const actividadesToSend = formData.actividades.map((actividad) => {
       return {
         ...actividad,
-        asesor: actividad.asesor ? { $oid: actividad.asesor } : null,
+        _id: { $oid: actividad._id },
+        asesor: actividad.asesor ? { $oid: actividad.asesor._id } : null,
       };
     });
 
@@ -93,11 +93,13 @@ const FormCursos = () => {
   const handleAsesorChange = (selectedOption, actividadIndex) => {
     setFormData((prevFormData) => {
       const newActividades = [...prevFormData.actividades];
-      newActividades[actividadIndex].asesor = selectedOption.value;
+      const asesorObj = asesores.find(
+        (asesor) => asesor._id === selectedOption.value
+      );
+      newActividades[actividadIndex].asesor = asesorObj;
       return { ...prevFormData, actividades: newActividades };
     });
   };
-
   const handleDateChange = (date, actividadIndex) => {
     setSelectedDates((prevSelectedDates) => {
       const newDates = [...prevSelectedDates];
@@ -179,10 +181,10 @@ const FormCursos = () => {
                           label: asesor.nombre,
                         }))}
                         value={{
-                          value: actividad.asesor,
-                          label: asesores.find(
-                            (asesor) => asesor._id === actividad.asesor
-                          )?.nombre,
+                          value: actividad.asesor ? actividad.asesor._id : null,
+                          label: actividad.asesor
+                            ? actividad.asesor.nombre
+                            : null,
                         }}
                         onChange={(selectedOption) =>
                           handleAsesorChange(selectedOption, actividadIndex)

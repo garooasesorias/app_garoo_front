@@ -278,6 +278,14 @@ class MongoDBLib {
       },
       {
         $lookup: {
+          from: "asesores", // Asumo que la colección se llama "asesores"
+          localField: "actividades.asesor",
+          foreignField: "_id",
+          as: "asesor_info",
+        },
+      },
+      {
+        $lookup: {
           from: "actividades",
           localField: "actividades._id",
           foreignField: "_id",
@@ -303,7 +311,10 @@ class MongoDBLib {
                 { $arrayElemAt: ["$actividad_info", 0] }, // Propiedades de actividades
                 {
                   // Propiedades locales
-                  asesor: "$actividades.asesor",
+                  asesor: {
+                    _id: { $arrayElemAt: ["$asesor_info._id", 0] },
+                    nombre: { $arrayElemAt: ["$asesor_info.nombre", 0] },
+                  },
                   nota: "$actividades.nota",
                   estadoAdm: "$actividades.estadoAdm",
                   estadoAsesor: "$actividades.estadoAsesor",
@@ -325,7 +336,6 @@ class MongoDBLib {
         },
       },
     ];
-
     // Ejecuta la consulta en tu base de datos
 
     const payload = {

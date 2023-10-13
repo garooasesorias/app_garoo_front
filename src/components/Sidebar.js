@@ -217,6 +217,17 @@ function Sidebar() {
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
+            <li>
+              <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
+                <li>
+                  <NavLink to="/actividadesReportes">Reporte Actividades</NavLink>
+                </li>
+                {/* <li>
+                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
+                </li> */}
+                {/* Other sub-options for "Actividades" */}
+              </CollapsibleDropdown>
+            </li>
           </ul>
           <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
             <li>

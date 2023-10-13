@@ -28,6 +28,7 @@ import Cursos from "./pages/Cursos";
 import EstadosCursos from "./pages/EstadosCursos";
 import CursosForm from "./pages/Cursos/components/Form";
 import FormCursos from "./pages/Cursos/components/Form";
+import ActividadesReportes from "./pages/ActividadesReportes";
 
 function App() {
   return (
@@ -61,6 +62,7 @@ function App() {
           path="/formEstadosCotizaciones"
           element={<FormEstadosCotizaciones />}
         />
+        <Route path="/actividadesReportes" element={<ActividadesReportes />} />
         <Route path="/formCursos" element={<FormCursos />} />
         <Route path="/formCursos/:id" element={<FormCursos />} />
         <Route path="/formEstadosCursos" element={<FormEstadosCursos />} />
