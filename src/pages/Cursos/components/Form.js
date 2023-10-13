@@ -30,13 +30,14 @@ const FormCursos = () => {
             setCurso(data[0]);
 
             const initialActividades = data[0].actividades.map((actividad) => ({
-              nota: { $numberInt: "0" },
+              nota: actividad.nota || { $numberInt: "0" },
               asesor: actividad.asesor,
-              _id: { $oid: actividad._id.$oid || actividad._id },
+              _id: actividad._id,
               estadoAdm: actividad.estadoAdm,
               estadoAsesor: actividad.estadoAsesor,
               fechaVencimiento: actividad.fechaVencimiento,
             }));
+
             setFormData((prev) => ({
               ...prev,
               actividades: initialActividades,
@@ -72,19 +73,27 @@ const FormCursos = () => {
   }, []);
 
   const handleSubmit = (e) => {
-    console.log(formData.actividades);
     e.preventDefault();
+
+    // Convertir las IDs de los asesores al formato deseado
+    const actividadesToSend = formData.actividades.map((actividad) => {
+      return {
+        ...actividad,
+        asesor: actividad.asesor ? { $oid: actividad.asesor } : null,
+      };
+    });
+
     google.script.run
       .withSuccessHandler((response) => {
         console.log(response);
       })
-      .updateCursoById(id, { actividades: formData.actividades });
+      .updateCursoById(id, { actividades: actividadesToSend });
   };
 
   const handleAsesorChange = (selectedOption, actividadIndex) => {
     setFormData((prevFormData) => {
       const newActividades = [...prevFormData.actividades];
-      newActividades[actividadIndex].asesor = { $oid: selectedOption.value }; // Asumiendo que selectedOption.value es una cadena que representa el ObjectId del asesor
+      newActividades[actividadIndex].asesor = selectedOption.value;
       return { ...prevFormData, actividades: newActividades };
     });
   };
@@ -142,8 +151,8 @@ const FormCursos = () => {
       <Table>
         <Table.Head>
           <Table.HeadCell>Estudiante</Table.HeadCell>
-          {curso.actividades &&
-            curso.actividades.map((actividad, actividadIndex) => (
+          {formData.actividades &&
+            formData.actividades.map((actividad, actividadIndex) => (
               <Table.HeadCell key={actividadIndex}>
                 <div className="flex flex-col">
                   <div className="mb-2">Actividad: {actividad.nombre}</div>
