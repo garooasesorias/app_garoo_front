@@ -15,3 +15,5 @@ node_modules
 tmp
 .clasprc.json
 .clasp.json
+
+apps-script/index.html
