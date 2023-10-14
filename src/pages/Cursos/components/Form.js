@@ -26,13 +26,17 @@ const FormCursos = () => {
         // Cargar los datos del curso si es una edición
         await google.script.run
           .withSuccessHandler((data) => {
-            console.log(data[0]);
+            // console.log(data[0]);
             setCurso(data[0]);
 
             const initialActividades = data[0].actividades.map((actividad) => ({
               nota: actividad.nota || { $numberInt: "0" },
-              asesor: actividad.asesor ? actividad.asesor._id : null,
               _id: actividad._id,
+              asesor: {
+                nombre: actividad.asesor.nombre,
+                _id: actividad.asesor._id,
+              },
+              // asesor: actividad.asesor ? actividad.asesor._id : null,
               estadoAdm: actividad.estadoAdm,
               estadoAsesor: actividad.estadoAsesor,
               fechaVencimiento: actividad.fechaVencimiento,
@@ -55,15 +59,18 @@ const FormCursos = () => {
           })
           .getCursoById(id);
 
-        google.script.run
+        await google.script.run
           .withSuccessHandler((response) => {
+            // console.log(response);
             setAsesores(response);
           })
           .getAsesores();
 
-        google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
+        await google.script.run
+          .withSuccessHandler(setEstadosAdm)
+          .getEstadosAdm();
 
-        google.script.run
+        await google.script.run
           .withSuccessHandler(setEstadosAsesores)
           .getEstadosAsesores();
       }
@@ -75,6 +82,9 @@ const FormCursos = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    console.log("Asesores:", asesores);
+    console.log("Actividades:", formData.actividades);
+
     const actividadesToSend = formData.actividades.map((actividad) => {
       return {
         ...actividad,
@@ -85,7 +95,8 @@ const FormCursos = () => {
 
     google.script.run
       .withSuccessHandler((response) => {
-        console.log(response);
+        // console.log(response);
+        alert("Éxito");
       })
       .updateCursoById(id, { actividades: actividadesToSend });
   };
@@ -138,6 +149,7 @@ const FormCursos = () => {
       className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
     >
+      <h1>Formulario Curso</h1>
       {curso.cliente && (
         <h2
           style={{
@@ -180,12 +192,14 @@ const FormCursos = () => {
                           value: asesor._id,
                           label: asesor.nombre,
                         }))}
-                        value={{
-                          value: actividad.asesor ? actividad.asesor._id : null,
-                          label: actividad.asesor
-                            ? actividad.asesor.nombre
-                            : null,
-                        }}
+                        value={
+                          actividad.asesor
+                            ? {
+                                value: actividad.asesor._id,
+                                label: actividad.asesor.nombre,
+                              }
+                            : null
+                        }
                         onChange={(selectedOption) =>
                           handleAsesorChange(selectedOption, actividadIndex)
                         }
@@ -259,30 +273,3 @@ const FormCursos = () => {
 };
 
 export default FormCursos;
-
-const actividades = [
-  {
-    nota: { $numberInt: "0" },
-    asesor: null,
-    _id: { $oid: "64dabe480add76a0a305a734" },
-    estadoAdm: null,
-    estadoAsesor: null,
-    fechaVencimiento: null,
-  },
-  {
-    _id: { $oid: "64dac56473243a87dde43fc1" },
-    estadoAdm: null,
-    estadoAsesor: null,
-    nota: { $numberInt: "0" },
-    asesor: null,
-    fechaVencimiento: null,
-  },
-  {
-    nota: { $numberInt: "0" },
-    _id: { $oid: "64dac5867f3ef1926f2b73a3" },
-    estadoAsesor: null,
-    estadoAdm: null,
-    asesor: null,
-    fechaVencimiento: null,
-  },
-];

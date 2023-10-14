@@ -22,6 +22,7 @@ function Cursos() {
 
   return (
     <>
+    <h1>Cursos</h1>
       {/* <Link to="/formCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Curso +

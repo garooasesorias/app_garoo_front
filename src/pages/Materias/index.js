@@ -49,6 +49,7 @@ function Materias() {
 
   return (
     <>
+    <h1>Materias</h1>
       <Link to="/formMaterias">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Materia +

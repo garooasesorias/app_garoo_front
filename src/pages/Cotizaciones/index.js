@@ -22,6 +22,7 @@ function Cotizaciones() {
 
   return (
     <>
+    <h1>Cotizaciones</h1>
       <Link to="/formCotizaciones">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Cotización +

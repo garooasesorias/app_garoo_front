@@ -28,6 +28,7 @@ function Clientes() {
 
   return (
     <>
+    <h1>Clientes</h1>
       <Link to="/formClientes">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Cliente +

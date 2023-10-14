@@ -12,7 +12,9 @@ function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
     google.script.run
-      .withSuccessHandler((response) => {})
+      .withSuccessHandler((response) => {
+        alert("Éxito");
+      })
       .insertCliente(formData);
   };
 
@@ -25,6 +27,7 @@ function Form() {
   };
   return (
     <>
+      <h1>Formulario Clientes</h1>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">

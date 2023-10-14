@@ -9,7 +9,6 @@ function EstadosCursos() {
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-  
       await google.script.run
         .withSuccessHandler((data) => {
           setEstadosCotizaciones(data);
@@ -22,6 +21,7 @@ function EstadosCursos() {
 
   return (
     <>
+      <h1>Estados Cotizaciones</h1>
       <Link to="/formEstadosCotizaciones">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Estado Cotización +

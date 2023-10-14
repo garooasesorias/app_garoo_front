@@ -22,6 +22,7 @@ function EstadosCursos() {
 
   return (
     <>
+    <h1>Estados Cursos</h1>
       <Link to="/formEstadosCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Estado Curso +

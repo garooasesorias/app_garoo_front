@@ -63,6 +63,7 @@ function ActividadesReportes() {
 
   return (
     <div className="flex flex-col space-y-6">
+      <h1>Reporte Actividades</h1>
       <div className="w-full">
         <Card>
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
@@ -181,7 +182,7 @@ function ActividadesReportes() {
           </div>
         </Card>
       </div>
-      <div className="w-2/3">
+      <div>
         <Table className="w-full">
           <Table.Head>
             <Table.HeadCell>Fecha Curso</Table.HeadCell>

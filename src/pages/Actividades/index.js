@@ -51,6 +51,7 @@ function Actividades() {
 
   return (
     <>
+      <h1>Actividades</h1>
       <Link to="/formActividades">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Actividad +
