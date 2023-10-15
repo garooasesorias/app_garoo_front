@@ -20,7 +20,6 @@ function Planes() {
     fetchData();
   }, []);
 
-
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
   };

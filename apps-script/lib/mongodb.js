@@ -132,6 +132,78 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
+  getSkillsWithEspecialidades(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "skills", // Name of the actividades collection
+          let: { skillIds: "$skills" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$skillIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "skills_relacionadas",
+        },
+      },
+      {
+        $lookup: {
+          from: "especialidades", // Name of the actividades collection
+          let: { especialidadIds: "$especialidades" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$especialidadIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "especialidades_relacionadas",
+        },
+      },
+      {
+        $sort: order,
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null; // or handle the error appropriately
+    }
+  }
+ 
+
+  
 
   getCotizacionesWithItems(endpoint, query, order, limit) {
     const pipeline = [

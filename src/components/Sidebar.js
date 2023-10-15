@@ -1,9 +1,10 @@
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
-import { FaCog } from "react-icons/fa";
+import { FaCog, FaAmilia } from "react-icons/fa";
 
 function Sidebar() {
   return (
+    
     <>
       <button
         data-drawer-target="default-sidebar"
@@ -92,44 +93,29 @@ function Sidebar() {
               </CollapsibleDropdown>
             </li>
             <li>
-              <Link to="/asesores">
+            <CollapsibleDropdown buttonText="Asesores" icon={<FaAmilia />}>
+            <li>
+              <NavLink to="/asesores">
                 <button
                   type="button"
                   className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
                   aria-controls="dropdown-pages"
                   data-collapse-toggle="dropdown-pages"
                 >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
                   <span className="flex-1 ml-3 text-left whitespace-nowrap">
                     Asesores
-                  </span>
-                  <svg
-                    aria-hidden="true"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
+                  </span> 
                 </button>
-              </Link>
+              </NavLink>
+              </li>
+              <li>
+                  <NavLink to="/skills" className="flex-1 ml-3 text-left whitespace-nowrap">Skills</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/especialidades" className="flex-1 ml-3 text-left whitespace-nowrap">Especialidades</NavLink>
+                </li>
+             </CollapsibleDropdown>
+
 
               <ul id="dropdown-pages" className="hidden py-2 space-y-2">
                 <li></li>
@@ -222,10 +208,6 @@ function Sidebar() {
                 <li>
                   <NavLink to="/actividadesReportes">Reporte Actividades</NavLink>
                 </li>
-                {/* <li>
-                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
-                </li> */}
-                {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
           </ul>
@@ -291,7 +273,7 @@ function Sidebar() {
               </a>
             </li>
           </ul>
-        </div>
+      </div>
         <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700">
           <a
             href="#"
