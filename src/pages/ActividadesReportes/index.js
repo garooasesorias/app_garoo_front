@@ -18,17 +18,132 @@ function ActividadesReportes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Suponiendo que ahora la función devuelve una lista de cursos
-        const cursosResponse = await new Promise((resolve) => {
-          google.script.run
-            .withSuccessHandler((response) => {
-              console.log(response);
-              resolve(response);
-            })
-            .getCursos(); // Asume que esta función ahora obtiene la lista de cursos
-        });
+        // const cursosResponse = await new Promise((resolve) => {
+        //   google.script.run
+        //     .withSuccessHandler((response) => {
+        //       console.log(response);
+        //       resolve(response);
+        //     })
+        //     .getCursos();
+        // });
 
-        setCursos(cursosResponse);
+        // setCursos(cursosResponse);
+        setCursos([
+          {
+            fecha: "2023-09-08T19:28:29.580Z",
+            cliente: {
+              celular: "3241243445e",
+              identificacion: "3456",
+              _id: "64d292067724b2e0f91308a6",
+              nombre: "Fernando Osorio",
+              correo: "fernando@mail.com",
+            },
+            estado: {
+              nombre: "Iniciado",
+              _id: "64eb986d83c29fa14cbabb69",
+            },
+            materia: {
+              nombre: "Calculo II",
+              tipo: "64dc1e8b1b0f1b5ea3978af8",
+              _id: "64dc206ede10c0d9a0f360a6",
+            },
+            _id: "64fb75e0cbdbf5a1f137cb36",
+            actividades: [
+              {
+                estadoAdm: "PENDIENTE-SIN APORTE",
+                precio: "150",
+                tipo: "64da55f2c0919e09477b59a8",
+                fechaVencimiento: "2023-10-09",
+                asesor: {
+                  nombre: "Julian",
+                  _id: "6525687bf7c64b76e9686ea0",
+                },
+                estadoAsesor: "ENVIADO",
+                _id: "64dabe480add76a0a305a734",
+                nombre: "Quiz 2",
+                nota: 0,
+              },
+              {
+                estadoAdm: "PENDIENTE-SIN APORTE",
+                precio: "150",
+                tipo: "64da55f2c0919e09477b59a8",
+                fechaVencimiento: "2023-10-09",
+                asesor: {
+                  nombre: "Fabian",
+                  _id: "65299a459fb77abc2cc231a7",
+                },
+                estadoAsesor: "ENVIADO",
+                _id: "64dac56473243a87dde43fc1",
+                nota: 0,
+                nombre: "Quiz 1",
+              },
+              {
+                estadoAdm: "REVISADO",
+                tipo: "64da55f2c0919e09477b59a8",
+                precio: "200",
+                fechaVencimiento: "2023-10-13",
+                asesor: {
+                  nombre: "Fabian",
+                  _id: "65299a459fb77abc2cc231a7",
+                },
+                estadoAsesor: "FINALIZADO",
+                _id: "64dac5867f3ef1926f2b73a3",
+                nombre: "Parcial 1",
+                nota: 0,
+              },
+            ],
+          },
+          {
+            fecha: "2023-10-13T16:39:36.623Z",
+            cliente: {
+              celular: "3165321730",
+              identificacion: "NG220",
+              _id: "65087d8208fdc492800cb7da",
+              nombre: "Diana Katherine Moncada Real",
+              correo: "natalia24tolosa@gmial.com",
+            },
+            estado: {
+              nombre: "Iniciado",
+              _id: "64eb986d83c29fa14cbabb69",
+            },
+            materia: {
+              nombre: "Calculo II",
+              tipo: "64dc1e8b1b0f1b5ea3978af8",
+              _id: "64dc206ede10c0d9a0f360a6",
+            },
+            _id: "652972cd79a1f1c149c5acdc",
+            actividades: [
+              {
+                estadoAdm: "ENVIADO",
+                tipo: "64da55f2c0919e09477b59a8",
+                precio: "150",
+                fechaVencimiento: "2023-10-13",
+                asesor: {
+                  nombre: "Julian",
+                  _id: "6525687bf7c64b76e9686ea0",
+                },
+                estadoAsesor: "PENDIENTE",
+                _id: "64dabe480add76a0a305a734",
+                nota: 0,
+                nombre: "Quiz 2",
+              },
+              {
+                estadoAdm: "ENVIADO",
+                tipo: "64da55f2c0919e09477b59a8",
+                precio: "200",
+                fechaVencimiento: "2023-10-15",
+                estadoAsesor: "PENDIENTE",
+                asesor: {
+                  nombre: "Julian",
+                  _id: "6525687bf7c64b76e9686ea0",
+                },
+                _id: "64dac5867f3ef1926f2b73a3",
+                nota: 0,
+                nombre: "Parcial 1",
+              },
+            ],
+          },
+        ]);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -39,25 +154,14 @@ function ActividadesReportes() {
 
   const filteredCursos = cursos.filter((curso) => {
     return (
-      (!filters.fecha ||
-        new Date(curso.fecha).toLocaleDateString() === filters.fecha) &&
-      (!filters.materia || curso.materia.nombre.includes(filters.materia)) &&
-      (!filters.cliente || curso.cliente.nombre.includes(filters.cliente)) &&
-      curso.actividades.some(
-        (actividad) =>
-          (!filters.actividad ||
-            actividad.nombre.includes(filters.actividad)) &&
-          (!filters.asesor ||
-            actividad.asesor.nombre.includes(filters.asesor)) &&
-          (!filters.estadoAsesor ||
-            actividad.estadoAsesor.includes(filters.estadoAsesor)) &&
-          (!filters.estadoAdm ||
-            actividad.estadoAdm.includes(filters.estadoAdm)) &&
-          (!filters.fechaVencimiento ||
-            new Date(actividad.fechaVencimiento).toLocaleDateString() ===
-              filters.fechaVencimiento) &&
-          (!filters.nota || actividad.nota.includes(filters.nota))
-      )
+      (!filters.materia ||
+        curso.materia.nombre
+          .toLowerCase()
+          .includes(filters.materia.toLowerCase())) &&
+      (!filters.cliente ||
+        curso.cliente.nombre
+          .toLowerCase()
+          .includes(filters.cliente.toLowerCase()))
     );
   });
 
