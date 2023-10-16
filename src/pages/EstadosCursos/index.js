@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
 
 function EstadosCursos() {
   const [estadosCursos, setEstadosCursos] = useState([]);
@@ -22,12 +23,14 @@ function EstadosCursos() {
 
   return (
     <>
-    <h1>Estados Cursos</h1>
-      <Link to="/formEstadosCursos">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Estado Curso +
-        </Button>
-      </Link>
+    <h1 class="PagesTitles">Estados Cursos</h1>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formEstadosCursos">
+          <Button className="shadow mb-5" color="success">
+            Crear Estado Curso +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
 
 function TiposMateria() {
   const [tiposMateria, setTiposMateria] = useState([]);
@@ -28,11 +29,14 @@ function TiposMateria() {
 
   return (
     <>
-      <Link to="/formTipoMaterias">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Tipo de Materia +
-        </Button>
-      </Link>
+    <h1 class="PagesTitles">Tipos de Materias</h1>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formTipoMaterias">
+          <Button className="shadow mb-5" color="success">
+            Crear Tipo De Materia +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}

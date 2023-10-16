@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Button, Label, TextInput } from "flowbite-react";
+import React, { useRef } from 'react';
 
 function Form() {
+  const formRef = useRef();
   const [formData, setFormData] = useState({
     identificacion: "",
     nombre: "",
@@ -12,9 +14,7 @@ function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
     google.script.run
-      .withSuccessHandler((response) => {
-        alert("Éxito");
-      })
+      .withSuccessHandler((response) => {})
       .insertCliente(formData);
   };
 
@@ -25,10 +25,28 @@ function Form() {
       [name]: value,
     }));
   };
+
+  const handleReset = () => {
+    if (
+      formData.identificacion !== "" &&
+      formData.nombre !== "" &&
+      formData.correo !== "" &&
+      formData.celular !== ""
+    ) {
+      formRef.current.reset();
+      setFormData({
+        identificacion: "",
+        nombre: "",
+        correo: "",
+        celular: "",
+      });
+      alert("Usuario creado con exito");
+    }
+  };
+  
   return (
     <>
-      <h1>Formulario Clientes</h1>
-      <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
+      <form ref={formRef} className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="identificacion" value="Identificacion" />
@@ -84,7 +102,7 @@ function Form() {
             required
           />
         </div>
-        <Button type="submit" color="dark">
+        <Button  type="submit" color="dark" onClick={handleReset}>
           Submit
         </Button>
       </form>

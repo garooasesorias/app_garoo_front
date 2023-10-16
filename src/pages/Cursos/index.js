@@ -3,6 +3,7 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
+import styles from '../../styles/main.scss';
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -22,7 +23,7 @@ function Cursos() {
 
   return (
     <>
-    <h1>Cursos</h1>
+    <h1 class="PagesTitles">Cursos</h1>
       {/* <Link to="/formCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Curso +
