@@ -23,7 +23,7 @@ function EstadosCursos() {
 
   return (
     <>
-    <h1 class="PagesTitles">Estados Cursos</h1>
+    <h1 className="PagesTitles">Estados Cursos</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
         <Link to="/formEstadosCursos">
           <Button className="shadow mb-5" color="success">

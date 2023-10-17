@@ -50,7 +50,7 @@ function Materias() {
 
   return (
     <>
-    <h1 class="PagesTitles">Materias</h1>
+    <h1 className="PagesTitles">Materias</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
         <Link to="/formMaterias">
           <Button className="shadow mb-5" color="success">

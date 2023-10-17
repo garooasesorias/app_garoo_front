@@ -37,7 +37,7 @@ function Planes() {
 
   return (
     <>
-    <h1 class="PagesTitles">Planes</h1>
+    <h1 className="PagesTitles">Planes</h1>
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4 items-center">
