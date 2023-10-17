@@ -61,6 +61,27 @@ class MongoDBLib {
     }
   }
 
+  updateDocument(endpoint, filter, update) {
+    const payload = {
+      dataSource: this.dataSource,
+      database: this.dataBase,
+      collection: this.collection,
+      filter: filter, // El criterio para seleccionar qué documentos actualizar
+      update: update, // Las operaciones de actualización a aplicar
+    };
+
+    const options = this.createOptions(payload); // Usamos POST como en el ejemplo de curl
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData; // Retornamos la respuesta directamente
+    } catch (error) {
+      console.error("Error updating document:", error);
+      return null; // o manejar el error adecuadamente
+    }
+  }
+
   getDocumentsWithActivities(endpoint, query, order, limit) {
     const pipeline = [
       {
@@ -111,6 +132,78 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
+  getSkillsWithEspecialidades(endpoint, query, order, limit) {
+    const pipeline = [
+      {
+        $match: query,
+      },
+      {
+        $lookup: {
+          from: "skills", // Name of the actividades collection
+          let: { skillIds: "$skills" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$skillIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "skills_relacionadas",
+        },
+      },
+      {
+        $lookup: {
+          from: "especialidades", // Name of the actividades collection
+          let: { especialidadIds: "$especialidades" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $in: [
+                    { $toObjectId: "$_id" }, // Convert the string _id to ObjectId
+                    "$$especialidadIds",
+                  ],
+                },
+              },
+            },
+          ],
+          as: "especialidades_relacionadas",
+        },
+      },
+      {
+        $sort: order,
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null; // or handle the error appropriately
+    }
+  }
+ 
+
+  
 
   getCotizacionesWithItems(endpoint, query, order, limit) {
     const pipeline = [
@@ -257,6 +350,14 @@ class MongoDBLib {
       },
       {
         $lookup: {
+          from: "asesores", // Asumo que la colección se llama "asesores"
+          localField: "actividades.asesor",
+          foreignField: "_id",
+          as: "asesor_info",
+        },
+      },
+      {
+        $lookup: {
           from: "actividades",
           localField: "actividades._id",
           foreignField: "_id",
@@ -282,10 +383,14 @@ class MongoDBLib {
                 { $arrayElemAt: ["$actividad_info", 0] }, // Propiedades de actividades
                 {
                   // Propiedades locales
-                  asesor: "$actividades.asesor",
+                  asesor: {
+                    _id: { $arrayElemAt: ["$asesor_info._id", 0] },
+                    nombre: { $arrayElemAt: ["$asesor_info.nombre", 0] },
+                  },
                   nota: "$actividades.nota",
                   estadoAdm: "$actividades.estadoAdm",
                   estadoAsesor: "$actividades.estadoAsesor",
+                  fechaVencimiento: "$actividades.fechaVencimiento",
                 },
               ],
             },
@@ -303,7 +408,6 @@ class MongoDBLib {
         },
       },
     ];
-
     // Ejecuta la consulta en tu base de datos
 
     const payload = {

@@ -10,6 +10,7 @@ function Form() {
     e.preventDefault();
     google.script.run
       .withSuccessHandler((response) => {
+        alert("Éxito");
         console.log(response);
       })
       .insertEstadoCotizacion(formData);
@@ -24,6 +25,7 @@ function Form() {
   };
   return (
     <>
+      <h1>Formulario Estado Cotizaciones</h1>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">

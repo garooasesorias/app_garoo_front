@@ -3,36 +3,22 @@ import { useParams } from "react-router-dom";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
 import { format } from "date-fns";
-
-//TESTING
-
-const estadosAdm = [
-  "Enviado",
-  "Pendiente",
-  "Finalizado",
-  "Pendiente - sin Aporte",
-  "Cancelado",
-  "No Requerido",
-  "Subcontratado",
-  "No entregado",
-  "Revisado",
-];
-
-const estadosAsesor = ["Enviado", "Pendiente", "Finalizado"];
 
 const FormCursos = () => {
   let { id } = useParams();
   const [formData, setFormData] = useState({
     fecha: "",
     items: [],
+    actividades: [],
   });
 
   const [curso, setCurso] = useState([]);
   const [asesores, setAsesores] = useState([]);
   const [selectedAsesores, setSelectedAsesores] = useState({});
   const [selectedDates, setSelectedDates] = useState({});
+  const [estadosAdm, setEstadosAdm] = useState([]);
+  const [estadosAsesor, setEstadosAsesores] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,177 +26,53 @@ const FormCursos = () => {
         // Cargar los datos del curso si es una edición
         await google.script.run
           .withSuccessHandler((data) => {
-            console.log(data);
+            // console.log(data[0]);
             setCurso(data[0]);
+
+            const initialActividades = data[0].actividades.map((actividad) => ({
+              nota: actividad.nota || { $numberInt: "0" },
+              _id: actividad._id,
+              asesor: {
+                nombre: actividad.asesor.nombre,
+                _id: actividad.asesor._id,
+              },
+              // asesor: actividad.asesor ? actividad.asesor._id : null,
+              estadoAdm: actividad.estadoAdm,
+              estadoAsesor: actividad.estadoAsesor,
+              fechaVencimiento: actividad.fechaVencimiento,
+            }));
+
+            setFormData((prev) => ({
+              ...prev,
+              actividades: initialActividades,
+            }));
+
+            const initialSelectedDates = data[0].actividades.map(
+              (actividad) => {
+                return actividad.fechaVencimiento
+                  ? new Date(actividad.fechaVencimiento)
+                  : null;
+              }
+            );
+
+            setSelectedDates(initialSelectedDates);
           })
           .getCursoById(id);
 
-        // Cargar los datos de los asesores (debes obtenerlos de alguna fuente)
-        const asesoresData = [
-          {
-            id: 1,
-            nombre: "Bonnie Green",
-            materia: "MATEMATICAS",
-            actividades: 10,
-            estado: "ACTIVO",
-            avatarUrl:
-              "https://avatoon.net/wp-content/uploads/2022/07/Cartoon-Avatar-White-Background-300x300.png", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 75 },
-              { label: "DIS", progress: 25 },
-              { label: "LE", progress: 95 },
-              { label: "OPE", progress: 5 },
-              { label: "SIS", progress: 85 },
-            ],
-          },
-          {
-            id: 2,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          // Agregar más datos de asesores aquí...
-          {
-            id: 3,
-            nombre: "Julian Benavides",
-            materia: "CÁLCULO",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 4,
-            nombre: "Spencer Pain",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 5,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 6,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 7,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 8,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 9,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSJIwASCJpICHRbFDOQXQ2S-pmikc8vs6K2GA&usqp=CAU", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-          {
-            id: 10,
-            nombre: "Alice Smith",
-            materia: "FISICA",
-            actividades: 5,
-            estado: "INACTIVO",
-            avatarUrl:
-              "https://pub-static.fotor.com/assets/projects/pages/d5bdd0513a0740a8a38752dbc32586d0/fotor-03d1a91a0cec4542927f53c87e0599f6.jpg", // URL del avatar de ejemplo
-            skills: [
-              { label: "CB", progress: 50 },
-              { label: "DIS", progress: 15 },
-              { label: "LE", progress: 80 },
-              { label: "OPE", progress: 10 },
-              { label: "SIS", progress: 70 },
-            ],
-          },
-        ];
+        await google.script.run
+          .withSuccessHandler((response) => {
+            // console.log(response);
+            setAsesores(response);
+          })
+          .getAsesores();
 
-        setAsesores(asesoresData);
+        await google.script.run
+          .withSuccessHandler(setEstadosAdm)
+          .getEstadosAdm();
+
+        await google.script.run
+          .withSuccessHandler(setEstadosAsesores)
+          .getEstadosAsesores();
       }
     };
 
@@ -219,21 +81,67 @@ const FormCursos = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Aquí puedes enviar los datos del formulario al servidor
+
+    console.log("Asesores:", asesores);
+    console.log("Actividades:", formData.actividades);
+
+    const actividadesToSend = formData.actividades.map((actividad) => {
+      return {
+        ...actividad,
+        _id: { $oid: actividad._id },
+        asesor: actividad.asesor ? { $oid: actividad.asesor._id } : null,
+      };
+    });
+
+    google.script.run
+      .withSuccessHandler((response) => {
+        // console.log(response);
+        alert("Éxito");
+      })
+      .updateCursoById(id, { actividades: actividadesToSend });
   };
 
   const handleAsesorChange = (selectedOption, actividadIndex) => {
-    setSelectedAsesores((prevSelectedAsesores) => ({
-      ...prevSelectedAsesores,
-      [actividadIndex]: selectedOption,
-    }));
+    setFormData((prevFormData) => {
+      const newActividades = [...prevFormData.actividades];
+      const asesorObj = asesores.find(
+        (asesor) => asesor._id === selectedOption.value
+      );
+      newActividades[actividadIndex].asesor = asesorObj;
+      return { ...prevFormData, actividades: newActividades };
+    });
+  };
+  const handleDateChange = (date, actividadIndex) => {
+    setSelectedDates((prevSelectedDates) => {
+      const newDates = [...prevSelectedDates];
+      newDates[actividadIndex] = date;
+      return newDates;
+    });
+
+    setFormData((prevFormData) => {
+      const newActividades = [...prevFormData.actividades];
+      // Comprobar si la fecha es nula o indefinida antes de intentar formatearla
+      newActividades[actividadIndex].fechaVencimiento = date
+        ? format(date, "yyyy-MM-dd")
+        : null;
+      return { ...prevFormData, actividades: newActividades };
+    });
   };
 
-  const handleDateChange = (date, actividadIndex) => {
-    setSelectedDates((prevSelectedDates) => ({
-      ...prevSelectedDates,
-      [actividadIndex]: date,
-    }));
+  const handleEstadoADMChange = (selectedOption, actividadIndex) => {
+    setFormData((prevFormData) => {
+      const newActividades = [...prevFormData.actividades];
+      newActividades[actividadIndex].estadoAdm = selectedOption.value;
+      return { ...prevFormData, actividades: newActividades };
+    });
+  };
+
+  const handleEstadoAsesorChange = (selectedOption, actividadIndex) => {
+    setFormData((prevFormData) => {
+      const newActividades = [...prevFormData.actividades];
+      newActividades[actividadIndex].estadoAsesor = selectedOption.value;
+      return { ...prevFormData, actividades: newActividades };
+    });
   };
 
   return (
@@ -241,6 +149,7 @@ const FormCursos = () => {
       className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
     >
+      <h1>Formulario Curso</h1>
       {curso.cliente && (
         <h2
           style={{
@@ -256,23 +165,21 @@ const FormCursos = () => {
       <Table>
         <Table.Head>
           <Table.HeadCell>Estudiante</Table.HeadCell>
-          {curso.actividades &&
-            curso.actividades.map((actividad, actividadIndex) => (
+          {formData.actividades &&
+            formData.actividades.map((actividad, actividadIndex) => (
               <Table.HeadCell key={actividadIndex}>
                 <div className="flex flex-col">
                   <div className="mb-2">Actividad: {actividad.nombre}</div>
                   <div className="flex items-center">
                     <span className="mr-2">Fecha de Vencimiento:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <DatePicker
                         selected={selectedDates[actividadIndex]}
                         onChange={(date) =>
                           handleDateChange(date, actividadIndex)
                         }
-                        dateFormat="dd/MM/yyyy" // Puedes personalizar el formato de fecha
-                        isClearable // Permite borrar la fecha seleccionada
+                        dateFormat="dd/MM/yyyy"
+                        isClearable
                         className="datepicker-custom"
                       />
                     </div>
@@ -280,14 +187,19 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Asesor:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={asesores.map((asesor) => ({
-                          value: asesor.id,
+                          value: asesor._id,
                           label: asesor.nombre,
                         }))}
-                        value={selectedAsesores[actividadIndex]}
+                        value={
+                          actividad.asesor
+                            ? {
+                                value: actividad.asesor._id,
+                                label: actividad.asesor.nombre,
+                              }
+                            : null
+                        }
                         onChange={(selectedOption) =>
                           handleAsesorChange(selectedOption, actividadIndex)
                         }
@@ -298,18 +210,18 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Estado ADM:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={estadosAdm.map((estado) => ({
-                          value: estado,
-                          label: estado,
+                          value: estado.nombre,
+                          label: estado.nombre,
                         }))}
-                        // Añade aquí el estado seleccionado para los estados ADM
-                        // value={selectedEstadosADM[actividadIndex]}
-                        // onChange={(selectedOption) =>
-                        //   handleEstadoADMChange(selectedOption, actividadIndex)
-                        // }
+                        value={{
+                          value: actividad.estadoAdm,
+                          label: actividad.estadoAdm,
+                        }}
+                        onChange={(selectedOption) =>
+                          handleEstadoADMChange(selectedOption, actividadIndex)
+                        }
                         isSearchable={true}
                       />
                     </div>
@@ -317,18 +229,21 @@ const FormCursos = () => {
                   <div className="flex items-center">
                     <span className="mr-2">Estado Asesor:</span>
                     <div className="ml-auto">
-                      {" "}
-                      {/* Añadir ml-auto para alinear a la derecha */}
                       <Select
                         options={estadosAsesor.map((estado) => ({
-                          value: estado,
-                          label: estado,
+                          value: estado.nombre,
+                          label: estado.nombre,
                         }))}
-                        // Añade aquí el estado seleccionado para los estados Asesor
-                        // value={selectedEstadosAsesor[actividadIndex]}
-                        // onChange={(selectedOption) =>
-                        //   handleEstadoAsesorChange(selectedOption, actividadIndex)
-                        // }
+                        value={{
+                          value: actividad.estadoAsesor,
+                          label: actividad.estadoAsesor,
+                        }}
+                        onChange={(selectedOption) =>
+                          handleEstadoAsesorChange(
+                            selectedOption,
+                            actividadIndex
+                          )
+                        }
                         isSearchable={true}
                       />
                     </div>

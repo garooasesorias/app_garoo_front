@@ -28,6 +28,11 @@ import Cursos from "./pages/Cursos";
 import EstadosCursos from "./pages/EstadosCursos";
 import CursosForm from "./pages/Cursos/components/Form";
 import FormCursos from "./pages/Cursos/components/Form";
+import Skills from "./pages/Skills";
+import FormSkills from "./pages/Skills/components/Form"
+import Especialidades from "./pages/Especialidades";
+import FormEspecialidades from "./pages/Especialidades/components/Form"
+import ActividadesReportes from "./pages/ActividadesReportes"
 
 function App() {
   return (
@@ -38,6 +43,10 @@ function App() {
         <Route path="/sidebar" element={<Sidebar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/asesores" element={<Asesores />} />
+        <Route path="/skills" element={<Skills />} />
+        <Route path="/formSkills" element={<FormSkills />} />
+        <Route path="/especialidades" element={<Especialidades />} />
+        <Route path="/formEspecialidades" element={<FormEspecialidades />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/actividades" element={<Actividades />} />
         <Route path="/tipoActividades" element={<TipoActividades />} />
@@ -61,6 +70,7 @@ function App() {
           path="/formEstadosCotizaciones"
           element={<FormEstadosCotizaciones />}
         />
+        <Route path="/actividadesReportes" element={<ActividadesReportes />} />
         <Route path="/formCursos" element={<FormCursos />} />
         <Route path="/formCursos/:id" element={<FormCursos />} />
         <Route path="/formEstadosCursos" element={<FormEstadosCursos />} />

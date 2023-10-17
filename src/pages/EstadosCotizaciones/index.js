@@ -10,7 +10,6 @@ function EstadosCursos() {
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-  
       await google.script.run
         .withSuccessHandler((data) => {
           setEstadosCotizaciones(data);

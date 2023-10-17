@@ -118,7 +118,11 @@ function CotizacionForm() {
       total: total,
     };
 
-    google.script.run.withSuccessHandler().insertCotizacion(formattedFormData);
+    google.script.run
+      .withSuccessHandler(() => {
+        alert("Éxito");
+      })
+      .insertCotizacion(formattedFormData);
   };
 
   const handleSubmitCurso = () => {
@@ -245,6 +249,7 @@ function CotizacionForm() {
       className="flex max-w-lg mx-auto flex-col gap-4"
       onSubmit={handleSubmit}
     >
+      <h1>Formulario Cotizaciones</h1>
       <div className="mb-4">
         <label>Cliente:</label>
         <Select

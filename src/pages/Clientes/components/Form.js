@@ -15,9 +15,8 @@ function Form() {
   const handleSubmit = (e) => {
     e.preventDefault();
     google.script.run
-    .withSuccessHandler((response) => {})
-    .insertCliente(formData);
-  
+      .withSuccessHandler((response) => {})
+      .insertCliente(formData);
   };
 
   const handleInputChange = (e) => {
