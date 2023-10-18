@@ -6,22 +6,20 @@ import { Link } from "react-router-dom";
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [filters, setFilters] = useState({
-    identificacion: "",
+    referencia: "",
+    cedula: "",
     nombre: "",
+    fechaNacimiento: "",
+    genero: "",
+    usuario: "",
+    contrasena: "",
     celular: "",
     correo: "",
+    carrera: "",
   });
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      // try {
-      //   const response = await fetch("your_api_endpoint_here");
-      //   const data = await response.json();
-      //   setClientes(data);
-      // } catch (error) {
-      //   console.error("Error fetching data:", error);
-      // }
       await google.script.run
         .withSuccessHandler((data) => {
           console.log(data);
@@ -33,20 +31,48 @@ function Clientes() {
     fetchData();
   }, []);
 
-  const filteredCursos = clientes.filter((cliente) => {
+  const renderFilterInput = (label, filterKey) => (
+    <div className="flex-1 px-2 mb-4">
+      <label className="block text-sm font-medium text-gray-700">{label}</label>
+      <input
+        type="text"
+        value={filters[filterKey]}
+        onChange={(e) =>
+          setFilters({ ...filters, [filterKey]: e.target.value })
+        }
+        className="mt-1 p-2 w-full border rounded-md"
+      />
+    </div>
+  );
+
+  const filteredClientes = clientes.filter((cliente) => {
     return (
-      (!filters.identificacion ||
-        cliente.identificacion
+      (!filters.referencia ||
+        cliente.referencia
           .toLowerCase()
-          .includes(filters.identificacion.toLowerCase())) &&
+          .includes(filters.referencia.toLowerCase())) &&
       (!filters.nombre ||
         cliente.nombre.toLowerCase().includes(filters.nombre.toLowerCase())) &&
+      (!filters.fechaNacimiento ||
+        cliente.fechaNacimiento
+          .toLowerCase()
+          .includes(filters.fechaNacimiento.toLowerCase())) &&
+      (!filters.genero ||
+        cliente.genero.toLowerCase().includes(filters.genero.toLowerCase())) &&
+      (!filters.usuario ||
+        cliente.usuario
+          .toLowerCase()
+          .includes(filters.usuario.toLowerCase())) &&
       (!filters.celular ||
         cliente.celular
           .toLowerCase()
           .includes(filters.celular.toLowerCase())) &&
       (!filters.correo ||
-        cliente.correo?.toLowerCase().includes(filters.correo?.toLowerCase()))
+        cliente.correo
+          ?.toLowerCase()
+          .includes(filters.correo?.toLowerCase())) &&
+      (!filters.carrera ||
+        cliente.carrera?.toLowerCase().includes(filters.carrera?.toLowerCase()))
     );
   });
 
@@ -59,55 +85,14 @@ function Clientes() {
             Filtros
           </h5>
           <div className="flex flex-wrap -mx-2">
-            <div className="flex-1 px-2 mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Identificación
-              </label>
-              <input
-                type="text"
-                value={filters.identificacion}
-                onChange={(e) =>
-                  setFilters({ ...filters, identificacion: e.target.value })
-                }
-                className="mt-1 p-2 w-full border rounded-md"
-              />
-            </div>
-            <div className="flex-1 px-2 mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Nombre
-              </label>
-              <input
-                type="text"
-                value={filters.nombre}
-                onChange={(e) =>
-                  setFilters({ ...filters, nombre: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex-1 px-2 mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Celular
-              </label>
-              <input
-                type="text"
-                value={filters.celular}
-                onChange={(e) =>
-                  setFilters({ ...filters, celular: e.target.value })
-                }
-              />
-            </div>
-            <div className="flex-1 px-2 mb-4">
-              <label className="block text-sm font-medium text-gray-700">
-                Correo
-              </label>
-              <input
-                type="text"
-                value={filters.correo}
-                onChange={(e) =>
-                  setFilters({ ...filters, correo: e.target.value })
-                }
-              />
-            </div>
+            {renderFilterInput("Referencia", "referencia")}
+            {renderFilterInput("Nombre", "nombre")}
+            {renderFilterInput("Fecha Nacimiento", "fechaNacimiento")}
+            {renderFilterInput("Género", "genero")}
+            {renderFilterInput("Usuario", "usuario")}
+            {renderFilterInput("Celular", "celular")}
+            {renderFilterInput("Correo", "correo")}
+            {renderFilterInput("Carrera", "carrera")}
           </div>
         </Card>
       </div>
@@ -127,18 +112,23 @@ function Clientes() {
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Identificación</Table.HeadCell>
+          <Table.HeadCell>Referencia</Table.HeadCell>
+          <Table.HeadCell>Cédula</Table.HeadCell>
           <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Fecha Nacimiento</Table.HeadCell>
+          <Table.HeadCell>Género</Table.HeadCell>
+          <Table.HeadCell>Usuario</Table.HeadCell>
+          <Table.HeadCell>Contraseña</Table.HeadCell>
           <Table.HeadCell>Celular</Table.HeadCell>
           <Table.HeadCell>Correo</Table.HeadCell>
-          <Table.HeadCell>Cédula</Table.HeadCell>
+          <Table.HeadCell>Carrera</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {filteredCursos &&
-            filteredCursos.map((cliente) => (
+          {filteredClientes &&
+            filteredClientes.map((cliente) => (
               <Table.Row
                 key={cliente._id}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
@@ -146,14 +136,19 @@ function Clientes() {
                 {/* <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
                 {cliente.id}
               </Table.Cell> */}
-                <Table.Cell>{cliente.identificacion}</Table.Cell>
+                <Table.Cell>{cliente.referencia}</Table.Cell>
+                <Table.Cell>{cliente.cedula}</Table.Cell>
                 <Table.Cell>{cliente.nombre}</Table.Cell>
+                <Table.Cell>{cliente.fechaNacimiento}</Table.Cell>
+                <Table.Cell>{cliente.genero}</Table.Cell>
+                <Table.Cell>{cliente.usuario}</Table.Cell>
+                <Table.Cell>{cliente.contrasena}</Table.Cell>
                 <Table.Cell>{cliente.celular}</Table.Cell>
                 <Table.Cell>{cliente.correo}</Table.Cell>
-                <Table.Cell>{cliente.cedula}</Table.Cell>
+                <Table.Cell>{cliente.carrera}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/editCliente/${cliente.id}`} // Assuming you have an edit route
+                    to={`/formClientes/${cliente._id}`} // Assuming you have an edit route
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
