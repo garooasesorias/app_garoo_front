@@ -86,7 +86,7 @@ function Clientes() {
           </h5>
           <div className="flex flex-wrap -mx-2">
             {renderFilterInput("Referencia", "referencia")}
-            {renderFilterInput("Nombre", "nombre")}
+            {renderFilterInput("Nombre de Cliente", "nombre")}
             {renderFilterInput("Fecha Nacimiento", "fechaNacimiento")}
             {renderFilterInput("Género", "genero")}
             {renderFilterInput("Usuario", "usuario")}
@@ -114,8 +114,8 @@ function Clientes() {
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
           <Table.HeadCell>Referencia</Table.HeadCell>
           <Table.HeadCell>Cédula</Table.HeadCell>
-          <Table.HeadCell>Nombre</Table.HeadCell>
-          <Table.HeadCell>Fecha Nacimiento</Table.HeadCell>
+          <Table.HeadCell>Nombre de Cliente</Table.HeadCell>
+          <Table.HeadCell>Fecha de Nacimiento</Table.HeadCell>
           <Table.HeadCell>Género</Table.HeadCell>
           <Table.HeadCell>Usuario</Table.HeadCell>
           <Table.HeadCell>Contraseña</Table.HeadCell>

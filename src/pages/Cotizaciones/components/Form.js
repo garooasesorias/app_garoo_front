@@ -80,6 +80,16 @@ function CotizacionForm() {
     fetchData();
   }, []);
 
+  const calculateRowTotal = (row) => {
+    let totalRow = 0;
+    if (row.plan) {
+      const plan = planes.find((plan) => plan._id === row.plan.value);
+      totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
+    }
+    // Si tienes más campos que influyen en el total por fila, puedes añadirlos aquí.
+    return totalRow;
+  };
+
   const calculateTotal = () => {
     let total = 0;
     for (const fila of formData.items) {
@@ -245,10 +255,7 @@ function CotizacionForm() {
     formData.estado && formData.estado.value === "64ea66fb83c29fa14cfa44bf";
 
   return (
-    <form
-      className="flex max-w-lg mx-auto flex-col gap-4"
-      onSubmit={handleSubmit}
-    >
+    <form className="flex mx-auto flex-col gap-4" onSubmit={handleSubmit}>
       <h1>Formulario Cotizaciones</h1>
       <div className="mb-4">
         <label>Cliente:</label>
@@ -267,6 +274,7 @@ function CotizacionForm() {
             <th>Materia</th>
             <th>Plan</th>
             <th>Actividades</th>
+            <th>Total</th>
             <th></th>
           </tr>
         </thead>
@@ -312,6 +320,7 @@ function CotizacionForm() {
                   isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
                 />
               </td>
+              <td>{calculateRowTotal(fila)} COP</td>
               <td>
                 <Button color="danger" onClick={() => removeRow(index)}>
                   Eliminar
@@ -323,7 +332,7 @@ function CotizacionForm() {
       </Table>
 
       <div className="text-center">
-        <p>Total: {calculateTotal()} USD</p>
+        <p>Total: {calculateTotal()} COP</p>
       </div>
 
       {id && (

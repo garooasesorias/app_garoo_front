@@ -29,7 +29,7 @@ function Skills() {
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Nombre de Skills</Table.HeadCell>
           {/*<Table.HeadCell>Tipo</Table.HeadCell>*/}
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
