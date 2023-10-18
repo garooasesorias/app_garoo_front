@@ -30,7 +30,7 @@ function TiposActividad() {
   return (
     <>
  
-      <h1 class="PagesTitles">Tipo de Actividades</h1>
+      <h1 className="PagesTitles">Tipo de Actividades</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
         <Link to="/formtiposActividad">
           <Button className="shadow mb-5" color="success">

@@ -37,7 +37,7 @@ function Asesores() {
 
   return (
     <>
-      <h1 class="PagesTitles">Asesores</h1>
+      <h1 className="PagesTitles">Asesores</h1>
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4 items-center">

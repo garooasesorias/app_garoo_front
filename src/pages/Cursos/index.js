@@ -23,7 +23,7 @@ function Cursos() {
 
   return (
     <>
-    <h1 class="PagesTitles">Cursos</h1>
+    <h1 className="PagesTitles">Cursos</h1>
       {/* <Link to="/formCursos">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Curso +

@@ -52,7 +52,7 @@ function Actividades() {
 
   return (
     <>
-      <h1 class="PagesTitles">Actividades</h1>
+      <h1 className="PagesTitles">Actividades</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
         <Link to="/formActividades">
           <Button className="shadow mb-5" color="success">
