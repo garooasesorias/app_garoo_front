@@ -29,10 +29,12 @@ import EstadosCursos from "./pages/EstadosCursos";
 import CursosForm from "./pages/Cursos/components/Form";
 import FormCursos from "./pages/Cursos/components/Form";
 import Skills from "./pages/Skills";
-import FormSkills from "./pages/Skills/components/Form"
+import FormSkills from "./pages/Skills/components/Form";
 import Especialidades from "./pages/Especialidades";
-import FormEspecialidades from "./pages/Especialidades/components/Form"
-import ActividadesReportes from "./pages/ActividadesReportes"
+import FormEspecialidades from "./pages/Especialidades/components/Form";
+import ActividadesReportes from "./pages/ActividadesReportes";
+import Descuentos from "./pages/Descuentos";
+import FormDescuentos from "./pages/Descuentos/components/Form";
 
 function App() {
   return (
@@ -71,6 +73,9 @@ function App() {
           path="/formEstadosCotizaciones"
           element={<FormEstadosCotizaciones />}
         />
+        <Route path="/formDescuentos" element={<FormDescuentos />} />
+        <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
+        <Route path="/descuentos" element={<Descuentos />} />
         <Route path="/actividadesReportes" element={<ActividadesReportes />} />
         <Route path="/formCursos" element={<FormCursos />} />
         <Route path="/formCursos/:id" element={<FormCursos />} />

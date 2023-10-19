@@ -11,6 +11,7 @@ function CotizacionForm() {
     items: [],
     total: 0,
     estado: null,
+    divisionPagos: [],
   });
 
   const [clientes, setClientes] = useState([]);
@@ -20,8 +21,11 @@ function CotizacionForm() {
   const [planActividades, setPlanActividades] = useState([]);
   const [cotizacion, setCotizacion] = useState([]);
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
-
+  const [descuentos, setDescuentos] = useState([]);
+  const [descuentoSeleccionado, setDescuentoSeleccionado] = useState(null);
   const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
+  const [numeroDivisiones, setNumeroDivisiones] = useState(1);
+  const [fechasLimite, setFechasLimite] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,12 +38,13 @@ function CotizacionForm() {
       await google.script.run
         .withSuccessHandler(setEstadosCotizaciones)
         .getEstadosCotizaciones();
+      await google.script.run.withSuccessHandler(setDescuentos).getDescuentos();
 
       if (id) {
         await google.script.run
           .withSuccessHandler((data) => {
             const cotizacion = data[0];
-            // Set the fetched cotizacion data to the state
+            console.log(data);
             setCotizacion(data[0]);
 
             // Prepopulate the form fields with data from cotizacion
@@ -55,9 +60,16 @@ function CotizacionForm() {
                   label: item.materia.nombre,
                   value: item.materia._id,
                 },
-                plan: {
-                  label: item.plan.nombre,
-                  value: item.plan._id,
+                plan: item.plan
+                  ? {
+                      label: item.plan.nombre,
+                      value: item.plan._id,
+                    }
+                  : null,
+                planSubtotal: item.plan.precio,
+                descuento: {
+                  label: `${item.descuento.descripcion} (${item.descuento.porcentaje}%)`,
+                  value: item.descuento._id,
                 },
                 actividad: item.actividades.map((act) => ({
                   label: act.nombre,
@@ -70,15 +82,14 @@ function CotizacionForm() {
                 value: cotizacion.estado._id,
               },
             });
-
-            // Log the fetched cotizacion data
           })
           .getCotizacionById(id);
       }
     };
-
     fetchData();
   }, []);
+
+  console.log(formData);
 
   const calculateRowTotal = (row) => {
     let totalRow = 0;
@@ -86,6 +97,16 @@ function CotizacionForm() {
       const plan = planes.find((plan) => plan._id === row.plan.value);
       totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
     }
+
+    if (row.descuento) {
+      const descuentoAplicable = descuentos.find(
+        (descuento) => descuento._id === row.descuento.value
+      );
+      if (descuentoAplicable) {
+        totalRow = totalRow - totalRow * (descuentoAplicable.porcentaje / 100);
+      }
+    }
+
     // Si tienes más campos que influyen en el total por fila, puedes añadirlos aquí.
     return totalRow;
   };
@@ -100,21 +121,23 @@ function CotizacionForm() {
     }
     return total;
   };
+  const calculateTotalConDescuento = () => {
+    return formData.items.reduce(
+      (accum, fila) => accum + calculateRowTotal(fila),
+      0
+    );
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const total = calculateTotal(); // Calcular el total
-
-    setFormData((prevData) => ({
-      ...prevData,
-      fecha: currentDate,
-      total: total,
-    }));
+    // Aquí es donde formateamos y enviamos los datos.
+    // Asegúrate de incluir el descuento cuando estés guardando el formulario.
 
     const formattedItems = formData.items.map((item) => ({
       materia: item.materia ? { $oid: item.materia.value } : null,
       plan: item.plan ? { $oid: item.plan.value } : null,
+      descuento: item.descuento ? { $oid: item.descuento.value } : null,
       actividades: item.actividad
         ? item.actividad.map((act) => ({ $oid: act.value }))
         : [],
@@ -125,7 +148,8 @@ function CotizacionForm() {
       cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
       estado: { $oid: "64e600985fef1743de870cbc" },
       items: formattedItems,
-      total: total,
+      subtotal: calculateTotal(),
+      total: calculateTotalConDescuento(),
     };
 
     google.script.run
@@ -136,7 +160,6 @@ function CotizacionForm() {
   };
 
   const handleSubmitCurso = () => {
-    console.log(formData);
     formData.items.forEach(async (item) => {
       const formatedFormData = {
         fecha: currentDate,
@@ -180,24 +203,41 @@ function CotizacionForm() {
     const updatedFilas = [...formData.items];
     updatedFilas[rowIndex].plan = selectedOption;
 
+    // Precio por defecto, puede ser cambiado según la estructura de datos.
+    let planPrice = 0;
+
     if (selectedOption.value !== "personalizado") {
       const plan = planes.find((plan) => plan._id === selectedOption.value);
+
+      // Suponiendo que cada plan tiene un precio asociado
+      planPrice = plan.precio;
+
       const actividadesRelacionadas = plan.actividades_relacionadas.map(
         (actividad, actividadIndex) => ({
           label: actividad.nombre,
           value: actividad._id,
-          key: `${rowIndex}-${actividadIndex}`, // Usar rowIndex y actividadIndex
+          key: `${rowIndex}-${actividadIndex}`,
         })
       );
-
-      setPlanActividades(actividadesRelacionadas);
-
       updatedFilas[rowIndex].actividad = actividadesRelacionadas;
     } else {
-      setPlanActividades([]);
       updatedFilas[rowIndex].actividad = [];
     }
 
+    // Calcula el subtotal basado en el precio del plan y la cantidad.
+    updatedFilas[rowIndex].planSubtotal = planPrice;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      items: updatedFilas,
+    }));
+
+    setPlanActividades(updatedFilas[rowIndex].actividad);
+  };
+
+  const handleDescuentoChange = (selectedOption, rowIndex) => {
+    const updatedFilas = [...formData.items];
+    updatedFilas[rowIndex].descuento = selectedOption;
     setFormData((prevData) => ({
       ...prevData,
       items: updatedFilas,
@@ -225,7 +265,17 @@ function CotizacionForm() {
       ...prevData,
       items: [
         ...prevData.items,
-        { materia: null, plan: null, actividad: null },
+        { materia: null, plan: null, actividad: null, descuento: null },
+      ],
+    }));
+  };
+
+  const generateDivisionesPagos = (numeroDivisiones) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      divisionPagos: [
+        ...prevData.divisionPagos,
+        { materia: null, plan: null, actividad: null, descuento: null },
       ],
     }));
   };
@@ -274,6 +324,8 @@ function CotizacionForm() {
             <th>Materia</th>
             <th>Plan</th>
             <th>Actividades</th>
+            <th>Subtotal</th>
+            <th>Descuento</th>
             <th>Total</th>
             <th></th>
           </tr>
@@ -320,6 +372,22 @@ function CotizacionForm() {
                   isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
                 />
               </td>
+              <td>{fila.planSubtotal ? fila.planSubtotal : "N/A"} COP</td>
+              <td>
+                <Select
+                  options={[
+                    { label: "Sin descuento", value: null },
+                    ...descuentos.map((descuento) => ({
+                      label: `${descuento.descripcion} (${descuento.porcentaje}%)`,
+                      value: descuento._id,
+                    })),
+                  ]}
+                  value={fila.descuento}
+                  onChange={(selectedOption) =>
+                    handleDescuentoChange(selectedOption, index)
+                  }
+                />
+              </td>
               <td>{calculateRowTotal(fila)} COP</td>
               <td>
                 <Button color="danger" onClick={() => removeRow(index)}>
@@ -333,6 +401,9 @@ function CotizacionForm() {
 
       <div className="text-center">
         <p>Total: {calculateTotal()} COP</p>
+        {formData.items.some((fila) => fila.descuento) && (
+          <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
+        )}
       </div>
 
       {id && (
@@ -352,6 +423,47 @@ function CotizacionForm() {
       <Button color="success" onClick={addRow}>
         Agregar Fila +
       </Button>
+
+      <div className="mb-4">
+        <label>Número de divisiones:</label>
+        <input
+          type="number"
+          value={numeroDivisiones}
+          // onChange={(e) => setNumeroDivisiones(e.target.value)}
+          onChange={(e) => generateDivisionesPagos(e.target.value)}
+        />
+      </div>
+
+      <Table className="mb-4">
+        <thead>
+          <tr>
+            <th>División</th>
+            <th>Monto</th>
+            <th>Fecha límite</th>
+          </tr>
+        </thead>
+        <tbody>
+          {Array.from({ length: numeroDivisiones }).map((_, index) => (
+            <tr key={index}>
+              <td>{index + 1}</td>
+              <td>
+                {(calculateTotalConDescuento() / numeroDivisiones).toFixed(2)}
+              </td>
+              <td>
+                <input
+                  type="date"
+                  value={fechasLimite[index] || ""}
+                  onChange={(e) => {
+                    const updatedFechas = [...fechasLimite];
+                    updatedFechas[index] = e.target.value;
+                    setFechasLimite(updatedFechas);
+                  }}
+                />
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
 
       {!id && (
         <Button type="submit" color="dark">
