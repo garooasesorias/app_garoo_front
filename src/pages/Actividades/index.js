@@ -63,8 +63,8 @@ function Actividades() {
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
-          <Table.HeadCell>Tipo</Table.HeadCell>
+          <Table.HeadCell>Nombre de Actividad</Table.HeadCell>
+          <Table.HeadCell>Tipo de Actividad</Table.HeadCell>
           <Table.HeadCell>Precio</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>

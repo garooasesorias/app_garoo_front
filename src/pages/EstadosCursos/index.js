@@ -34,7 +34,7 @@ function EstadosCursos() {
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Nombre Estado de Curso</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>

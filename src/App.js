@@ -59,6 +59,7 @@ function App() {
         <Route path="/estadosCursos" element={<EstadosCursos />} />
         <Route path="/formAsesores" element={<FormAsesores />} />
         <Route path="/formClientes" element={<FormClientes />} />
+        <Route path="/formClientes/:id" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />
         <Route path="/formMaterias" element={<FormMaterias />} />
         <Route path="/formActividades" element={<FormActividades />} />
