@@ -25,7 +25,7 @@ function Form() {
   };
   return (
     <>
-      <h1>Formulario Estados Cursos</h1>
+      <h1 className="PagesTitles">Formulario Estado Cursos</h1>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -44,6 +44,9 @@ function Form() {
           Submit
         </Button>
       </form>
+      <Button type="button" color="dark" href="/EstadosCursos" className="button">
+          Volver
+        </Button>
     </>
   );
 }

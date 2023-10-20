@@ -249,7 +249,7 @@ function CotizacionForm() {
       className="flex max-w-lg mx-auto flex-col gap-4"
       onSubmit={handleSubmit}
     >
-      <h1>Formulario Cotizaciones</h1>
+  <h1 className="PagesTitles">Formulario Cotizaciones</h1>
       <div className="mb-4">
         <label>Cliente:</label>
         <Select
@@ -381,7 +381,10 @@ function CotizacionForm() {
 
       {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
     </form>
+    
+    
   );
+  
 }
 
 export default CotizacionForm;

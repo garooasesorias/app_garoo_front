@@ -69,7 +69,7 @@ function Form() {
   };
   return (
     <>
-     <h1>Formulario Actividades</h1>
+     <h1 className="PagesTitles">Formulario Actividades</h1>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -120,6 +120,9 @@ function Form() {
           Submit
         </Button>
       </form>
+      <Button type="button" color="dark" href="/Actividades" className="button">
+          Volver
+        </Button>
     </>
   );
 }

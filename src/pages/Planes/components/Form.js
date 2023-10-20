@@ -107,6 +107,9 @@ function Form() {
           Submit
         </Button>
       </form>
+      <Button type="button" color="dark" href="/Planes" className="button">
+          Volver
+        </Button>
     </>
   );
 }

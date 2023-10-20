@@ -21,6 +21,7 @@ function Skills() {
 
   return (
     <>
+    <h1 className="PagesTitles">Skills</h1>
       <Link to="/formSkills">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear skill +

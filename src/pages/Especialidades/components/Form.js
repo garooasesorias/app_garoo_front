@@ -40,6 +40,9 @@ function Form() {
           Submit
         </Button>
       </form>
+      <Button type="button" color="dark" href="/Especialidades" className="button">
+          Volver
+        </Button>
     </>
   );
 }

@@ -22,6 +22,7 @@ function Especialidades() {
 
   return (
     <>
+    <h1 className="PagesTitles">Especialidades</h1>
       <Link to="/formEspecialidades">
         <Button className="shadow mb-5 ms-auto mr-5" color="success">
           Crear Especialidades +

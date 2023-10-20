@@ -167,7 +167,7 @@ function ActividadesReportes() {
 
   return (
     <div className="flex flex-col space-y-6">
-      <h1>Reporte Actividades</h1>
+      <h1 className="PagesTitles">Reporte Actividades</h1>
       <div className="w-full">
         <Card>
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
