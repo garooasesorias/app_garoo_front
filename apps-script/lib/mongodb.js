@@ -260,6 +260,7 @@ class MongoDBLib {
           _id: 1,
           total: 1,
           fecha: 1,
+          divisionPagos: 1, // Incluyendo divisionPagos aquí
           cliente: {
             $mergeObjects: { $arrayElemAt: ["$cliente_info", 0] },
           },

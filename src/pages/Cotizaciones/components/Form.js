@@ -24,7 +24,6 @@ function CotizacionForm() {
   const [descuentos, setDescuentos] = useState([]);
   const [descuentoSeleccionado, setDescuentoSeleccionado] = useState(null);
   const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
-  const [numeroDivisiones, setNumeroDivisiones] = useState(1);
   const [fechasLimite, setFechasLimite] = useState([]);
 
   useEffect(() => {
@@ -54,7 +53,6 @@ function CotizacionForm() {
                 label: cotizacion.cliente.nombre,
                 value: cotizacion.cliente._id,
               },
-              // You can add other fields similarly
               items: cotizacion.items.map((item) => ({
                 materia: {
                   label: item.materia.nombre,
@@ -67,14 +65,25 @@ function CotizacionForm() {
                     }
                   : null,
                 planSubtotal: item.plan.precio,
-                descuento: {
-                  label: `${item.descuento.descripcion} (${item.descuento.porcentaje}%)`,
-                  value: item.descuento._id,
-                },
+                descuento:
+                  item.descuento && Object.keys(item.descuento).length
+                    ? {
+                        label: `${item.descuento.descripcion} (${item.descuento.porcentaje}%)`,
+                        value: item.descuento._id,
+                      }
+                    : {
+                        label: "Sin Descuento",
+                        value: null,
+                      },
                 actividad: item.actividades.map((act) => ({
                   label: act.nombre,
                   value: act._id,
                 })),
+              })),
+              divisionPagos: cotizacion.divisionPagos.map((division) => ({
+                numeroDivision: division.numeroDivision,
+                monto: division.monto,
+                fechaLimite: division.fechaLimite,
               })),
               total: cotizacion.total,
               estado: {
@@ -150,7 +159,10 @@ function CotizacionForm() {
       items: formattedItems,
       subtotal: calculateTotal(),
       total: calculateTotalConDescuento(),
+      divisionPagos: formData.divisionPagos,
     };
+
+    console.log(formattedFormData);
 
     google.script.run
       .withSuccessHandler(() => {
@@ -270,14 +282,38 @@ function CotizacionForm() {
     }));
   };
 
-  const generateDivisionesPagos = (numeroDivisiones) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      divisionPagos: [
-        ...prevData.divisionPagos,
-        { materia: null, plan: null, actividad: null, descuento: null },
-      ],
-    }));
+  const generateDivisionesPagos = (nuevoNumeroDivisiones) => {
+    setFormData((prevData) => {
+      const diferencia = nuevoNumeroDivisiones - prevData.divisionPagos.length;
+
+      // Si necesitas agregar más divisiones
+      if (diferencia > 0) {
+        return {
+          ...prevData,
+          divisionPagos: [
+            ...prevData.divisionPagos,
+            ...Array.from({ length: diferencia }).map((_, index) => ({
+              numeroDivision: index + 1,
+              monto: (
+                calculateTotalConDescuento() / nuevoNumeroDivisiones
+              ).toFixed(2),
+              fechaLimite: "",
+            })),
+          ],
+        };
+      }
+
+      // Si necesitas eliminar divisiones
+      if (diferencia < 0) {
+        return {
+          ...prevData,
+          divisionPagos: prevData.divisionPagos.slice(0, nuevoNumeroDivisiones),
+        };
+      }
+
+      // Si no hay cambios
+      return prevData;
+    });
   };
 
   const removeRow = (index) => {
@@ -428,8 +464,7 @@ function CotizacionForm() {
         <label>Número de divisiones:</label>
         <input
           type="number"
-          value={numeroDivisiones}
-          // onChange={(e) => setNumeroDivisiones(e.target.value)}
+          value={formData.divisionPagos.length}
           onChange={(e) => generateDivisionesPagos(e.target.value)}
         />
       </div>
@@ -443,20 +478,23 @@ function CotizacionForm() {
           </tr>
         </thead>
         <tbody>
-          {Array.from({ length: numeroDivisiones }).map((_, index) => (
+          {formData.divisionPagos.map((division, index) => (
             <tr key={index}>
-              <td>{index + 1}</td>
-              <td>
-                {(calculateTotalConDescuento() / numeroDivisiones).toFixed(2)}
-              </td>
+              <td>{division.numeroDivision}</td>
+              <td>{division.monto}</td>
               <td>
                 <input
                   type="date"
-                  value={fechasLimite[index] || ""}
+                  value={division.fechaLimite}
                   onChange={(e) => {
-                    const updatedFechas = [...fechasLimite];
-                    updatedFechas[index] = e.target.value;
-                    setFechasLimite(updatedFechas);
+                    setFormData((prevData) => {
+                      const updatedDivisiones = [...prevData.divisionPagos];
+                      updatedDivisiones[index].fechaLimite = e.target.value;
+                      return {
+                        ...prevData,
+                        divisionPagos: updatedDivisiones,
+                      };
+                    });
                   }}
                 />
               </td>
