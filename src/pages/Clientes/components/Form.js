@@ -97,7 +97,6 @@ function Form() {
 
 
   const goBack = () => {
-    
     window.history.back();
   };
 
@@ -272,16 +271,13 @@ function Form() {
           Submit
         </Button> */}
         <Button type="submit" color="dark">
-          Submit
+          {id ? "Actualizar" : "Crear"}
         </Button>
       </form>
 
-
-      <Button type="button" color="dark" onClick= {goBack}>
-          Volver
-        </Button>
-
-
+      <Button type="button" color="dark" onClick={goBack}>
+        Volver
+      </Button>
 
       {props.showToast && (
         <Toast>

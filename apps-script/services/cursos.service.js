@@ -22,7 +22,7 @@ function getCursoById(id) {
   const query = {
     _id: { $oid: id },
   };
-  
+
   const order = {};
   const limit = 10;
 

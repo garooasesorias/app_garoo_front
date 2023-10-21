@@ -201,9 +201,6 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
- 
-
-  
 
   getCotizacionesWithItems(endpoint, query, order, limit) {
     const pipeline = [
@@ -224,6 +221,14 @@ class MongoDBLib {
           localField: "items.plan",
           foreignField: "_id",
           as: "plan_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "descuentos",
+          localField: "items.descuento",
+          foreignField: "_id",
+          as: "descuento_info",
         },
       },
       {
@@ -255,6 +260,7 @@ class MongoDBLib {
           _id: 1,
           total: 1,
           fecha: 1,
+          divisionPagos: 1, // Incluyendo divisionPagos aquí
           cliente: {
             $mergeObjects: { $arrayElemAt: ["$cliente_info", 0] },
           },
@@ -270,6 +276,9 @@ class MongoDBLib {
                   $mergeObjects: { $arrayElemAt: ["$materia_info", 0] },
                 },
                 plan: { $mergeObjects: { $arrayElemAt: ["$plan_info", 0] } },
+                descuento: {
+                  $mergeObjects: { $arrayElemAt: ["$descuento_info", 0] },
+                },
                 actividades: {
                   $map: {
                     input: "$$item.actividades",
