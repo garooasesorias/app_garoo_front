@@ -57,6 +57,35 @@ main {
   display: flex;
 }
 
+.loader {
+  box-sizing: border-box;
+  border: 2px solid;
+  border-radius: 50%;
+  width: 60px;
+  height: 25px;
+  animation: 2s linear infinite l2;
+  display: grid;
+}
+
+.loader:before, .loader:after {
+  content: "";
+  border: inherit;
+  animation: inherit;
+  border-radius: 50%;
+  grid-area: 1 / 1;
+  animation-duration: 3s;
+}
+
+.loader:after {
+  --s: -1;
+}
+
+@keyframes l2 {
+  100% {
+    transform: rotate(calc(var(--s, 1) * 1turn));
+  }
+}
+
 .react-datepicker__year-read-view--down-arrow, .react-datepicker__month-read-view--down-arrow, .react-datepicker__month-year-read-view--down-arrow, .react-datepicker__navigation-icon:before {
   content: "";
   border: 3px solid #ccc;

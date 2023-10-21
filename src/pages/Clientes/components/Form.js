@@ -2,10 +2,13 @@ import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+import Loader from '../../../components/Loader.js';
+
 
 
 function Form() {
   const formRef = useRef();
+  
   const [formData, setFormData] = useState({
     referencia: "",
     cedula: "",
@@ -19,6 +22,7 @@ function Form() {
     carrera: "",
   });
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
   const props = { showToast, setShowToast };
 
   const { id } = useParams(); // Extrae el id desde la URL
@@ -56,6 +60,7 @@ function Form() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (id) {
       // Si hay un ID, actualizamos el cliente en lugar de insertar uno nuevo
@@ -63,6 +68,7 @@ function Form() {
         .withSuccessHandler((response) => {
           console.log(response);
           setAction("updated"); // Establecemos la acción a 'actualizado'
+          setLoading(false);
           props.setShowToast(!props.showToast);
         })
         .updateClienteById(id, formData); // Envia el ID y los datos del formulario
@@ -72,6 +78,7 @@ function Form() {
         .withSuccessHandler((response) => {
           console.log(response);
           setAction("creado"); // Establecemos la acción a 'creado'
+          setLoading(false);
           props.setShowToast(!props.showToast);
         })
         .insertCliente(formData);
@@ -86,6 +93,7 @@ function Form() {
     }));
   };
 
+  
 
 
   const goBack = () => {
@@ -114,6 +122,7 @@ function Form() {
   return (
     <>
 
+      {loading ? <Loader /> : null}
       <form
         ref={formRef}
         className="flex max-w-md flex-col gap-4"
