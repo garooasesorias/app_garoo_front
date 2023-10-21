@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Label, Table } from "flowbite-react";
 import Select from "react-select";
+import PdfButton from "./PDFButton";
 
 function CotizacionForm() {
   let { id } = useParams();
@@ -52,6 +53,7 @@ function CotizacionForm() {
               cliente: {
                 label: cotizacion.cliente.nombre,
                 value: cotizacion.cliente._id,
+                usuario: cotizacion.cliente.usuario,
               },
               items: cotizacion.items.map((item) => ({
                 materia: {
@@ -508,6 +510,8 @@ function CotizacionForm() {
           Submit
         </Button>
       )}
+
+      {formData.fecha && <PdfButton data={formData} />}
 
       {isEstadoGenerada && (
         <Button color="light">Enviar Cotización al Cliente</Button>
