@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
-import { HiFire } from "react-icons/hi";
+import { HiCheck } from "react-icons/hi";
 import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 
 function Form() {
@@ -22,7 +22,7 @@ function Form() {
 
   const { id } = useParams(); // Extrae el id desde la URL
 
-  const [action, setAction] = useState("created"); // Nuevo estado para saber si estamos creando o actualizando
+  const [action, setAction] = useState("creado"); // Nuevo estado para saber si estamos creando o actualizando
 
   // Si hay un id, obtén los datos del cliente por el id
   useEffect(() => {
@@ -70,7 +70,7 @@ function Form() {
       google.script.run
         .withSuccessHandler((response) => {
           console.log(response);
-          setAction("created"); // Establecemos la acción a 'creado'
+          setAction("creado"); // Establecemos la acción a 'creado'
           props.setShowToast(!props.showToast);
         })
         .insertCliente(formData);
@@ -83,6 +83,10 @@ function Form() {
       ...prevData,
       [name]: value,
     }));
+  };
+
+  const goBack = () => {
+    window.history.back();
   };
 
   // const handleReset = () => {
@@ -105,17 +109,6 @@ function Form() {
 
   return (
     <>
-      {props.showToast && (
-        <Toast>
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-            <HiFire className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">
-            Cliente {action} con Éxito
-          </div>
-          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
-        </Toast>
-      )}
       <form
         ref={formRef}
         className="flex max-w-md flex-col gap-4"
@@ -265,9 +258,25 @@ function Form() {
           Submit
         </Button> */}
         <Button type="submit" color="dark">
-          Submit
+          {id ? "Actualizar" : "Crear"}
         </Button>
       </form>
+
+      <Button type="button" color="dark" onClick={goBack}>
+        Volver
+      </Button>
+
+      {props.showToast && (
+        <Toast>
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+            <HiCheck className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">
+            Cliente {action} con Éxito
+          </div>
+          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
+        </Toast>
+      )}
     </>
   );
 }

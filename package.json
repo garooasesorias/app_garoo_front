@@ -5,8 +5,8 @@
   "scripts": {
     "glogin": "clasp login",
     "glogout": "clasp logout",
-    "gcreate": "clasp create --title 'React_Garoo_Project' --rootDir ./apps-script",
-    "gclone": "clasp clone 11HIm6g_7hE6Xh6wkfpcKLrElgZDZu98TWNxdtznCMJF35LpnWAn6qGqb --rootDir ./apps-script",
+    "gcreate": "clasp create --title 'Jose_Garoo_Project' --rootDir ./apps-script",
+    "gclone": "clasp clone 1CdK0myVVbAnblIz2hOJ_QaNy5UM3toI8ShjSQiCs94LNnPomft2D9xFT --rootDir ./apps-script",
     "gpull": "clasp pull",
     "gpush": "clasp push",
     "gstart": "clasp push --watch",
@@ -33,7 +33,7 @@
     "react-datepicker": "^4.17.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.10.1",
-    "react-router-dom": "^6.14.2",
+    "react-router-dom": "^6.17.0",
     "react-select": "^5.7.4",
     "sass": "^1.64.1"
   }

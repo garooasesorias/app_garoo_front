@@ -342,9 +342,19 @@ function CotizacionForm() {
   const isEstadoGestionada =
     formData.estado && formData.estado.value === "64ea66fb83c29fa14cfa44bf";
 
+    const goBack = () => {
+    
+      window.history.back();
+    };
+  
+
   return (
-    <form className="flex mx-auto flex-col gap-4" onSubmit={handleSubmit}>
-      <h1>Formulario Cotizaciones</h1>
+    <>
+    <form
+      className="flex mx-auto flex-col gap-4"
+      onSubmit={handleSubmit}
+    >
+  <h1 className="PagesTitles">Formulario Cotizaciones</h1>
       <div className="mb-4">
         <label>Cliente:</label>
         <Select
@@ -544,7 +554,12 @@ function CotizacionForm() {
 
       {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
     </form>
+    <Button type="button" color="dark" onClick= {goBack}>
+          Volver
+        </Button>
+    </>
   );
+  
 }
 
 export default CotizacionForm;
