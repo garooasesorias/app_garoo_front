@@ -57,11 +57,6 @@ main {
   display: flex;
 }
 
-.button {
-  width: 20%;
-  margin: 5px 120px;
-}
-
 .react-datepicker__year-read-view--down-arrow, .react-datepicker__month-read-view--down-arrow, .react-datepicker__month-year-read-view--down-arrow, .react-datepicker__navigation-icon:before {
   content: "";
   border: 3px solid #ccc;

@@ -133,6 +133,12 @@ function Form() {
     formData.especialidades.includes(especialidad._id)
   );
 
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
+
   return (
     <>
       <form className="flex max-w-md flex-col gap-4" onSubmit={handleSubmit}>
@@ -247,7 +253,7 @@ function Form() {
         >  Submit
         </Button>
       </form>
-      <Button type="button" color="dark" href="/Asesores" className="button">
+      <Button type="button" color="dark" onClick= {goBack}>
           Volver
         </Button>
     </>

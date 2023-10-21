@@ -67,6 +67,12 @@ function Form() {
     const selectedValue = e.target.value;
     handleTipoChange(selectedValue);
   };
+
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
   return (
     <>
      <h1 className="PagesTitles">Formulario Actividades</h1>
@@ -120,7 +126,7 @@ function Form() {
           Submit
         </Button>
       </form>
-      <Button type="button" color="dark" href="/Actividades" className="button">
+      <Button type="button" color="dark" onClick= {goBack}>
           Volver
         </Button>
     </>

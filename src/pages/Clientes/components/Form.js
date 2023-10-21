@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
-import { HiCheck } from 'react-icons/hi';
+import { HiCheck } from "react-icons/hi";
 import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+
 
 function Form() {
   const formRef = useRef();
@@ -85,6 +86,13 @@ function Form() {
     }));
   };
 
+
+
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
   // const handleReset = () => {
   //   if (
   //     formData.referencia !== "" &&
@@ -105,7 +113,7 @@ function Form() {
 
   return (
     <>
-  
+
       <form
         ref={formRef}
         className="flex max-w-md flex-col gap-4"
@@ -259,16 +267,17 @@ function Form() {
         </Button>
       </form>
 
-      <Button type="button" color="dark" href="/Clientes" className="button">
+
+      <Button type="button" color="dark" onClick= {goBack}>
           Volver
         </Button>
 
 
-     
+
       {props.showToast && (
         <Toast>
           <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-          <HiCheck className="h-5 w-5" />
+            <HiCheck className="h-5 w-5" />
           </div>
           <div className="ml-3 text-sm font-normal">
             Cliente {action} con Éxito

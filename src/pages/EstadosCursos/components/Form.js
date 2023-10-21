@@ -23,6 +23,12 @@ function Form() {
       [name]: value,
     }));
   };
+
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
   return (
     <>
       <h1 className="PagesTitles">Formulario Estado Cursos</h1>
@@ -44,7 +50,7 @@ function Form() {
           Submit
         </Button>
       </form>
-      <Button type="button" color="dark" href="/EstadosCursos" className="button">
+      <Button type="button" color="dark" onClick= {goBack}>
           Volver
         </Button>
     </>

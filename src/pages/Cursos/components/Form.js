@@ -144,7 +144,14 @@ const FormCursos = () => {
     });
   };
 
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
+
   return (
+    <>
     <form
       className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
@@ -269,6 +276,10 @@ const FormCursos = () => {
         Submit
       </Button>
     </form>
+        <Button type="button" color="dark" onClick= {goBack}>
+        Volver
+      </Button>
+      </>
   );
 };
 
