@@ -1,4 +1,4 @@
-var imagesFiles = [
+const  filesArray = [
   { nombre: "logoGaroo", id: "19WEtck882Nc0uuMfmB7KLC0D9jjPCjwu" },
   { nombre: "logoNequi", id: "1ebNHvVH8Je1sDda-4EAmQ0OQcZwvyk25" },
   { nombre: "logoEfecty", id: "1aHg0PH0lgP5mNBaHEaeZV7XoTsTxVEam" },
@@ -56,10 +56,6 @@ function getCotizacionById(id) {
 function updateCotizacionById() {}
 
 function getImagenesCotizacion() {
-  return filesToBase64(imagesFiles);
-}
-
-function filesToBase64(filesArray) {
   for (var i = 0; i < filesArray.length; i++) {
     var file = DriveApp.getFileById(filesArray[i].id);
     var blob = file.getBlob();
