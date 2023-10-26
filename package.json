@@ -5,7 +5,7 @@
   "scripts": {
     "glogin": "clasp login",
     "glogout": "clasp logout",
-    "gcreate": "clasp create --title 'Jose_Garoo_Project' --rootDir ./apps-script",
+    "gcreate": "clasp create --title 'MesaSoporte_Garoo_Project' --rootDir ./apps-script",
     "gclone": "clasp clone 1CdK0myVVbAnblIz2hOJ_QaNy5UM3toI8ShjSQiCs94LNnPomft2D9xFT --rootDir ./apps-script",
     "gpull": "clasp pull",
     "gpush": "clasp push",
