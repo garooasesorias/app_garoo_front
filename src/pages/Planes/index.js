@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
 import { Link } from "react-router-dom";
 import styles from '../../styles/main.scss';
+import Loader from '../../components/Loader.js';
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collapsedIndex, setCollapsedIndex] = useState(null);
   const [planes, setPlanes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,6 +16,7 @@ function Planes() {
         .withSuccessHandler((data) => {
           console.log(data);
           setPlanes(data);
+          setLoading(false);
         })
         .getPlanes();
     };
@@ -103,6 +106,9 @@ function Planes() {
           </Card>
         ))}
       </div>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

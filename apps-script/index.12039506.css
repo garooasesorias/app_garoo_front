@@ -57,6 +57,32 @@ main {
   display: flex;
 }
 
+.Toast {
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+}
+
+.LoaderContainer {
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  margin: 50px auto auto;
+  display: flex;
+}
+
+.LoaderContainerForm {
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
 .loader {
   box-sizing: border-box;
   border: 2px solid;

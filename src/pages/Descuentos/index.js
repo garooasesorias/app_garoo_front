@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Table, Card } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 
 function Descuentos() {
   const [descuentos, setDescuentos] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     descripcion: "",
     porcentaje: "",
@@ -19,6 +21,7 @@ function Descuentos() {
         .withSuccessHandler((data) => {
           console.log(data);
           setDescuentos(data);
+          setLoading(false);
         })
         .getDescuentos();
     };
@@ -123,6 +126,9 @@ function Descuentos() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

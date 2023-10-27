@@ -354,7 +354,7 @@ function CotizacionForm() {
       className="flex mx-auto flex-col gap-4"
       onSubmit={handleSubmit}
     >
-  <h1 className="PagesTitles">Formulario Cotizaciones</h1>
+ 
       <div className="mb-4">
         <label>Cliente:</label>
         <Select
@@ -554,9 +554,9 @@ function CotizacionForm() {
 
       {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
     </form>
-    <Button type="button" color="dark" onClick= {goBack}>
-          Volver
-        </Button>
+    <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
+        Volver
+      </Button>
     </>
   );
   

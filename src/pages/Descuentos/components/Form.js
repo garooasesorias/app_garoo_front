@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
-import { HiFire } from "react-icons/hi";
 import { useParams } from "react-router-dom";
+import { HiCheck } from "react-icons/hi";
+import Loader from '../../../components/Loader.js';
 
 function DescuentoForm() {
   const formRef = useRef();
@@ -13,17 +14,22 @@ function DescuentoForm() {
     estado: "",
   });
   const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
   const props = { showToast, setShowToast };
 
+  const [action, setAction] = useState("creado");
+
   const { id } = useParams();
-  const [action, setAction] = useState("created");
+  
 
   useEffect(() => {
     if (id) {
+      setLoading(true);
       google.script.run
         .withSuccessHandler((data) => {
           console.log(data);
           setDescuento(data[0]);
+          setLoading(false);
         })
         .getDescuentoById(id);
     }
@@ -41,17 +47,20 @@ function DescuentoForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoading(true);
     if (id) {
       google.script.run
         .withSuccessHandler((response) => {
-          setAction("updated");
+          setAction("actualizado");
+          setLoading(false);
           props.setShowToast(!props.showToast);
         })
         .updateDescuentoById(id, formData);
     } else {
       google.script.run
         .withSuccessHandler((response) => {
-          setAction("created");
+          setAction("creado");
+          setLoading(false);
           props.setShowToast(!props.showToast);
         })
         .insertDescuento(formData);
@@ -66,22 +75,18 @@ function DescuentoForm() {
     }));
   };
 
+  const goBack = () => {
+    
+    window.history.back();
+  };
+
+
   return (
     <>
-      {props.showToast && (
-        <Toast>
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-            <HiFire className="h-5 w-5" />
-          </div>
-          <div className="ml-3 text-sm font-normal">
-            Descuento {action} con Éxito
-          </div>
-          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
-        </Toast>
-      )}
+
       <form
         ref={formRef}
-        className="flex max-w-md flex-col gap-4"
+        className="flex max-w-md flex-col gap-4 m-auto"
         onSubmit={handleSubmit}
       >
         <div className="max-w-md">
@@ -148,6 +153,25 @@ function DescuentoForm() {
           Submit
         </Button>
       </form>
+      <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
+        Volver
+      </Button>
+
+      <div className="LoaderContainerForm">
+      {loading ? <Loader /> : null}
+      </div>
+
+      {props.showToast && (
+        <Toast style={{ maxWidth: '250px' }} className="Toast" >
+          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
+            <HiCheck className="h-5 w-5" />
+          </div>
+          <div className="ml-3 text-sm font-normal">
+            Descuento {action} con éxito
+          </div>
+          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
+        </Toast>
+      )}
     </>
   );
 }

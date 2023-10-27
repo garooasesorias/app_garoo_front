@@ -3,9 +3,11 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import styles from '../../styles/main.scss';
+import Loader from '../../components/Loader.js';
 
 function TiposMateria() {
   const [tiposMateria, setTiposMateria] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -20,6 +22,7 @@ function TiposMateria() {
       await google.script.run
         .withSuccessHandler((data) => {
           setTiposMateria(data);
+          setLoading(false);
         })
         .getTiposMateria();
     };
@@ -69,6 +72,9 @@ function TiposMateria() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

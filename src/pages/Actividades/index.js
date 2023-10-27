@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 import styles from '../../styles/main.scss';
 
 function Actividades() {
   const [actividades, setActividades] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,6 +29,7 @@ function Actividades() {
             })
             .getTiposActividad();
         });
+        setLoading(false);
 
         // Assuming tipoDataResponse contains an array of tipo objects
         const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
@@ -92,6 +95,9 @@ function Actividades() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

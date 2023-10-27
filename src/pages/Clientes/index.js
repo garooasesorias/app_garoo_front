@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Table, Card } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 
 function Clientes() {
   const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     referencia: "",
     cedula: "",
@@ -17,15 +19,16 @@ function Clientes() {
     correo: "",
     carrera: "",
   });
-
   useEffect(() => {
     const fetchData = async () => {
       await google.script.run
-        .withSuccessHandler((data) => {
+      .withSuccessHandler((data) => {
           console.log(data);
           setClientes(data);
+          setLoading(false);
         })
         .getClientes();
+        
     };
 
     fetchData();
@@ -158,6 +161,9 @@ function Clientes() {
             ))}
         </Table.Body>
       </Table>
+            <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

@@ -33,9 +33,11 @@ function Form() {
   useEffect(() => {
     console.log(id);
     if (id) {
+      setLoading(true);
       google.script.run
         .withSuccessHandler((data) => {
           setCliente(data[0]);
+          setLoading(false);
         })
         .getClienteById(id);
     }
@@ -67,7 +69,7 @@ function Form() {
       google.script.run
         .withSuccessHandler((response) => {
           console.log(response);
-          setAction("updated"); // Establecemos la acción a 'actualizado'
+          setAction("actualizado"); // Establecemos la acción a 'actualizado'
           setLoading(false);
           props.setShowToast(!props.showToast);
         })
@@ -121,10 +123,10 @@ function Form() {
   return (
     <>
 
-      {loading ? <Loader /> : null}
+    
       <form
         ref={formRef}
-        className="flex max-w-md flex-col gap-4"
+        className="flex max-w-md flex-col gap-4 m-auto"
         onSubmit={handleSubmit}
       >
         <div className="max-w-md">
@@ -275,21 +277,25 @@ function Form() {
         </Button>
       </form>
 
-      <Button type="button" color="dark" onClick={goBack}>
+      <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
         Volver
       </Button>
-
+    
+      <div className="LoaderContainerForm">
+      {loading ? <Loader /> : null}
+      </div>
       {props.showToast && (
-        <Toast>
+        <Toast style={{ maxWidth: '250px' }} className="Toast" >
           <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
             <HiCheck className="h-5 w-5" />
           </div>
           <div className="ml-3 text-sm font-normal">
-            Cliente {action} con Éxito
+            Cliente {action} con éxito
           </div>
           <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
         </Toast>
       )}
+      
     </>
   );
 }
