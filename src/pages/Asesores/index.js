@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 import styles from '../../styles/main.scss';
+
 
 function Asesores() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collapsedIndex, setCollapsedIndex] = useState(null);
   const [asesores, setAsesores] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -14,6 +17,7 @@ function Asesores() {
         .withSuccessHandler((data) => {
           console.log(data);
           setAsesores(data);
+          setLoading(false);
         })
         .getAsesores();
     };
@@ -142,6 +146,9 @@ function Asesores() {
           </Card>
         ))}
       </div>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

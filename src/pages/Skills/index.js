@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button, Label } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 
 function Skills() {
   const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -12,6 +14,7 @@ function Skills() {
       await google.script.run
         .withSuccessHandler((data) => {
           setSkills(data);
+          setLoading(false);
         })
         .getSkills();
     };
@@ -57,6 +60,9 @@ function Skills() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

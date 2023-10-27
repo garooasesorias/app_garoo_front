@@ -156,7 +156,6 @@ const FormCursos = () => {
       className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
     >
-      <h1>Formulario Curso</h1>
       {curso.cliente && (
         <h2
           style={{
@@ -276,7 +275,7 @@ const FormCursos = () => {
         Submit
       </Button>
     </form>
-        <Button type="button" color="dark" onClick= {goBack}>
+    <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
         Volver
       </Button>
       </>

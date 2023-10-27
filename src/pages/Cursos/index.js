@@ -3,10 +3,12 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
+import Loader from '../../components/Loader.js';
 import styles from '../../styles/main.scss';
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -15,6 +17,7 @@ function Cursos() {
         .withSuccessHandler((data) => {
           console.log(data);
           setCursos(data);
+          setLoading(false);
         })
         .getCursos();
     };
@@ -82,6 +85,9 @@ function Cursos() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

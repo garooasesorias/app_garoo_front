@@ -2,10 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
 import styles from '../../styles/main.scss';
 
 function EstadosCursos() {
   const [estadosCursos, setEstadosCursos] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -14,6 +16,7 @@ function EstadosCursos() {
       await google.script.run
         .withSuccessHandler((data) => {
           setEstadosCursos(data);
+          setLoading(false);
         })
         .getEstadosCursos();
     };
@@ -63,6 +66,9 @@ function EstadosCursos() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

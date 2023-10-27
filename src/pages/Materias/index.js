@@ -3,10 +3,12 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import styles from '../../styles/main.scss';
+import Loader from '../../components/Loader.js';
 
 function Materias() {
   const [materias, setMaterias] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -18,7 +20,8 @@ function Materias() {
               resolve(response);
             })
             .getMaterias();
-        });
+          });
+          
 
         const tipoDataResponse = await new Promise((resolve) => {
           google.script.run
@@ -27,6 +30,7 @@ function Materias() {
             })
             .getTiposMateria();
         });
+        setLoading(false);
 
         // Assuming tipoDataResponse contains an array of tipo objects
         const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
@@ -44,10 +48,10 @@ function Materias() {
         console.error("Error fetching data:", error);
       }
     };
+    
 
     fetchData();
   }, []);
-
   return (
     <>
     <h1 className="PagesTitles">Materias</h1>
@@ -88,6 +92,9 @@ function Materias() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

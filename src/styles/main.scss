@@ -32,6 +32,7 @@ main {
   }
 }
 
+
 .PagesTitles{
   font-size: 33px;
   font-weight: bold;
@@ -55,6 +56,34 @@ color: green;
   display: flex;
   justify-content: space-between;
 }
+
+.Toast{
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+  
+}
+
+.LoaderContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin:auto;
+  margin-top: 50px;
+  width: 100px;
+  height: 100px;
+}
+.LoaderContainerForm{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
 
 .loader {
   width: 60px;

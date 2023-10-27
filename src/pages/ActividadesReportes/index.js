@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Card } from "flowbite-react";
 import { Link } from "react-router-dom";
 
+
 function ActividadesReportes() {
   const [cursos, setCursos] = useState([]);
   const [filters, setFilters] = useState({
@@ -337,6 +338,7 @@ function ActividadesReportes() {
         </Table>
       </div>
     </div>
+    
   );
 }
 
