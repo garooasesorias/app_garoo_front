@@ -12,7 +12,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
 
   return (
     <>
-      <button className="relative  z-50" onClick={toggleMinimize}>
+      <button className="relative  z-50 ms-2 text-xl" onClick={toggleMinimize}>
         ☰
       </button>
 
@@ -163,6 +163,17 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                 </li>
                 <li>
                   <NavLink to="/estadosCursos">Estados Cursos</NavLink>
+                </li>
+                {/* Other sub-options for "Actividades" */}
+              </CollapsibleDropdown>
+            </li>
+            <li>
+              <CollapsibleDropdown buttonText="CursosV2" icon={<FaCog />}>
+                <li>
+                  <NavLink to="/cursosv2">Cursos</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/estadosCursosv2">Estados Cursos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>

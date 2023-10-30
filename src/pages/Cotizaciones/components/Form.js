@@ -192,7 +192,9 @@ function CotizacionForm() {
       };
 
       await google.script.run
-        .withSuccessHandler()
+        .withSuccessHandler((response) => {
+          console.log(response);
+        })
         .insertCurso(formatedFormData);
     });
   };
@@ -342,224 +344,222 @@ function CotizacionForm() {
   const isEstadoGestionada =
     formData.estado && formData.estado.value === "64ea66fb83c29fa14cfa44bf";
 
-    const goBack = () => {
-    
-      window.history.back();
-    };
-  
+  const goBack = () => {
+    window.history.back();
+  };
 
   return (
     <>
-    <form
-      className="flex mx-auto flex-col gap-4"
-      onSubmit={handleSubmit}
-    >
- 
-      <div className="mb-4">
-        <label>Cliente:</label>
-        <Select
-          options={clientes.map((cliente) => ({
-            label: cliente.nombre,
-            value: cliente._id,
-          }))}
-          value={formData.cliente}
-          onChange={handleClienteChange}
-        />
-      </div>
-      <Table className="mb-4">
-        <thead>
-          <tr>
-            <th>Materia</th>
-            <th>Plan</th>
-            <th>Actividades</th>
-            <th>Subtotal</th>
-            <th>Descuento</th>
-            <th>Total</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {formData.items.map((fila, index) => (
-            <tr key={index}>
-              <td>
-                <Select
-                  options={materias.map((materia) => ({
-                    label: materia.nombre,
-                    value: materia._id,
-                  }))}
-                  value={fila.materia}
-                  onChange={(selectedOption) =>
-                    handleMateriaChange(selectedOption, index)
-                  }
-                />
-              </td>
-              <td>
-                <Select
-                  options={planes.map((plan) => ({
-                    label: plan.nombre,
-                    value: plan._id,
-                  }))}
-                  value={fila.plan}
-                  onChange={(selectedOption) =>
-                    handlePlanChange(selectedOption, index)
-                  }
-                />
-              </td>
-              <td>
-                <Select
-                  options={
-                    fila.plan === "personalizado"
-                      ? actividades
-                      : planActividades
-                  }
-                  value={fila.actividad}
-                  onChange={(selectedOptions) =>
-                    handleActividadChange(selectedOptions, index)
-                  }
-                  isMulti // Habilitar el modo multiselect
-                  isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
-                />
-              </td>
-              <td>{fila.planSubtotal ? fila.planSubtotal : "N/A"} COP</td>
-              <td>
-                <Select
-                  options={[
-                    { label: "Sin descuento", value: null },
-                    ...descuentos.map((descuento) => ({
-                      label: `${descuento.descripcion} (${descuento.porcentaje}%)`,
-                      value: descuento._id,
-                    })),
-                  ]}
-                  value={fila.descuento}
-                  onChange={(selectedOption) =>
-                    handleDescuentoChange(selectedOption, index)
-                  }
-                />
-              </td>
-              <td>{calculateRowTotal(fila)} COP</td>
-              <td>
-                <Button color="danger" onClick={() => removeRow(index)}>
-                  Eliminar
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      <div className="text-center">
-        <p>Total: {calculateTotal()} COP</p>
-        {formData.items.some((fila) => fila.descuento) && (
-          <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
-        )}
-      </div>
-
-      {id && (
+      <form className="flex mx-auto flex-col gap-4" onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label>Estado de Cotización:</label>
+          <label>Cliente:</label>
           <Select
-            options={estadosCotizaciones.map((estado) => ({
-              label: estado.nombre,
-              value: estado._id,
+            options={clientes.map((cliente) => ({
+              label: cliente.nombre,
+              value: cliente._id,
             }))}
-            value={formData.estado}
-            onChange={handleEstadoChange}
+            value={formData.cliente}
+            onChange={handleClienteChange}
           />
         </div>
-      )}
-
-      <Button color="success" onClick={addRow}>
-        Agregar Fila +
-      </Button>
-
-      <div className="mb-4">
-        <label>Número de divisiones:</label>
-        <input
-          type="number"
-          value={formData.divisionPagos.length}
-          onChange={(e) => generateDivisionesPagos(e.target.value)}
-        />
-      </div>
-
-      <Table className="mb-4">
-        <thead>
-          <tr>
-            <th>División</th>
-            <th>Monto</th>
-            <th>Fecha límite</th>
-          </tr>
-        </thead>
-        <tbody>
-          {formData.divisionPagos.map((division, index) => (
-            <tr key={index}>
-              <td>{division.numeroDivision}</td>
-              <td>{division.monto}</td>
-              <td>
-                <input
-                  type="date"
-                  value={division.fechaLimite}
-                  onChange={(e) => {
-                    setFormData((prevData) => {
-                      const updatedDivisiones = [...prevData.divisionPagos];
-                      updatedDivisiones[index].fechaLimite = e.target.value;
-                      return {
-                        ...prevData,
-                        divisionPagos: updatedDivisiones,
-                      };
-                    });
-                  }}
-                />
-              </td>
+        <Table className="mb-4">
+          <thead>
+            <tr>
+              <th>Materia</th>
+              <th>Plan</th>
+              <th>Actividades</th>
+              <th>Subtotal</th>
+              <th>Descuento</th>
+              <th>Total</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </thead>
+          <tbody>
+            {formData.items.map((fila, index) => (
+              <tr key={index}>
+                <td>
+                  <Select
+                    options={materias.map((materia) => ({
+                      label: materia.nombre,
+                      value: materia._id,
+                    }))}
+                    value={fila.materia}
+                    onChange={(selectedOption) =>
+                      handleMateriaChange(selectedOption, index)
+                    }
+                  />
+                </td>
+                <td>
+                  <Select
+                    options={planes.map((plan) => ({
+                      label: plan.nombre,
+                      value: plan._id,
+                    }))}
+                    value={fila.plan}
+                    onChange={(selectedOption) =>
+                      handlePlanChange(selectedOption, index)
+                    }
+                  />
+                </td>
+                <td>
+                  <Select
+                    options={
+                      fila.plan === "personalizado"
+                        ? actividades
+                        : planActividades
+                    }
+                    value={fila.actividad}
+                    onChange={(selectedOptions) =>
+                      handleActividadChange(selectedOptions, index)
+                    }
+                    isMulti // Habilitar el modo multiselect
+                    isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
+                  />
+                </td>
+                <td>{fila.planSubtotal ? fila.planSubtotal : "N/A"} COP</td>
+                <td>
+                  <Select
+                    options={[
+                      { label: "Sin descuento", value: null },
+                      ...descuentos.map((descuento) => ({
+                        label: `${descuento.descripcion} (${descuento.porcentaje}%)`,
+                        value: descuento._id,
+                      })),
+                    ]}
+                    value={fila.descuento}
+                    onChange={(selectedOption) =>
+                      handleDescuentoChange(selectedOption, index)
+                    }
+                  />
+                </td>
+                <td>{calculateRowTotal(fila)} COP</td>
+                <td>
+                  <Button color="danger" onClick={() => removeRow(index)}>
+                    Eliminar
+                  </Button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
 
-      {!id && (
-        <Button type="submit" color="dark">
-          Submit
+        <div className="text-center">
+          <p>Total: {calculateTotal()} COP</p>
+          {formData.items.some((fila) => fila.descuento) && (
+            <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
+          )}
+        </div>
+
+        {id && (
+          <div className="mb-4">
+            <label>Estado de Cotización:</label>
+            <Select
+              options={estadosCotizaciones.map((estado) => ({
+                label: estado.nombre,
+                value: estado._id,
+              }))}
+              value={formData.estado}
+              onChange={handleEstadoChange}
+            />
+          </div>
+        )}
+
+        <Button color="success" onClick={addRow}>
+          Agregar Fila +
         </Button>
-      )}
 
-      {formData.fecha && <PdfButton data={formData} />}
+        <div className="mb-4">
+          <label>Número de divisiones:</label>
+          <input
+            type="number"
+            value={formData.divisionPagos.length}
+            onChange={(e) => generateDivisionesPagos(e.target.value)}
+          />
+        </div>
 
-      {isEstadoGenerada && (
-        <Button color="light">Enviar Cotización al Cliente</Button>
-      )}
+        <Table className="mb-4">
+          <thead>
+            <tr>
+              <th>División</th>
+              <th>Monto</th>
+              <th>Fecha límite</th>
+            </tr>
+          </thead>
+          <tbody>
+            {formData.divisionPagos.map((division, index) => (
+              <tr key={index}>
+                <td>{division.numeroDivision}</td>
+                <td>{division.monto}</td>
+                <td>
+                  <input
+                    type="date"
+                    value={division.fechaLimite}
+                    onChange={(e) => {
+                      setFormData((prevData) => {
+                        const updatedDivisiones = [...prevData.divisionPagos];
+                        updatedDivisiones[index].fechaLimite = e.target.value;
+                        return {
+                          ...prevData,
+                          divisionPagos: updatedDivisiones,
+                        };
+                      });
+                    }}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
 
-      {isEstadoEnviada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Aprobar Cotización</Button>
-          <Button color="light">Rechazar Cotización</Button>
-        </>
-      )}
-
-      {isEstadoAprobada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Rechazar Cotización</Button>
-          <Button onClick={handleSubmitCurso} color="light">
-            Crear Curso
+        {!id && (
+          <Button type="submit" color="dark">
+            Submit
           </Button>
-        </>
-      )}
+        )}
 
-      {isEstadoRechazada && (
-        <>
-          <Button color="light">Reenviar Cotización</Button>
-          <Button color="light">Aprobar Cotización</Button>
-        </>
-      )}
+        {formData.fecha && <PdfButton data={formData} />}
 
-      {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
-    </form>
-    <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
+        {isEstadoGenerada && (
+          <Button color="light">Enviar Cotización al Cliente</Button>
+        )}
+
+        {isEstadoEnviada && (
+          <>
+            <Button color="light">Reenviar Cotización</Button>
+            <Button color="light">Aprobar Cotización</Button>
+            <Button color="light">Rechazar Cotización</Button>
+          </>
+        )}
+
+        {isEstadoAprobada && (
+          <>
+            <Button color="light">Reenviar Cotización</Button>
+            <Button color="light">Rechazar Cotización</Button>
+            <Button onClick={handleSubmitCurso} color="light">
+              Crear Curso
+            </Button>
+          </>
+        )}
+
+        {isEstadoRechazada && (
+          <>
+            <Button color="light">Reenviar Cotización</Button>
+            <Button color="light">Aprobar Cotización</Button>
+          </>
+        )}
+
+        {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
+      </form>
+      <Button
+        type="button"
+        color="dark"
+        onClick={goBack}
+        className="m-auto mt-4"
+      >
         Volver
       </Button>
     </>
   );
-  
 }
 
 export default CotizacionForm;

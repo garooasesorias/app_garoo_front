@@ -12,13 +12,13 @@ export function Layout({ children }) {
   }
 
   // La margen se ajustará según el valor de isMinimized
-  let marginLeftValue = isMinimized ? "50px" : "280px";
+  let marginLeftValue = isMinimized ? "100px" : "280px";
 
   return (
     <>
-      <button className="relative z-50" onClick={toggleSidebar}>
+      {/* <button className="relative z-50" onClick={toggleSidebar}>
         ☰
-      </button>
+      </button> */}
       <Sidebar 
           isOpen={isOpen} 
           toggle={toggleSidebar}
