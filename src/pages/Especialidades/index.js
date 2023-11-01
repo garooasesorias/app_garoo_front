@@ -416,7 +416,7 @@ const generatePDF = async () => {
   se procederá a entregar el trabajo en el tiempo acordado
   11. Si sigues estas indicaciones nos facilitarás el trabajo y podremos garantizarte los mejores resultados.Si tienes alguna inquietud con respecto a esta información no dudes consultarnos, por medio de nuestro chat de Whatsapp 31941107980 o a nuestro correo electrónico garooasesorias@gmail.com.
   `;
-
+//Este es un cambio
   const maxWidth3 = 180;
   const lineHeight3 = 7;
   const splitText3 = doc.splitTextToSize(termsText, maxWidth3);
