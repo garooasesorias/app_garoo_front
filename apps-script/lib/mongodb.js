@@ -132,6 +132,58 @@ class MongoDBLib {
       return null; // or handle the error appropriately
     }
   }
+
+  getDocumentsWithExpiredActivities(endpoint, currentDate) {
+    const pipeline = [
+      {
+        $match: {
+          // Aquí podrías poner alguna condición inicial si es necesaria,
+          // por ejemplo, que solo busque entre documentos activos o de un cierto tipo, etc.
+        },
+      },
+      {
+        $addFields: {
+          actividadesFiltradas: {
+            $filter: {
+              input: "$actividades",
+              as: "actividad",
+              cond: {
+                $and: [
+                  { $not: "$$actividad.estadoAdm" },
+                  { $not: "$$actividad.estadoAsesor" },
+                  { $lt: ["$$actividad.fechaVencimiento", currentDate] },
+                ],
+              },
+            },
+          },
+        },
+      },
+      {
+        $match: {
+          actividadesFiltradas: { $ne: [] }, // Filtra los documentos que tienen actividades vencidas y sin estados
+        },
+      },
+      // Aquí podrías incluir otros pasos como $sort, $limit, etc., si son necesarios
+    ];
+
+    const payload = {
+      pipeline: pipeline,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+
+    try {
+      const responseData = this.executeAPI(endpoint, options);
+      this.handleError(responseData);
+      return responseData.documents;
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      return null; // or handle the error appropriately
+    }
+  }
   getSkillsWithEspecialidades(endpoint, query, order, limit) {
     const pipeline = [
       {

@@ -1,33 +1,33 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import { FiBell } from "react-icons/fi"; // Importamos el ícono de campana
 
 export function Layout({ children }) {
-  const [isOpen, setIsOpen] = useState(false); // Estado para el Sidebar
-  const [isMinimized, setIsMinimized] = useState(false); // Estado para minimizar el Sidebar
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
-  // Función para abrir/cerrar el Sidebar
   function toggleSidebar() {
     setIsOpen(!isOpen);
   }
 
-  // La margen se ajustará según el valor de isMinimized
   let marginLeftValue = isMinimized ? "100px" : "280px";
 
   return (
     <>
-      {/* <button className="relative z-50" onClick={toggleSidebar}>
-        ☰
-      </button> */}
-      <Sidebar 
-          isOpen={isOpen} 
-          toggle={toggleSidebar}
-          isMinimized={isMinimized}
-          setIsMinimized={setIsMinimized} // Pasamos el setter como prop
+      <div className="shadow w-full h-10 flex justify-end p-3">
+        <FiBell size={24} /> {/* Ícono de campana */}
+      </div>
+      <Sidebar
+        isOpen={isOpen}
+        toggle={toggleSidebar}
+        isMinimized={isMinimized}
+        setIsMinimized={setIsMinimized}
       />
       <main style={{ marginLeft: marginLeftValue, marginRight: "10px" }}>
         {children}
       </main>
+
       <Footer>{/* Contenido del pie de página */}</Footer>
     </>
   );
