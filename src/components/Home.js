@@ -1,6 +1,16 @@
 import React from "react";
+function obtenerFechaActualFormatoYYYYMMDD() {
+  const fecha = new Date();
+
+  const año = fecha.getFullYear();
+  const mes = (fecha.getMonth() + 1).toString().padStart(2, "0"); // getMonth() devuelve un índice basado en 0, por lo tanto sumamos 1
+  const dia = fecha.getDate().toString().padStart(2, "0");
+
+  return `${año}-${mes}-${dia}`;
+}
 
 const Home = () => {
+  console.log(obtenerFechaActualFormatoYYYYMMDD());
   return (
     <div className="flex-1 flex items-center justify-center p-10">
       <div className="bg-white p-8 rounded-lg shadow-md w-2/3">

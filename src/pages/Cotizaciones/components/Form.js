@@ -186,6 +186,7 @@ function CotizacionForm() {
               asesor: null,
               estadoAdm: null,
               estadoAsesor: null,
+              fechaVencimiento: "",
               nota: 0,
             }))
           : [],

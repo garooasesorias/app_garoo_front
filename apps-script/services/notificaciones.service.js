@@ -1,53 +1,21 @@
-function insertCurso(document) {
-  const result = new MongoDBLib("cursos").insertDocument("insertOne", document);
-  return result;
-}
-
-function getCursos() {
+function getNotificaciones() {
   const collectionName = "cursos"; // Replace with your collection name
   const mongoDB = new MongoDBLib(collectionName);
+  const fecha = new Date();
 
-  const query = {}; // Your query conditions
-  const order = {}; // Your sort order
-  const limit = 10; // Limit the number of documents
+  const año = fecha.getFullYear();
+  const mes = (fecha.getMonth() + 1).toString().padStart(2, "0"); // getMonth() devuelve un índice basado en 0, por lo tanto sumamos 1
+  const dia = fecha.getDate().toString().padStart(2, "0");
 
-  const documents = mongoDB.getCursos("aggregate", query, order, limit);
-  return documents;
-}
+  const currentDate = `${año}-${mes}-${dia}`;
+  // const query = {};
 
-function getNotificaciones(id) {
-  const collectionName = "cursos"; // Replace with your collection name
-  const mongoDB = new MongoDBLib(collectionName);
-
-  const query = {
-    _id: { $oid: id },
-  };
-
-  const order = {};
-  const limit = 10;
+  // const order = {};
+  // const limit = 10;
 
   const documents = mongoDB.getDocumentsWithExpiredActivities(
     "aggregate",
-    query,
-    order,
-    limit
+    currentDate
   );
-  console.log("Documents with related Items:", documents);
   return documents;
-}
-
-function updateCursoById(id, data) {
-  const filter = {
-    _id: { $oid: id },
-  };
-  const update = {
-    $set: data,
-  };
-
-  const result = new MongoDBLib("cursos").updateDocument(
-    "updateOne",
-    filter,
-    update
-  );
-  return result;
 }

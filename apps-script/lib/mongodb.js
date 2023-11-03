@@ -136,22 +136,18 @@ class MongoDBLib {
   getDocumentsWithExpiredActivities(endpoint, currentDate) {
     const pipeline = [
       {
-        $match: {
-          // Aquí podrías poner alguna condición inicial si es necesaria,
-          // por ejemplo, que solo busque entre documentos activos o de un cierto tipo, etc.
-        },
-      },
-      {
-        $addFields: {
-          actividadesFiltradas: {
+        $project: {
+          _id: 1,
+          actividades: {
             $filter: {
               input: "$actividades",
               as: "actividad",
               cond: {
-                $and: [
-                  { $not: "$$actividad.estadoAdm" },
-                  { $not: "$$actividad.estadoAsesor" },
-                  { $lt: ["$$actividad.fechaVencimiento", currentDate] },
+                $or: [
+                  { $eq: ["$$actividad.estadoAsesor", null] },
+                  { $eq: ["$$actividad.estadoAdm", null] },
+                  { $eq: ["$$actividad.fechaVencimiento", null] },
+                  { $lt: ["$$actividad.fechaVencimiento", currentDate] }, // Compara la fecha de vencimiento con la fecha actual
                 ],
               },
             },
@@ -160,10 +156,41 @@ class MongoDBLib {
       },
       {
         $match: {
-          actividadesFiltradas: { $ne: [] }, // Filtra los documentos que tienen actividades vencidas y sin estados
+          "actividades.0": { $exists: true },
         },
       },
-      // Aquí podrías incluir otros pasos como $sort, $limit, etc., si son necesarios
+      {
+        $project: {
+          _id: 1,
+          actividades: {
+            $map: {
+              input: "$actividades",
+              as: "actividad",
+              in: {
+                _id: "$$actividad._id",
+                nota: { $ifNull: ["$$actividad.nota", 0] },
+                estadoAdm: "$$actividad.estadoAdm",
+                estadoAsesor: "$$actividad.estadoAsesor",
+                fechaVencimiento: {
+                  $cond: {
+                    if: { $eq: ["$$actividad.fechaVencimiento", ""] },
+                    then: null,
+                    else: {
+                      $cond: {
+                        if: {
+                          $lt: ["$$actividad.fechaVencimiento", currentDate],
+                        },
+                        then: "expired",
+                        else: "$$actividad.fechaVencimiento",
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     ];
 
     const payload = {

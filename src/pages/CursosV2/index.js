@@ -39,6 +39,12 @@ function Cursos() {
       await google.script.run
         .withSuccessHandler(setEstadosAsesores)
         .getEstadosAsesores();
+
+      await google.script.run
+        .withSuccessHandler((response) => {
+          console.log("Notificaciones", response);
+        })
+        .getNotificaciones();
     };
     fetchData();
   }, []);
@@ -58,7 +64,6 @@ function Cursos() {
         nombre: actividad.asesor.nombre,
         _id: actividad.asesor._id,
       },
-      // asesor: actividad.asesor ? actividad.asesor._id : null,
       estadoAdm: actividad.estadoAdm,
       estadoAsesor: actividad.estadoAsesor,
       fechaVencimiento: actividad.fechaVencimiento,
@@ -107,7 +112,6 @@ function Cursos() {
   };
 
   const handleDateChange = (date, actividadIndex) => {
-    // console.log(date);
     setSelectedDates((prevSelectedDates) => {
       const newDates = [...prevSelectedDates];
       newDates[actividadIndex] = date;
@@ -135,10 +139,11 @@ function Cursos() {
         ...actividad,
         fechaVencimiento,
         _id: { $oid: actividad._id },
-        asesor: actividad.asesor ? { $oid: actividad.asesor._id } : null,
+        asesor: actividad.asesor._id ? { $oid: actividad.asesor._id } : null,
+        estadoAdm: actividad.estadoAdm || null,
+        estadoAsesor: actividad.estadoAsesor || null,
       };
     });
-    console.log(actividadesToSend);
 
     google.script.run
       .withSuccessHandler((response) => {

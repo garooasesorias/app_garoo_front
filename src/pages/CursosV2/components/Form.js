@@ -37,9 +37,9 @@ const FormCursos = () => {
                 _id: actividad.asesor._id,
               },
               // asesor: actividad.asesor ? actividad.asesor._id : null,
-              estadoAdm: actividad.estadoAdm,
-              estadoAsesor: actividad.estadoAsesor,
-              fechaVencimiento: actividad.fechaVencimiento,
+              estadoAdm: actividad.estadoAdm || null,
+              estadoAsesor: actividad.estadoAsesor || null,
+              fechaVencimiento: actividad.fechaVencimiento || null,
             }));
 
             setFormData((prev) => ({
@@ -90,6 +90,9 @@ const FormCursos = () => {
         ...actividad,
         _id: { $oid: actividad._id },
         asesor: actividad.asesor ? { $oid: actividad.asesor._id } : null,
+        estadoAdm: actividad.estadoAdm || null,
+        estadoAsesor: actividad.estadoAsesor || null,
+        fechaVencimiento: actividad.fechaVencimiento || null,
       };
     });
 
@@ -145,140 +148,146 @@ const FormCursos = () => {
   };
 
   const goBack = () => {
-    
     window.history.back();
   };
 
-
   return (
     <>
-    <form
-      className="flex mx-auto flex-col gap-4 w-full"
-      onSubmit={handleSubmit}
-    >
-      {curso.cliente && (
-        <h2
-          style={{
-            fontSize: "24px",
-            fontWeight: "bold",
-            margin: "16px 0",
-            textAlign: "center",
-          }}
-        >
-          {curso.materia.nombre} - {curso.cliente.nombre} - {curso.fecha}
-        </h2>
-      )}
-      <Table>
-        <Table.Head>
-          <Table.HeadCell>Estudiante</Table.HeadCell>
-          {formData.actividades &&
-            formData.actividades.map((actividad, actividadIndex) => (
-              <Table.HeadCell key={actividadIndex}>
-                <div className="flex flex-col">
-                  <div className="mb-2">Actividad: {actividad.nombre}</div>
-                  <div className="flex items-center">
-                    <span className="mr-2">Fecha de Vencimiento:</span>
-                    <div className="ml-auto">
-                      <DatePicker
-                        selected={selectedDates[actividadIndex]}
-                        onChange={(date) =>
-                          handleDateChange(date, actividadIndex)
-                        }
-                        dateFormat="dd/MM/yyyy"
-                        isClearable
-                        className="datepicker-custom"
-                      />
+      <form
+        className="flex mx-auto flex-col gap-4 w-full"
+        onSubmit={handleSubmit}
+      >
+        {curso.cliente && (
+          <h2
+            style={{
+              fontSize: "24px",
+              fontWeight: "bold",
+              margin: "16px 0",
+              textAlign: "center",
+            }}
+          >
+            {curso.materia.nombre} - {curso.cliente.nombre} - {curso.fecha}
+          </h2>
+        )}
+        <Table>
+          <Table.Head>
+            <Table.HeadCell>Estudiante</Table.HeadCell>
+            {formData.actividades &&
+              formData.actividades.map((actividad, actividadIndex) => (
+                <Table.HeadCell key={actividadIndex}>
+                  <div className="flex flex-col">
+                    <div className="mb-2">Actividad: {actividad.nombre}</div>
+                    <div className="flex items-center">
+                      <span className="mr-2">Fecha de Vencimiento:</span>
+                      <div className="ml-auto">
+                        <DatePicker
+                          selected={selectedDates[actividadIndex]}
+                          onChange={(date) =>
+                            handleDateChange(date, actividadIndex)
+                          }
+                          dateFormat="dd/MM/yyyy"
+                          isClearable
+                          className="datepicker-custom"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-2">Asesor:</span>
+                      <div className="ml-auto">
+                        <Select
+                          options={asesores.map((asesor) => ({
+                            value: asesor._id,
+                            label: asesor.nombre,
+                          }))}
+                          value={
+                            actividad.asesor
+                              ? {
+                                  value: actividad.asesor._id,
+                                  label: actividad.asesor.nombre,
+                                }
+                              : null
+                          }
+                          onChange={(selectedOption) =>
+                            handleAsesorChange(selectedOption, actividadIndex)
+                          }
+                          isSearchable={true}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-2">Estado ADM:</span>
+                      <div className="ml-auto">
+                        <Select
+                          options={estadosAdm.map((estado) => ({
+                            value: estado.nombre,
+                            label: estado.nombre,
+                          }))}
+                          value={{
+                            value: actividad.estadoAdm,
+                            label: actividad.estadoAdm,
+                          }}
+                          onChange={(selectedOption) =>
+                            handleEstadoADMChange(
+                              selectedOption,
+                              actividadIndex
+                            )
+                          }
+                          isSearchable={true}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-center">
+                      <span className="mr-2">Estado Asesor:</span>
+                      <div className="ml-auto">
+                        <Select
+                          options={estadosAsesor.map((estado) => ({
+                            value: estado.nombre,
+                            label: estado.nombre,
+                          }))}
+                          value={{
+                            value: actividad.estadoAsesor,
+                            label: actividad.estadoAsesor,
+                          }}
+                          onChange={(selectedOption) =>
+                            handleEstadoAsesorChange(
+                              selectedOption,
+                              actividadIndex
+                            )
+                          }
+                          isSearchable={true}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">Asesor:</span>
-                    <div className="ml-auto">
-                      <Select
-                        options={asesores.map((asesor) => ({
-                          value: asesor._id,
-                          label: asesor.nombre,
-                        }))}
-                        value={
-                          actividad.asesor
-                            ? {
-                                value: actividad.asesor._id,
-                                label: actividad.asesor.nombre,
-                              }
-                            : null
-                        }
-                        onChange={(selectedOption) =>
-                          handleAsesorChange(selectedOption, actividadIndex)
-                        }
-                        isSearchable={true}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">Estado ADM:</span>
-                    <div className="ml-auto">
-                      <Select
-                        options={estadosAdm.map((estado) => ({
-                          value: estado.nombre,
-                          label: estado.nombre,
-                        }))}
-                        value={{
-                          value: actividad.estadoAdm,
-                          label: actividad.estadoAdm,
-                        }}
-                        onChange={(selectedOption) =>
-                          handleEstadoADMChange(selectedOption, actividadIndex)
-                        }
-                        isSearchable={true}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <span className="mr-2">Estado Asesor:</span>
-                    <div className="ml-auto">
-                      <Select
-                        options={estadosAsesor.map((estado) => ({
-                          value: estado.nombre,
-                          label: estado.nombre,
-                        }))}
-                        value={{
-                          value: actividad.estadoAsesor,
-                          label: actividad.estadoAsesor,
-                        }}
-                        onChange={(selectedOption) =>
-                          handleEstadoAsesorChange(
-                            selectedOption,
-                            actividadIndex
-                          )
-                        }
-                        isSearchable={true}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Table.HeadCell>
-            ))}
-        </Table.Head>
-        <Table.Body>
-          <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
-            <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
-              {curso.cliente && curso.cliente.nombre}
-            </Table.Cell>
-            {curso.actividades &&
-              curso.actividades.map((actividad, actividadIndex) => (
-                <Table.Cell key={actividadIndex}>0</Table.Cell>
+                </Table.HeadCell>
               ))}
-          </Table.Row>
-        </Table.Body>
-      </Table>
+          </Table.Head>
+          <Table.Body>
+            <Table.Row className="bg-white dark:border-gray-700 dark:bg-gray-800">
+              <Table.Cell className="whitespace-nowrap font-medium text-gray-900 dark:text-white">
+                {curso.cliente && curso.cliente.nombre}
+              </Table.Cell>
+              {curso.actividades &&
+                curso.actividades.map((actividad, actividadIndex) => (
+                  <Table.Cell key={actividadIndex}>0</Table.Cell>
+                ))}
+            </Table.Row>
+          </Table.Body>
+        </Table>
 
-      <Button type="submit" color="dark">
-        Submit
-      </Button>
-    </form>
-    <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
+        <Button type="submit" color="dark">
+          Submit
+        </Button>
+      </form>
+      <Button
+        type="button"
+        color="dark"
+        onClick={goBack}
+        className="m-auto mt-4"
+      >
         Volver
       </Button>
-      </>
+    </>
   );
 };
 
