@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { Table, Button, Link, TableCell } from "flowbite-react";
 import Select from "react-select";
 import Loader from "../../components/Loader.js";
 import { parseISO, format } from "date-fns";
+import { NotificationesContext } from "../../context/NotificacionesContext.js";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -16,6 +17,7 @@ function Cursos() {
     actividades: [],
   });
   const [estadosAsesor, setEstadosAsesores] = useState([]);
+  const { notificationes } = useContext(NotificationesContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,11 +42,11 @@ function Cursos() {
         .withSuccessHandler(setEstadosAsesores)
         .getEstadosAsesores();
 
-      await google.script.run
-        .withSuccessHandler((response) => {
-          console.log("Notificaciones", response);
-        })
-        .getNotificaciones();
+      // await google.script.run
+      //   .withSuccessHandler((response) => {
+      // console.log("Notificaciones Contes", response);
+      //   })
+      //   .getNotificaciones();
     };
     fetchData();
   }, []);
@@ -155,6 +157,26 @@ function Cursos() {
 
   return (
     <div className="container p-6">
+      {/* <div>
+        {notificationes.map((item) => (
+          <div key={item._id}>
+            <h3>Grupo de Actividades ID: {item._id}</h3>
+            {item.actividades.map((actividad) => (
+              <div key={actividad._id}>
+                <p>Estado Administrativo: {actividad.estadoAdm}</p>
+                <p>Estado Asesor: {actividad.estadoAsesor}</p>
+                <p>Nota: {actividad.nota}</p>
+                <p>
+                  Fecha de Vencimiento:{" "}
+                  {actividad.fechaVencimiento
+                    ? actividad.fechaVencimiento
+                    : "No especificada"}
+                </p>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div> */}
       <h1 className="text-3xl mb-4 font-semibold text-gray-700">Cursos V2</h1>
 
       <div className="flex">

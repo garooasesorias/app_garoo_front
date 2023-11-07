@@ -1,11 +1,15 @@
+import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
 import { FaCog, FaAmilia } from "react-icons/fa";
-import React, { useState } from "react";
+import { NotificacionesContext } from "../context/NotificacionesContext";
+
+import { BsCircleFill } from "react-icons/bs";
+// {/* <BsCircleFill style={{ color: "red" }} /> */}
 
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
-  // Recibimos las props
-  // Movemos el método para alternar isMinimized aquí
+  const { notificaciones } = useContext(NotificacionesContext);
+
   function toggleMinimize() {
     setIsMinimized(!isMinimized);
   }
@@ -168,7 +172,16 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="CursosV2" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText="CursosV2"
+                icon={
+                  notificaciones && notificaciones.length > 0 ? (
+                    <BsCircleFill style={{ color: "red" }} />
+                  ) : (
+                    <FaCog style={{ color: "gray" }} />
+                  )
+                }
+              >
                 <li>
                   <NavLink to="/cursosv2">Cursos</NavLink>
                 </li>

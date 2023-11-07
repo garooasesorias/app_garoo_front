@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import { format } from "date-fns";
 
 const FormCursos = () => {
@@ -152,7 +152,7 @@ const FormCursos = () => {
 
   return (
     <>
-    <form
+    {/* <form
       className="flex mx-auto flex-col gap-4 w-full"
       onSubmit={handleSubmit}
     >
@@ -277,7 +277,7 @@ const FormCursos = () => {
     </form>
     <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
         Volver
-      </Button>
+      </Button> */}
       </>
   );
 };
