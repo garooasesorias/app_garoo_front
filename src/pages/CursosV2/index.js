@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useContext } from "react";
-import { Table, Button, Link, TableCell } from "flowbite-react";
+import { Table, Button, Tabs } from "flowbite-react";
 import Select from "react-select";
 import Loader from "../../components/Loader.js";
 import { parseISO, format } from "date-fns";
-import { NotificationesContext } from "../../context/NotificacionesContext.js";
+import { NotificacionesContext } from "../../context/NotificacionesContext.js";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -17,7 +17,7 @@ function Cursos() {
     actividades: [],
   });
   const [estadosAsesor, setEstadosAsesores] = useState([]);
-  const { notificationes } = useContext(NotificationesContext);
+  const { notificationes } = useContext(NotificacionesContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -41,12 +41,6 @@ function Cursos() {
       await google.script.run
         .withSuccessHandler(setEstadosAsesores)
         .getEstadosAsesores();
-
-      // await google.script.run
-      //   .withSuccessHandler((response) => {
-      // console.log("Notificaciones Contes", response);
-      //   })
-      //   .getNotificaciones();
     };
     fetchData();
   }, []);
@@ -157,28 +151,7 @@ function Cursos() {
 
   return (
     <div className="container p-6">
-      {/* <div>
-        {notificationes.map((item) => (
-          <div key={item._id}>
-            <h3>Grupo de Actividades ID: {item._id}</h3>
-            {item.actividades.map((actividad) => (
-              <div key={actividad._id}>
-                <p>Estado Administrativo: {actividad.estadoAdm}</p>
-                <p>Estado Asesor: {actividad.estadoAsesor}</p>
-                <p>Nota: {actividad.nota}</p>
-                <p>
-                  Fecha de Vencimiento:{" "}
-                  {actividad.fechaVencimiento
-                    ? actividad.fechaVencimiento
-                    : "No especificada"}
-                </p>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div> */}
       <h1 className="text-3xl mb-4 font-semibold text-gray-700">Cursos V2</h1>
-
       <div className="flex">
         <aside className="p-3 shadow mr-3">
           <h2 className="text-xl mb-3 font-semibold text-gray-600">
@@ -199,112 +172,154 @@ function Cursos() {
         </aside>
 
         <main className="w-full">
-          <form onSubmit={handleSubmit}>
-            {formData.fecha && (
-              <>
-                <h2 className="text-2xl mb-4 font-semibold text-gray-700">
-                  Actividades para{" "}
-                  {`${selectedCurso.materia.nombre} - ${selectedCurso.cliente.nombre}`}
-                </h2>
-                <Table variant="striped">
-                  <thead>
-                    <tr>
-                      <th className="px-4 py-2">Nombre</th>
-                      <th className="px-4 py-2">Asesor</th>
-                      <th className="px-4 py-2">Estado Adm</th>
-                      <th className="px-4 py-2">Estado Asesor</th>
-                      <th className="px-4 py-2">Fecha Límite</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {formData.actividades.map((actividad, actividadIndex) => (
-                      <tr key={actividad._id}>
-                        <td className="px-4 py-2">
-                          {selectedCurso.actividades[actividadIndex].nombre}
-                        </td>
-                        <td className="px-4 py-2">
-                          <Select
-                            options={asesores.map((asesor) => ({
-                              value: asesor._id,
-                              label: asesor.nombre,
-                            }))}
-                            value={
-                              actividad.asesor
-                                ? {
-                                    value: actividad.asesor._id,
-                                    label: actividad.asesor.nombre,
-                                  }
-                                : null
-                            }
-                            onChange={(selectedOption) =>
-                              handleAsesorChange(selectedOption, actividadIndex)
-                            }
-                            isSearchable={true}
-                          />
-                        </td>
-                        <td className="px-4 py-2">
-                          <Select
-                            options={estadosAdm.map((estado) => ({
-                              value: estado.nombre,
-                              label: estado.nombre,
-                            }))}
-                            value={{
-                              value: actividad.estadoAdm,
-                              label: actividad.estadoAdm,
-                            }}
-                            onChange={(selectedOption) =>
-                              handleEstadoADMChange(
-                                selectedOption,
-                                actividadIndex
-                              )
-                            }
-                            isSearchable={true}
-                          />
-                        </td>
-                        <td className="px-4 py-2">
-                          <Select
-                            options={estadosAsesor.map((estado) => ({
-                              value: estado.nombre,
-                              label: estado.nombre,
-                            }))}
-                            value={{
-                              value: actividad.estadoAsesor,
-                              label: actividad.estadoAsesor,
-                            }}
-                            onChange={(selectedOption) =>
-                              handleEstadoAsesorChange(
-                                selectedOption,
-                                actividadIndex
-                              )
-                            }
-                            isSearchable={true}
-                          />
-                        </td>
-                        <td className="px-4 py-2">
-                          <input
-                            type="date"
-                            value={selectedDates[actividadIndex] || ""}
-                            onChange={(event) =>
-                              handleDateChange(
-                                event.target.value,
-                                actividadIndex
-                              )
-                            }
-                            className="datepicker-custom"
-                          />
-                        </td>
+          {formData.fecha && (
+            <Tabs.Group aria-label="Tabs with underline" style="underline">
+              <Tabs.Item title="Asignamientos">
+                <form onSubmit={handleSubmit}>
+                  <h2 className="text-2xl mb-4 font-semibold text-gray-700">
+                    Actividades para{" "}
+                    {`${selectedCurso.materia.nombre} - ${selectedCurso.cliente.nombre}`}
+                  </h2>
+                  <Table variant="striped">
+                    <thead>
+                      <tr>
+                        <th className="px-4 py-2">Nombre Actividad</th>
+                        <th className="px-4 py-2">Fecha Límite</th>
+                        <th className="px-4 py-2">Asesor</th>
+                        {/* <th className="px-4 py-2">Estado Asesor</th>
+                        <th className="px-4 py-2">Fecha Límite</th> */}
                       </tr>
+                    </thead>
+                    <tbody>
+                      {formData.actividades.map((actividad, actividadIndex) => (
+                        <tr key={actividad._id}>
+                          <td className="px-4 py-2">
+                            {selectedCurso.actividades[actividadIndex].nombre}
+                          </td>
+                          <td className="px-4 py-2">
+                            <input
+                              type="date"
+                              value={selectedDates[actividadIndex] || ""}
+                              onChange={(event) =>
+                                handleDateChange(
+                                  event.target.value,
+                                  actividadIndex
+                                )
+                              }
+                              className="datepicker-custom"
+                            />
+                          </td>
+                          <td className="px-4 py-2">
+                            <Select
+                              options={asesores.map((asesor) => ({
+                                value: asesor._id,
+                                label: asesor.nombre,
+                              }))}
+                              value={
+                                actividad.asesor
+                                  ? {
+                                      value: actividad.asesor._id,
+                                      label: actividad.asesor.nombre,
+                                    }
+                                  : null
+                              }
+                              onChange={(selectedOption) =>
+                                handleAsesorChange(
+                                  selectedOption,
+                                  actividadIndex
+                                )
+                              }
+                              isSearchable={true}
+                            />
+                          </td>
+                          {/* <td className="px-4 py-2">
+                            <Select
+                              options={estadosAdm.map((estado) => ({
+                                value: estado.nombre,
+                                label: estado.nombre,
+                              }))}
+                              value={{
+                                value: actividad.estadoAdm,
+                                label: actividad.estadoAdm,
+                              }}
+                              onChange={(selectedOption) =>
+                                handleEstadoADMChange(
+                                  selectedOption,
+                                  actividadIndex
+                                )
+                              }
+                              isSearchable={true}
+                            />
+                          </td> */}
+                          {/* <td className="px-4 py-2">
+                            <Select
+                              options={estadosAsesor.map((estado) => ({
+                                value: estado.nombre,
+                                label: estado.nombre,
+                              }))}
+                              value={{
+                                value: actividad.estadoAsesor,
+                                label: actividad.estadoAsesor,
+                              }}
+                              onChange={(selectedOption) =>
+                                handleEstadoAsesorChange(
+                                  selectedOption,
+                                  actividadIndex
+                                )
+                              }
+                              isSearchable={true}
+                            />
+                          </td> */}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                  <div className="flex justify-center mt-2">
+                    <Button type="submit" color="dark">
+                      Actualizar Curso
+                    </Button>
+                  </div>
+                </form>
+              </Tabs.Item>
+              <Tabs.Item title="Operaciones">Operaciones</Tabs.Item>
+              <Tabs.Item title="Calificaciones">
+                <Table striped={true}>
+                  <Table.Head>
+                    <Table.HeadCell>Estudiante</Table.HeadCell>
+                    <Table.HeadCell>Entregable</Table.HeadCell>
+                    <Table.HeadCell>Nota</Table.HeadCell>
+                    <Table.HeadCell>Estado</Table.HeadCell>
+                    <Table.HeadCell>Comentarios</Table.HeadCell>
+                    <Table.HeadCell>Acciones</Table.HeadCell>
+                  </Table.Head>
+                  <Table.Body className="divide-y">
+                    {Array.from({ length: 5 }, (_, index) => (
+                      <Table.Row key={index}>
+                        <Table.Cell>Estudiante {index + 1}</Table.Cell>
+                        <Table.Cell>Entregable {index + 1}</Table.Cell>
+                        <Table.Cell>
+                          {(Math.random() * 10).toFixed(2)}
+                        </Table.Cell>
+                        <Table.Cell>
+                          {Math.random() > 0.5 ? "Aprobado" : "Pendiente"}
+                        </Table.Cell>
+                        <Table.Cell>Comentarios de ejemplo</Table.Cell>
+                        <Table.Cell>
+                          {/* Replace these Button components with actual event handlers and icons if needed */}
+                          <Button size="xs" color="gray">
+                            Editar
+                          </Button>
+                          <Button size="xs" color="red">
+                            Eliminar
+                          </Button>
+                        </Table.Cell>
+                      </Table.Row>
                     ))}
-                  </tbody>
+                  </Table.Body>
                 </Table>
-                <div className="flex justify-center mt-2">
-                  <Button type="submit" color="dark">
-                    Actualizar Curso
-                  </Button>
-                </div>
-              </>
-            )}
-          </form>
+              </Tabs.Item>
+            </Tabs.Group>
+          )}
         </main>
       </div>
 

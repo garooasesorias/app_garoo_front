@@ -1,4 +1,8 @@
 import React from "react";
+import { Dropdown } from "flowbite-react";
+import { Table, Button, Tabs } from "flowbite-react";
+import { HiCog, HiCurrencyDollar, HiLogout, HiViewGrid } from "react-icons/hi";
+import { FiBell } from "react-icons/fi";
 
 const Home = () => {
   return (
