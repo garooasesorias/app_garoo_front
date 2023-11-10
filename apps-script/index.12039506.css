@@ -57,7 +57,22 @@ main {
   display: flex;
 }
 
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: .8;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .Toast {
+  animation: 5s fadeOut;
   position: fixed;
   bottom: 30px;
   right: 10px;
@@ -81,6 +96,13 @@ main {
   position: fixed;
   bottom: 10px;
   right: 10px;
+}
+
+.LoaderContainerDelete {
+  justify-content: center;
+  align-items: center;
+  margin: 36.7px;
+  display: flex;
 }
 
 .loader {

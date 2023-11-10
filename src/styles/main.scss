@@ -57,11 +57,24 @@ color: green;
   justify-content: space-between;
 }
 
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 .Toast{
   position: fixed;
   bottom: 30px;
   right: 10px;
-  
+  animation: fadeOut 5s ease;
 }
 
 .LoaderContainer{
@@ -82,6 +95,14 @@ color: green;
   position: fixed;
   bottom: 10px;
   right: 10px;
+}
+
+.LoaderContainerDelete{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin:auto;
+  margin: 36.7px;
 }
 
 
