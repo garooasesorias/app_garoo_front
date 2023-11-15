@@ -3,9 +3,11 @@ import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
+import Loader from '../../components/Loader.js';
 
 function Cotizaciones() {
   const [cotizaciones, setCotizaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -13,6 +15,7 @@ function Cotizaciones() {
       await google.script.run
         .withSuccessHandler((data) => {
           setCotizaciones(data);
+          setLoading(false);
         })
         .getCotizaciones();
     };
@@ -22,11 +25,14 @@ function Cotizaciones() {
 
   return (
     <>
-      <Link to="/formCotizaciones">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Cotización +
-        </Button>
-      </Link>
+    <h1 className="PagesTitles">Cotizaciones</h1>
+    <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formCotizaciones">
+          <Button className="shadow mb-5" color="success">
+            Crear Cotización +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           <Table.HeadCell>Fecha</Table.HeadCell>
@@ -70,6 +76,9 @@ function Cotizaciones() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

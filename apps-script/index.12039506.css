@@ -1,5 +1,134 @@
 
 
+h1 {
+  color: green;
+  font-size: 2rem;
+}
+
+p {
+  color: purple;
+}
+
+.datepicker-custom {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 5px;
+  font-size: 14px;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.PagesTitles {
+  color: #333;
+  letter-spacing: 1px;
+  opacity: 0;
+  margin: 2%;
+  font-size: 33px;
+  font-weight: bold;
+  animation: 1s ease-in-out forwards slideIn;
+  transform: translateY(20px);
+}
+
+.link {
+  color: green;
+  width: -moz-fit-content;
+  width: fit-content;
+  height: -moz-fit-content;
+  height: fit-content;
+}
+
+.Title-Button {
+  justify-content: space-between;
+  display: flex;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+
+  80% {
+    opacity: .8;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
+.Toast {
+  animation: 5s fadeOut;
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+}
+
+.LoaderContainer {
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  margin: 50px auto auto;
+  display: flex;
+}
+
+.LoaderContainerForm {
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.LoaderContainerDelete {
+  justify-content: center;
+  align-items: center;
+  margin: 36.7px;
+  display: flex;
+}
+
+.loader {
+  box-sizing: border-box;
+  border: 2px solid;
+  border-radius: 50%;
+  width: 60px;
+  height: 25px;
+  animation: 2s linear infinite l2;
+  display: grid;
+}
+
+.loader:before, .loader:after {
+  content: "";
+  border: inherit;
+  animation: inherit;
+  border-radius: 50%;
+  grid-area: 1 / 1;
+  animation-duration: 3s;
+}
+
+.loader:after {
+  --s: -1;
+}
+
+@keyframes l2 {
+  100% {
+    transform: rotate(calc(var(--s, 1) * 1turn));
+  }
+}
+
 .react-datepicker__year-read-view--down-arrow, .react-datepicker__month-read-view--down-arrow, .react-datepicker__month-year-read-view--down-arrow, .react-datepicker__navigation-icon:before {
   content: "";
   border: 3px solid #ccc;

@@ -18,9 +18,52 @@ function getClientes() {
     order,
     limit
   );
+
   return result;
 }
 
-function getClienteById() {}
+function getClienteById(id) {
+  const query = {
+    _id: { $oid: id },
+  };
+  const order = {};
+  const limit = 100;
 
-function updateClienteById() {}
+  const result = new MongoDBLib("clientes").getDocuments(
+    "find",
+    query,
+    order,
+    limit
+  );
+
+  return result;
+}
+
+function updateClienteById(id, data) {
+  const filter = {
+    _id: { $oid: id },
+  };
+  const update = {
+    $set: data,
+  };
+
+  const result = new MongoDBLib("clientes").updateDocument(
+    "updateOne",
+    filter,
+    update
+  );
+  return result;
+}
+
+function deleteClienteById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("clientes").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+

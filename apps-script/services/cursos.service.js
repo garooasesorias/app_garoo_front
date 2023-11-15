@@ -22,13 +22,27 @@ function getCursoById(id) {
   const query = {
     _id: { $oid: id },
   };
+
   const order = {};
   const limit = 10;
 
   const documents = mongoDB.getCursos("aggregate", query, order, limit);
-  console.log(id);
   console.log("Documents with related Items:", documents);
   return documents;
 }
 
-function updateCursoById() {}
+function updateCursoById(id, data) {
+  const filter = {
+    _id: { $oid: id },
+  };
+  const update = {
+    $set: data,
+  };
+
+  const result = new MongoDBLib("cursos").updateDocument(
+    "updateOne",
+    filter,
+    update
+  );
+  return result;
+}

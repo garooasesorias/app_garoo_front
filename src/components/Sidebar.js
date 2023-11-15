@@ -1,36 +1,30 @@
+import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
-import { FaCog } from "react-icons/fa";
+import { FaCog, FaAmilia } from "react-icons/fa";
+import { NotificacionesContext } from "../context/NotificacionesContext";
 
-function Sidebar() {
+import { BsCircleFill } from "react-icons/bs";
+// {/* <BsCircleFill style={{ color: "red" }} /> */}
+
+function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
+  const { notificaciones } = useContext(NotificacionesContext);
+
+  function toggleMinimize() {
+    setIsMinimized(!isMinimized);
+  }
+
   return (
     <>
-      <button
-        data-drawer-target="default-sidebar"
-        data-drawer-toggle="default-sidebar"
-        aria-controls="default-sidebar"
-        type="button"
-        className="inline-flex items-center p-2 mt-2 ml-3 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
-      >
-        <span className="sr-only">Open sidebar</span>
-        <svg
-          className="w-6 h-6"
-          aria-hidden="true"
-          fill="currentColor"
-          viewBox="0 0 20 20"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            clipRule="evenodd"
-            fillRule="evenodd"
-            d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z"
-          ></path>
-        </svg>
+      <button className="relative  z-50 ms-2 text-xl" onClick={toggleMinimize}>
+        ☰
       </button>
 
       <aside
         id="default-sidebar"
-        className="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0"
+        className={`fixed top-0 left-0 z-40 h-screen transition-transform sm:translate-x-0 ${
+          isMinimized ? "w-20" : "w-64"
+        }`}
         aria-label="Sidenav"
       >
         <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
@@ -92,44 +86,38 @@ function Sidebar() {
               </CollapsibleDropdown>
             </li>
             <li>
-              <Link to="/asesores">
-                <button
-                  type="button"
-                  className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  aria-controls="dropdown-pages"
-                  data-collapse-toggle="dropdown-pages"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
+              <CollapsibleDropdown buttonText="Asesores" icon={<FaAmilia />}>
+                <li>
+                  <NavLink to="/asesores">
+                    <button
+                      type="button"
+                      className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                      aria-controls="dropdown-pages"
+                      data-collapse-toggle="dropdown-pages"
+                    >
+                      <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                        Asesores
+                      </span>
+                    </button>
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/skills"
+                    className="flex-1 ml-3 text-left whitespace-nowrap"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                    Asesores
-                  </span>
-                  <svg
-                    aria-hidden="true"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
+                    Skills
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/especialidades"
+                    className="flex-1 ml-3 text-left whitespace-nowrap"
                   >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </button>
-              </Link>
+                    Especialidades
+                  </NavLink>
+                </li>
+              </CollapsibleDropdown>
 
               <ul id="dropdown-pages" className="hidden py-2 space-y-2">
                 <li></li>
@@ -149,49 +137,15 @@ function Sidebar() {
               </CollapsibleDropdown>
             </li>
             <li>
-              <Link to="/planes">
-                <button
-                  type="button"
-                  className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
-                  aria-controls="dropdown-sales"
-                  data-collapse-toggle="dropdown-sales"
-                >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                    Planes
-                  </span>
-                  <svg
-                    aria-hidden="true"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </button>
-              </Link>
-              <ul id="dropdown-sales" className="hidden py-2 space-y-2">
-                <li></li>
-                <li></li>
-                <li></li>
-              </ul>
+              <CollapsibleDropdown buttonText="Planes" icon={<FaCog />}>
+                <li>
+                  <NavLink to="/planes">Planes</NavLink>
+                </li>
+                <li>
+                  <NavLink to="/descuentos">Descuentos</NavLink>
+                </li>
+                {/* Other sub-options for "Actividades" */}
+              </CollapsibleDropdown>
             </li>
             <li>
               <CollapsibleDropdown buttonText="Cotizaciones" icon={<FaCog />}>
@@ -207,14 +161,32 @@ function Sidebar() {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Cursos" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText="CursosV2"
+                icon={
+                  notificaciones && notificaciones.length > 0 ? (
+                    <BsCircleFill style={{ color: "red" }} />
+                  ) : (
+                    <FaCog style={{ color: "gray" }} />
+                  )
+                }
+              >
                 <li>
-                  <NavLink to="/cursos">Cursos</NavLink>
+                  <NavLink to="/cursosv2">Cursos</NavLink>
                 </li>
                 <li>
-                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
+                  <NavLink to="/estadosCursosv2">Estados Cursos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
+              </CollapsibleDropdown>
+            </li>
+            <li>
+              <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
+                <li>
+                  <NavLink to="/actividadesReportes">
+                    Reporte Actividades
+                  </NavLink>
+                </li>
               </CollapsibleDropdown>
             </li>
           </ul>

@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
+import Loader from '../../components/Loader.js';
 
 function Materias() {
   const [materias, setMaterias] = useState([]);
-
+  const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -17,7 +20,8 @@ function Materias() {
               resolve(response);
             })
             .getMaterias();
-        });
+          });
+          
 
         const tipoDataResponse = await new Promise((resolve) => {
           google.script.run
@@ -26,6 +30,7 @@ function Materias() {
             })
             .getTiposMateria();
         });
+        setLoading(false);
 
         // Assuming tipoDataResponse contains an array of tipo objects
         const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
@@ -43,22 +48,25 @@ function Materias() {
         console.error("Error fetching data:", error);
       }
     };
+    
 
     fetchData();
   }, []);
-
   return (
     <>
-      <Link to="/formMaterias">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Materia +
-        </Button>
-      </Link>
+    <h1 className="PagesTitles">Materias</h1>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formMaterias">
+          <Button className="shadow mb-5" color="success">
+            Crear Materia +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
-          <Table.HeadCell>Tipo</Table.HeadCell>
+          <Table.HeadCell>Nombre de Materia</Table.HeadCell>
+          <Table.HeadCell>Tipo de Materia</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
@@ -84,6 +92,9 @@ function Materias() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }
