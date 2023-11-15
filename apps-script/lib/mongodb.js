@@ -68,6 +68,7 @@ class MongoDBLib {
       collection: this.collection,
       filter: filter, // El criterio para seleccionar qué documentos actualizar
       update: update, // Las operaciones de actualización a aplicar
+      upsert: true,
     };
 
     const options = this.createOptions(payload); // Usamos POST como en el ejemplo de curl
@@ -419,6 +420,22 @@ class MongoDBLib {
       },
       {
         $lookup: {
+          from: "asignamientos",
+          localField: "_id",
+          foreignField: "curso",
+          as: "asignamiento_info",
+        },
+      },
+      {
+        $lookup: {
+          from: "operaciones",
+          localField: "_id",
+          foreignField: "curso",
+          as: "operacion_info",
+        },
+      },
+      {
+        $lookup: {
           from: "clientes",
           localField: "cliente",
           foreignField: "_id",
@@ -447,7 +464,7 @@ class MongoDBLib {
       {
         $lookup: {
           from: "actividades",
-          localField: "actividades._id",
+          localField: "actividades",
           foreignField: "_id",
           as: "actividad_info",
         },
@@ -465,21 +482,30 @@ class MongoDBLib {
           estado: {
             $first: { $mergeObjects: { $arrayElemAt: ["$estado_info", 0] } },
           },
+          asignamiento: {
+            $first: {
+              $mergeObjects: { $arrayElemAt: ["$asignamiento_info", 0] },
+            },
+          },
+          operacion: {
+            $first: {
+              $mergeObjects: { $arrayElemAt: ["$operacion_info", 0] },
+            },
+          },
           actividades: {
             $push: {
               $mergeObjects: [
                 { $arrayElemAt: ["$actividad_info", 0] }, // Propiedades de actividades
-                {
-                  // Propiedades locales
-                  asesor: {
-                    _id: { $arrayElemAt: ["$asesor_info._id", 0] },
-                    nombre: { $arrayElemAt: ["$asesor_info.nombre", 0] },
-                  },
-                  nota: "$actividades.nota",
-                  estadoAdm: "$actividades.estadoAdm",
-                  estadoAsesor: "$actividades.estadoAsesor",
-                  fechaVencimiento: "$actividades.fechaVencimiento",
-                },
+                // {
+                //   asesor: {
+                //     _id: { $arrayElemAt: ["$asesor_info._id", 0] },
+                //     nombre: { $arrayElemAt: ["$asesor_info.nombre", 0] },
+                //   },
+                //   nota: "$actividades.nota",
+                //   estadoAdm: "$actividades.estadoAdm",
+                //   estadoAsesor: "$actividades.estadoAsesor",
+                //   fechaVencimiento: "$actividades.fechaVencimiento",
+                // },
               ],
             },
           },
@@ -493,6 +519,8 @@ class MongoDBLib {
           cliente: 1,
           estado: 1,
           actividades: 1,
+          asignamiento: 1,
+          operacion: 1,
         },
       },
     ];

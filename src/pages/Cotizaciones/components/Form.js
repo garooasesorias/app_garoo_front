@@ -181,14 +181,7 @@ function CotizacionForm() {
         cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
         estado: { $oid: "64eb986d83c29fa14cbabb69" },
         actividades: item.actividad
-          ? item.actividad.map((act) => ({
-              _id: { $oid: act.value },
-              asesor: null,
-              estadoAdm: null,
-              estadoAsesor: null,
-              fechaVencimiento: "",
-              nota: 0,
-            }))
+          ? item.actividad.map((act) => ({ $oid: act.value }))
           : [],
       };
 

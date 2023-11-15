@@ -161,17 +161,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Cursos" icon={<FaCog />}>
-                <li>
-                  <NavLink to="/cursos">Cursos</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
-                </li>
-                {/* Other sub-options for "Actividades" */}
-              </CollapsibleDropdown>
-            </li>
-            <li>
               <CollapsibleDropdown
                 buttonText="CursosV2"
                 icon={
