@@ -54,3 +54,16 @@ function updateClienteById(id, data) {
   );
   return result;
 }
+
+function deleteClienteById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("clientes").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+

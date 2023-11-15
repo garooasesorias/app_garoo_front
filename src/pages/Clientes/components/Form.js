@@ -8,7 +8,7 @@ import Loader from '../../../components/Loader.js';
 
 function Form() {
   const formRef = useRef();
-  
+
   const [formData, setFormData] = useState({
     referencia: "",
     cedula: "",
@@ -71,7 +71,10 @@ function Form() {
           console.log(response);
           setAction("actualizado"); // Establecemos la acción a 'actualizado'
           setLoading(false);
-          props.setShowToast(!props.showToast);
+          props.setShowToast(true);
+          setTimeout(() => {
+            props.setShowToast(false);
+          }, 5000);
         })
         .updateClienteById(id, formData); // Envia el ID y los datos del formulario
     } else {
@@ -81,7 +84,11 @@ function Form() {
           console.log(response);
           setAction("creado"); // Establecemos la acción a 'creado'
           setLoading(false);
-          props.setShowToast(!props.showToast);
+          props.setShowToast(true);
+          setTimeout(() => {
+            props.setShowToast(false);
+          }, 5000);
+          handleResetForm();
         })
         .insertCliente(formData);
     }
@@ -95,35 +102,32 @@ function Form() {
     }));
   };
 
-  
+
 
 
   const goBack = () => {
     window.history.back();
   };
 
-  // const handleReset = () => {
-  //   if (
-  //     formData.referencia !== "" &&
-  //     formData.nombre !== "" &&
-  //     formData.correo !== "" &&
-  //     formData.celular !== ""
-  //   ) {
-  //     formRef.current.reset();
-  //     setFormData({
-  //       referencia: "",
-  //       nombre: "",
-  //       correo: "",
-  //       celular: "",
-  //     });
-  //     // alert("Usuario creado con exito");
-  //   }
-  // };
+  const handleResetForm = () => {
+    setFormData({
+      referencia: "",
+      cedula: "",
+      nombre: "",
+      fechaNacimiento: "",
+      genero: "",
+      usuario: "",
+      contrasena: "",
+      correo: "",
+      celular: "",
+      carrera: "",
+    });
+  };
 
   return (
     <>
 
-    
+
       <form
         ref={formRef}
         className="flex max-w-md flex-col gap-4 m-auto"
@@ -280,9 +284,9 @@ function Form() {
       <Button type="button" color="dark" onClick={goBack} className="m-auto mt-4">
         Volver
       </Button>
-    
+
       <div className="LoaderContainerForm">
-      {loading ? <Loader /> : null}
+        {loading ? <Loader /> : null}
       </div>
       {props.showToast && (
         <Toast style={{ maxWidth: '250px' }} className="Toast" >
@@ -295,7 +299,7 @@ function Form() {
           <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
         </Toast>
       )}
-      
+
     </>
   );
 }
