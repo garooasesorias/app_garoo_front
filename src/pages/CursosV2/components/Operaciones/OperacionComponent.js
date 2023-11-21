@@ -1,34 +1,48 @@
 import React, { useState, useEffect, useContext } from "react";
 import { parseISO, format } from "date-fns";
-import { Button, Table } from "flowbite-react";
+import { Button, Table, Modal, TextInput } from "flowbite-react";
 import Select from "react-select";
 
 export default function OperacionComponent({ data }) {
-  console.log(data);
+  const [operaciones, setOperaciones] = useState([]);
+
   const [asesores, setAsesores] = useState([]);
   const [estadosAdm, setEstadosAdm] = useState([]);
   const [openModal, setOpenModal] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null); // Estado para almacenar el item actual
+  const [currentItem, setCurrentItem] = useState({}); // Estado para almacenar el item actual
 
-  const items = data.asignamiento?.items || [];
-  const [formData, setFormData] = useState({
-    items: data.actividades.map((actividad, index) => ({
-      actividad: items[index]?.actividad || actividad._id,
-      grupo: items[index]?.grupo || null,
-      tutor: items[index]?.tutor || null,
-      archivos: items[index]?.archivos || null,
-      comentarios: items[index]?.comentarios || null,
-      estado: {
-        _id: items[index]?.estado || null,
-      },
-      formaEnvio: items[index]?.formaEnvio || null,
-      actividadURL: items[index]?.actividadURL || null,
-      priorizacion: items[index]?.priorizacion || null,
-    })),
-  });
+  const [formData, setFormData] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
+      await google.script.run
+        .withSuccessHandler((response) => {
+          console.log("response operaciones by Curso", response);
+          setFormData({
+            items: response.map((operacion) => ({
+              _id: operacion._id,
+              actividad: operacion.actividad,
+              curso: data._id,
+              nombreActividad: "test",
+              nombreActividad:
+                data.actividades.find(
+                  (actividad) => actividad._id === operacion.actividad
+                )?.nombre || "",
+              grupo: operacion.grupo || "",
+              tutor: operacion.tutor || "",
+              archivosURL: operacion.archivosURL || "",
+              comentarios: operacion.comentarios || "",
+              estado: {
+                _id: operacion.estado || "",
+              },
+              formaEnvio: operacion.formaEnvio || "",
+              actividadURL: operacion.actividadURL || "",
+              priorizacion: operacion.priorizacion || "",
+            })),
+          });
+        })
+        .getOperacionesByIdCurso(data._id);
+
       await google.script.run.withSuccessHandler(setAsesores).getAsesores();
       await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
     };
@@ -47,45 +61,41 @@ export default function OperacionComponent({ data }) {
   };
 
   // Función para abrir el modal con la información del item seleccionado
-  const handleEdit = (item) => {
-    setCurrentItem(item);
+  const handleEdit = (item, index) => {
+    console.log(item);
+    setCurrentItem({ ...item, index });
     setOpenModal(true);
   };
 
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentItem((prevCurrentItem) => ({
+      ...prevCurrentItem,
+      [name]: value,
+    }));
+  };
+
   // // Función para manejar la actualización del item (ajustar según tus necesidades)
-  // const handleUpdate = () => {
-  //   console.log("Actualizar", currentItem);
-  //   // Aquí puedes agregar la lógica para actualizar el item
-  //   setOpenModal(false); // Cerrar el modal después de actualizar
-  // };
+  const handleUpdate = () => {
+    const objectToSend = currentItem;
+    objectToSend.actividad = { $oid: currentItem.actividad };
+    objectToSend._id = { $oid: currentItem._id };
+    objectToSend.curso = { $oid: currentItem.curso };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const itemsToSend = formData.items.map((item) => {
-      return {
-        ...item,
-        fechaVencimiento: item.fechaVencimiento,
-        actividad: { $oid: item.actividad },
-        asesor: item.asesor._id ? { $oid: item.asesor._id } : null,
-      };
-    });
-
+    console.log("Actualizar", objectToSend);
     google.script.run
       .withSuccessHandler((response) => {
+        console.log("respuesta actualización operación");
         console.log(response);
-        alert("Éxito");
       })
-      .updateOperacionById(
-        data.operacion._id ? { _id: { $oid: data.operacion._id } } : {},
-        {
-          curso: { $oid: data._id },
-          items: itemsToSend,
-        }
-      );
+      .updateOperacionById({ _id: objectToSend._id }, objectToSend);
+    console.log("FormData", formData);
+    // Aquí puedes agregar la lógica para actualizar el item
+    setOpenModal(false); // Cerrar el modal después de actualizar
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       <h2 className="text-2xl mb-4 font-semibo-ld text-gray-700">
         Actividades para {`${data.materia.nombre} - ${data.cliente.nombre}`}
       </h2>
@@ -109,32 +119,33 @@ export default function OperacionComponent({ data }) {
             formData.items.map((item, itemIndex) => (
               <tr key={item.actividad}>
                 <td className="px-4 py-2">
-                  {data.actividades[itemIndex].nombre}
+                  {item.nombreActividad}
+                  {/* {
+                    data.actividades.find(
+                      (actividad) => actividad._id === item.actividad
+                    ).nombre
+                  } */}
                 </td>
                 <td className="px-4 py-2">{item.grupo || "Sin Grupo"}</td>
-                <td className="px-4 py-2">
-                  {item.tutor?.nombre || "Sin Tutor"}
-                </td>
-                <td className="px-4 py-2">
-                  {item.archivos?.length > 0
-                    ? item.archivos.join(", ")
-                    : "Sin Archivos"}
-                </td>
+                <td className="px-4 py-2">{item.tutor || "Sin Tutor"}</td>
+                <td className="px-4 py-2">{item.archivos || "Sin Archivos"}</td>
                 <td className="px-4 py-2">
                   {item.comentarios || "Sin Comentarios"}
                 </td>
                 <td className="px-4 py-2">
-                  <Select
-                    options={estadosAdm.map((estados) => ({
-                      value: estados._id,
-                      label: estados.nombre,
+                  {estadosAdm.find((estado) => estado._id === item.estado._id)
+                    ?.nombre || "Sin Estado"}
+                  {/* <Select
+                    options={estadosAdm.map((estado) => ({
+                      value: estado._id,
+                      label: estado.nombre,
                     }))}
                     value={
                       estadosAdm.find(
                         (estado) => estado._id === item.estado._id
                       )
                         ? {
-                            value: item.estados._id,
+                            value: item.estado._id,
                             label: estadosAdm.find(
                               (estado) => estado._id === item.estado._id
                             ).nombre,
@@ -145,7 +156,7 @@ export default function OperacionComponent({ data }) {
                       handleEstadoChange(selectedOption, itemIndex)
                     }
                     isSearchable={true}
-                  />
+                  /> */}
                 </td>
                 <td className="px-4 py-2">
                   {item.formaEnvio || "Sin Forma de Envío"}
@@ -155,7 +166,10 @@ export default function OperacionComponent({ data }) {
                   {item.priorizacion || "Sin Priorización"}
                 </td>
                 <td className="px-4 py-2">
-                  <Button color="light" onClick={() => handleEdit(item)}>
+                  <Button
+                    color="light"
+                    onClick={() => handleEdit(item, itemIndex)}
+                  >
                     Editar
                   </Button>
                 </td>
@@ -164,25 +178,91 @@ export default function OperacionComponent({ data }) {
         </tbody>
       </Table>
       {/* Modal para editar */}
-      {currentItem && (
+      {currentItem.index >= 0 && (
         <Modal show={openModal} onClose={() => setOpenModal(false)}>
-          <Modal.Header>Editar Actividad</Modal.Header>
+          <Modal.Header>
+            Editar Actividad {currentItem.nombreActividad}
+          </Modal.Header>
           <Modal.Body>
-            {/* Aquí puedes agregar campos de formulario para editar los detalles de currentItem */}
+            <h1>{currentItem._id}</h1>
+            <div className="space-y-4">
+              <div>
+                <label
+                  htmlFor="grupo"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Grupo
+                </label>
+                <TextInput
+                  id="grupo"
+                  name="grupo"
+                  value={currentItem.grupo}
+                  onChange={handleFormChange}
+                  placeholder="Grupo"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="tutor"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Tutor
+                </label>
+                <TextInput
+                  id="tutor"
+                  name="tutor"
+                  value={currentItem.tutor}
+                  onChange={handleFormChange}
+                  placeholder="Tutor"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="tutor"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Archivos
+                </label>
+                <TextInput
+                  id="archivos"
+                  name="archivos"
+                  value={currentItem.archivos}
+                  onChange={handleFormChange}
+                  placeholder="URL ejem. http://www..."
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="tutor"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Comentarios
+                </label>
+                <TextInput
+                  id="comentarios"
+                  name="comentarios"
+                  value={currentItem.comentarios}
+                  onChange={handleFormChange}
+                  placeholder="comentarios"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              {/* Repite este patrón para otros campos */}
+            </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={handleUpdate}>Actualizar</Button>
+            <Button color="gray" onClick={handleUpdate}>
+              Actualizar
+            </Button>
             <Button color="gray" onClick={() => setOpenModal(false)}>
               Cancelar
             </Button>
           </Modal.Footer>
         </Modal>
       )}
-      {/* <div className="flex justify-center mt-2">
-        <Button type="submit" color="dark">
-          Actualizar Operaciones
-        </Button>
-      </div> */}
     </form>
   );
 }

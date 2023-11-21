@@ -20,16 +20,21 @@ class MongoDBLib {
   executeAPI(endpoint, options) {
     try {
       const response = UrlFetchApp.fetch(this.api + endpoint, options);
+      console.log("response...");
+      console.log(response.getContentText());
       const responseData = JSON.parse(response.getContentText());
-      if (response.getResponseCode() !== 200) {
+      const responseCode = response.getResponseCode();
+
+      // Aceptar tanto el código 200 (OK) como el 201 (Created)
+      if (responseCode !== 200 && responseCode !== 201) {
         throw new Error(
-          "API request failed with response code: " + response.getResponseCode()
+          "API request failed with response code: " + responseCode
         );
       }
       return responseData;
     } catch (error) {
       console.error("Error executing API request:", error);
-      return null; // or handle the error appropriately
+      return null; // o maneja el error de manera apropiada
     }
   }
 
@@ -68,9 +73,9 @@ class MongoDBLib {
       collection: this.collection,
       filter: filter, // El criterio para seleccionar qué documentos eliminar
     };
-  
+
     const options = this.createOptions(payload); // Usamos POST como en el ejemplo de curl
-  
+
     try {
       const responseData = this.executeAPI(endpoint, options);
       this.handleError(responseData);
@@ -80,8 +85,6 @@ class MongoDBLib {
       return null; // o manejar el error adecuadamente
     }
   }
-  
-  
 
   updateDocument(endpoint, filter, update) {
     const payload = {
@@ -450,14 +453,6 @@ class MongoDBLib {
       },
       {
         $lookup: {
-          from: "operaciones",
-          localField: "_id",
-          foreignField: "curso",
-          as: "operacion_info",
-        },
-      },
-      {
-        $lookup: {
           from: "clientes",
           localField: "cliente",
           foreignField: "_id",
@@ -509,11 +504,6 @@ class MongoDBLib {
               $mergeObjects: { $arrayElemAt: ["$asignamiento_info", 0] },
             },
           },
-          operacion: {
-            $first: {
-              $mergeObjects: { $arrayElemAt: ["$operacion_info", 0] },
-            },
-          },
           actividades: {
             $push: {
               $mergeObjects: [
@@ -542,7 +532,6 @@ class MongoDBLib {
           estado: 1,
           actividades: 1,
           asignamiento: 1,
-          operacion: 1,
         },
       },
     ];
@@ -569,6 +558,20 @@ class MongoDBLib {
   insertDocument(endpoint, document) {
     const payload = {
       document: document,
+      collection: this.collection,
+      dataSource: this.dataSource,
+      database: this.dataBase,
+    };
+
+    const options = this.createOptions(payload);
+    const response = this.executeAPI(endpoint, options);
+    console.log(response);
+    return response;
+  }
+
+  insertDocuments(endpoint, document) {
+    const payload = {
+      documents: document,
       collection: this.collection,
       dataSource: this.dataSource,
       database: this.dataBase,
