@@ -44,7 +44,6 @@ function CotizacionForm() {
         await google.script.run
           .withSuccessHandler((data) => {
             const cotizacion = data[0];
-            console.log(data);
             setCotizacion(data[0]);
 
             // Prepopulate the form fields with data from cotizacion
@@ -99,8 +98,6 @@ function CotizacionForm() {
     };
     fetchData();
   }, []);
-
-  console.log(formData);
 
   const calculateRowTotal = (row) => {
     let totalRow = 0;
@@ -164,8 +161,6 @@ function CotizacionForm() {
       divisionPagos: formData.divisionPagos,
     };
 
-    console.log(formattedFormData);
-
     google.script.run
       .withSuccessHandler(() => {
         alert("Éxito");
@@ -186,8 +181,19 @@ function CotizacionForm() {
       };
 
       await google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
+        .withSuccessHandler(async ({ insertedId }) => {
+          const actividades = item.actividad
+            ? item.actividad.map((act) => ({
+                actividad: { $oid: act.value },
+                curso: { $oid: insertedId },
+              }))
+            : [];
+
+          await google.script.run
+            .withSuccessHandler((response) => {
+              console.log("Operaciones insertadas: ", response);
+            })
+            .insertOperaciones(actividades);
         })
         .insertCurso(formatedFormData);
     });
