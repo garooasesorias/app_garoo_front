@@ -6,10 +6,10 @@ p {
   color: purple;
 }
 
-main {
-  margin-left: 300px;
-  margin-top: 30px;
-}
+// main {
+//   margin-left: 300px;
+//   margin-top: 30px;
+// }
 
 /* styles.css */
 .datepicker-custom {
@@ -19,4 +19,114 @@ main {
   border: 1px solid #ccc;
   border-radius: 4px;
   /* Añade otros estilos según tus preferencias */
+}
+
+@keyframes slideIn {
+  from{
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.PagesTitles{
+  font-size: 33px;
+  font-weight: bold;
+  color:#333;
+  letter-spacing: 1px;
+  margin: 2%;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: slideIn 1s ease-in-out forwards;
+}
+
+.link{
+
+height: fit-content;
+width: fit-content;
+color: green;
+
+}
+
+.Title-Button{
+  display: flex;
+  justify-content: space-between;
+}
+
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.Toast{
+  position: fixed;
+  bottom: 30px;
+  right: 10px;
+  animation: fadeOut 5s ease;
+}
+
+.LoaderContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin:auto;
+  margin-top: 50px;
+  width: 100px;
+  height: 100px;
+}
+.LoaderContainerForm{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100px;
+  height: 100px;
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+}
+
+.LoaderContainerDelete{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin:auto;
+  margin: 36.7px;
+}
+
+
+.loader {
+  width: 60px;
+  height: 25px;
+  border: 2px solid;
+  box-sizing: border-box;
+  border-radius: 50%;
+  display: grid;
+  animation: l2 2s infinite linear;
+}
+.loader:before,
+.loader:after {
+  content: "";
+  grid-area: 1/1;
+  border: inherit;
+  border-radius: 50%;
+  animation: inherit;
+  animation-duration: 3s;
+}
+.loader:after {
+  --s:-1;
+}
+@keyframes l2 {
+   100% {transform:rotate(calc(var(--s,1)*1turn))}
 }

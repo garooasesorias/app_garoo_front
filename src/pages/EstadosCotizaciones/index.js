@@ -2,17 +2,20 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import Loader from '../../components/Loader.js';
+import styles from '../../styles/main.scss';
 
 function EstadosCursos() {
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-  
       await google.script.run
         .withSuccessHandler((data) => {
           setEstadosCotizaciones(data);
+          setLoading(false);
         })
         .getEstadosCotizaciones();
     };
@@ -22,15 +25,18 @@ function EstadosCursos() {
 
   return (
     <>
-      <Link to="/formEstadosCotizaciones">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Estado Cotización +
-        </Button>
-      </Link>
+    <h1 className="PagesTitles">Estados Cotizaciones</h1>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formEstadosCotizaciones">
+          <Button className="shadow mb-5" color="success">
+            Crear Estado Cotización +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Nombre Estado Cotización</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
@@ -59,6 +65,9 @@ function EstadosCursos() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }

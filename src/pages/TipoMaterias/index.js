@@ -2,9 +2,12 @@ import React, { useState, useEffect } from "react";
 import { Table } from "flowbite-react";
 import { Button } from "flowbite-react";
 import { Link } from "react-router-dom";
+import styles from '../../styles/main.scss';
+import Loader from '../../components/Loader.js';
 
 function TiposMateria() {
   const [tiposMateria, setTiposMateria] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Fetch data from an external source (assuming it's an array of objects)
@@ -19,6 +22,7 @@ function TiposMateria() {
       await google.script.run
         .withSuccessHandler((data) => {
           setTiposMateria(data);
+          setLoading(false);
         })
         .getTiposMateria();
     };
@@ -28,15 +32,18 @@ function TiposMateria() {
 
   return (
     <>
-      <Link to="/formTipoMaterias">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Tipo de Materia +
-        </Button>
-      </Link>
+    <h1 className="PagesTitles">Tipos de Materias</h1>
+      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+        <Link to="/formTipoMaterias">
+          <Button className="shadow mb-5" color="success">
+            Crear Tipo De Materia +
+          </Button>
+        </Link>
+      </div>
       <Table>
         <Table.Head>
           {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre</Table.HeadCell>
+          <Table.HeadCell>Nombre Tipo de Materia</Table.HeadCell>
           <Table.HeadCell>
             <span className="sr-only">Edit</span>
           </Table.HeadCell>
@@ -65,6 +72,9 @@ function TiposMateria() {
             ))}
         </Table.Body>
       </Table>
+      <div className="LoaderContainer">
+            {loading ? <Loader /> : null}
+            </div>
     </>
   );
 }
