@@ -161,9 +161,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-<<<<<<< HEAD
-              <CollapsibleDropdown buttonText="Cursos" icon={<FaCog />}>
-=======
               <CollapsibleDropdown
                 buttonText="CursosV2"
                 icon={
@@ -174,7 +171,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   )
                 }
               >
->>>>>>> ae2c71d498f4de81aefc312ab3a5f31533aec397
                 <li>
                   <NavLink to="/cursosv2">Cursos</NavLink>
                 </li>
@@ -183,8 +179,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
-<<<<<<< HEAD
-=======
             </li>
             <li>
               <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
@@ -194,7 +188,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </NavLink>
                 </li>
               </CollapsibleDropdown>
->>>>>>> ae2c71d498f4de81aefc312ab3a5f31533aec397
             </li>
           </ul>
           <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
