@@ -52,4 +52,16 @@ function insertMateria(document) {
     );
     return result;
   }
+
+  function deleteMateriaById(id) {
+    const filter = {
+      _id: { $oid: id },
+    };
+  
+    const result = new MongoDBLib("materias").deleteDocument(
+      "deleteOne",
+      filter,
+    );
+    return result;
+  }
   

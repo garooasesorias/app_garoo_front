@@ -40,3 +40,15 @@ function uploadFilesToGoogleDrive(data, name, type) {
   let obj = { url, id }; //prepare object to response
   return obj;
 }
+
+function deleteAsesorById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("asesores").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
