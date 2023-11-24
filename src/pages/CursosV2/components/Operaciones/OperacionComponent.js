@@ -2,61 +2,54 @@ import React, { useState, useEffect, useContext } from "react";
 import { parseISO, format } from "date-fns";
 import { Button, Table, Modal, TextInput } from "flowbite-react";
 import Select from "react-select";
+import { IoMdAttach } from "react-icons/io";
 
 export default function OperacionComponent({ data }) {
-  const [operaciones, setOperaciones] = useState([]);
-
-  const [asesores, setAsesores] = useState([]);
   const [estadosAdm, setEstadosAdm] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [currentItem, setCurrentItem] = useState({}); // Estado para almacenar el item actual
 
   const [formData, setFormData] = useState({});
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((response) => {
-          console.log("response operaciones by Curso", response);
-          setFormData({
-            items: response.map((operacion) => ({
-              _id: operacion._id,
-              actividad: operacion.actividad,
-              curso: data._id,
-              nombreActividad: "test",
-              nombreActividad:
-                data.actividades.find(
-                  (actividad) => actividad._id === operacion.actividad
-                )?.nombre || "",
-              grupo: operacion.grupo || "",
-              tutor: operacion.tutor || "",
-              archivosURL: operacion.archivosURL || "",
-              comentarios: operacion.comentarios || "",
-              estado: {
-                _id: operacion.estado || "",
-              },
-              formaEnvio: operacion.formaEnvio || "",
-              actividadURL: operacion.actividadURL || "",
-              priorizacion: operacion.priorizacion || "",
-            })),
-          });
-        })
-        .getOperacionesByIdCurso(data._id);
+  const fetchData = async () => {
+    await google.script.run
+      .withSuccessHandler((response) => {
+        console.log("response operaciones by Curso", response);
+        setFormData({
+          items: response.map((operacion) => ({
+            _id: operacion._id,
+            actividad: operacion.actividad,
+            curso: data._id,
+            nombreActividad: "test",
+            nombreActividad:
+              data.actividades.find(
+                (actividad) => actividad._id === operacion.actividad
+              )?.nombre || "",
+            grupo: operacion.grupo || "",
+            tutor: operacion.tutor || "",
+            archivosURL: operacion.archivosURL || "",
+            comentarios: operacion.comentarios || "",
+            estado: {
+              _id: operacion.estado || "",
+            },
+            formaEnvio: operacion.formaEnvio || "",
+            actividadURL: operacion.actividadURL || "",
+            priorizacion: operacion.priorizacion || "",
+          })),
+        });
+      })
+      .getOperacionesByIdCurso(data._id);
 
-      await google.script.run.withSuccessHandler(setAsesores).getAsesores();
-      await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
-    };
+    // await google.script.run.withSuccessHandler(setAsesores).getAsesores();
+    await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
+  };
+  useEffect(() => {
     fetchData();
   }, []);
 
   const handleEstadoChange = (selectedOption, itemIndex) => {
-    setFormData((prevFormData) => {
-      const newItems = [...prevFormData.items];
-      const estadoObj = estadosAdm.find(
-        (estado) => estado._id === selectedOption.value
-      );
-      newItems[itemIndex].estado = estadoObj;
-      return { ...prevFormData, items: newItems };
+    setCurrentItem((prevCurrentItem) => {
+      return { ...prevCurrentItem, estado: { _id: selectedOption.value } };
     });
   };
 
@@ -81,17 +74,37 @@ export default function OperacionComponent({ data }) {
     objectToSend.actividad = { $oid: currentItem.actividad };
     objectToSend._id = { $oid: currentItem._id };
     objectToSend.curso = { $oid: currentItem.curso };
+    objectToSend.estado = currentItem.estado?._id
+      ? { $oid: currentItem.estado._id }
+      : null;
 
     console.log("Actualizar", objectToSend);
     google.script.run
       .withSuccessHandler((response) => {
         console.log("respuesta actualización operación");
         console.log(response);
+        fetchData();
       })
       .updateOperacionById({ _id: objectToSend._id }, objectToSend);
     console.log("FormData", formData);
     // Aquí puedes agregar la lógica para actualizar el item
     setOpenModal(false); // Cerrar el modal después de actualizar
+  };
+
+  const renderLinkIcon = (url) => {
+    if (url) {
+      return (
+        <a
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex justify-center"
+        >
+          <IoMdAttach size={20} />
+        </a>
+      );
+    }
+    return "Sin Archivos"; // O cualquier otro mensaje/placerholder que prefieras
   };
 
   return (
@@ -118,50 +131,25 @@ export default function OperacionComponent({ data }) {
           {formData.items &&
             formData.items.map((item, itemIndex) => (
               <tr key={item.actividad}>
-                <td className="px-4 py-2">
-                  {item.nombreActividad}
-                  {/* {
-                    data.actividades.find(
-                      (actividad) => actividad._id === item.actividad
-                    ).nombre
-                  } */}
-                </td>
+                <td className="px-4 py-2">{item.nombreActividad}</td>
                 <td className="px-4 py-2">{item.grupo || "Sin Grupo"}</td>
                 <td className="px-4 py-2">{item.tutor || "Sin Tutor"}</td>
-                <td className="px-4 py-2">{item.archivos || "Sin Archivos"}</td>
+                <td className="px-4 py-2">
+                  {renderLinkIcon(item.archivosURL)}
+                </td>
                 <td className="px-4 py-2">
                   {item.comentarios || "Sin Comentarios"}
                 </td>
                 <td className="px-4 py-2">
-                  {estadosAdm.find((estado) => estado._id === item.estado._id)
+                  {estadosAdm.find((estado) => estado._id === item.estado?._id)
                     ?.nombre || "Sin Estado"}
-                  {/* <Select
-                    options={estadosAdm.map((estado) => ({
-                      value: estado._id,
-                      label: estado.nombre,
-                    }))}
-                    value={
-                      estadosAdm.find(
-                        (estado) => estado._id === item.estado._id
-                      )
-                        ? {
-                            value: item.estado._id,
-                            label: estadosAdm.find(
-                              (estado) => estado._id === item.estado._id
-                            ).nombre,
-                          }
-                        : null
-                    }
-                    onChange={(selectedOption) =>
-                      handleEstadoChange(selectedOption, itemIndex)
-                    }
-                    isSearchable={true}
-                  /> */}
                 </td>
                 <td className="px-4 py-2">
                   {item.formaEnvio || "Sin Forma de Envío"}
                 </td>
-                <td className="px-4 py-2">{item.actividadURL || "Sin URL"}</td>
+                <td className="px-4 py-2">
+                  {renderLinkIcon(item.actividadURL)}
+                </td>
                 <td className="px-4 py-2">
                   {item.priorizacion || "Sin Priorización"}
                 </td>
@@ -226,9 +214,9 @@ export default function OperacionComponent({ data }) {
                   Archivos
                 </label>
                 <TextInput
-                  id="archivos"
-                  name="archivos"
-                  value={currentItem.archivos}
+                  id="archivosURL"
+                  name="archivosURL"
+                  value={currentItem.archivosURL}
                   onChange={handleFormChange}
                   placeholder="URL ejem. http://www..."
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
@@ -247,6 +235,85 @@ export default function OperacionComponent({ data }) {
                   value={currentItem.comentarios}
                   onChange={handleFormChange}
                   placeholder="comentarios"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="estado"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Estado
+                </label>
+                <Select
+                  id="estado"
+                  options={estadosAdm.map((estado) => ({
+                    value: estado._id,
+                    label: estado.nombre,
+                  }))}
+                  value={
+                    estadosAdm.find(
+                      (estado) => estado._id === currentItem.estado?._id
+                    )
+                      ? {
+                          value: currentItem.estado._id,
+                          label: estadosAdm.find(
+                            (estado) => estado._id === currentItem.estado?._id
+                          ).nombre,
+                        }
+                      : null
+                  }
+                  onChange={(selectedOption) =>
+                    handleEstadoChange(selectedOption, currentItem.index)
+                  }
+                  isSearchable={true}
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="formaEnvio"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Forma Envío
+                </label>
+                <TextInput
+                  id="formaEnvio"
+                  name="formaEnvio"
+                  value={currentItem.formaEnvio}
+                  onChange={handleFormChange}
+                  placeholder=""
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="actividadURL"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Actividad URL
+                </label>
+                <TextInput
+                  id="actividadURL"
+                  name="actividadURL"
+                  value={currentItem.actividadURL}
+                  onChange={handleFormChange}
+                  placeholder="https://..."
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+                />
+              </div>
+              <div>
+                <label
+                  htmlFor="priorizacion"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Priorización
+                </label>
+                <TextInput
+                  id="priorizacion"
+                  name="priorizacion"
+                  value={currentItem.priorizacion}
+                  onChange={handleFormChange}
+                  placeholder="https://..."
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                 />
               </div>
