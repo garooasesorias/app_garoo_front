@@ -130,3 +130,16 @@ color: green;
 @keyframes l2 {
    100% {transform:rotate(calc(var(--s,1)*1turn))}
 }
+
+.accordion {
+  background-color: transparent;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  transition: background-color 0.3s ease;
+}
+
+.accordion:hover {
+  background-color: rgb(233, 231, 231);
+}

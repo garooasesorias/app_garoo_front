@@ -129,4 +129,17 @@ p {
   }
 }
 
+.accordion {
+  background-color: #0000;
+  border: none;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  transition: background-color .3s;
+}
+
+.accordion:hover {
+  background-color: #e9e7e7;
+}
+
 /*# sourceMappingURL=index.12039506.css.map */

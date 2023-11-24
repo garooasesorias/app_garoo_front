@@ -14,10 +14,18 @@ export function Layout({ children }) {
 
   // Para controlar el estado de la visibilidad del Dropdown
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  function toggleMinimize() {
+    setIsMinimized(!isMinimized);
+  }
   return (
     <>
-      <div className="shadow w-full h-15 flex justify-end p-5 items-center">
+      <div className="shadow w-full h-15 flex justify-between p-5 items-center">
+        <button
+          className={`accordion ${isMinimized ? ' z-50 text-xl ml-20' : ' z-50 text-xl ml-64'}`}
+          onClick={toggleMinimize}
+        >
+          ☰
+        </button>
         <Dropdown
           inline={true}
           label={
@@ -45,7 +53,7 @@ export function Layout({ children }) {
             notificationGroup.actividades.map((actividad, indexActividad) => (
               <Dropdown.Item
                 key={`${indexNotificacionGroup}-${indexActividad}`}
-                // No se necesita icono aquí, a menos que lo quieras incluir
+              // No se necesita icono aquí, a menos que lo quieras incluir
               >
                 Una actividad necesita revisión
               </Dropdown.Item>

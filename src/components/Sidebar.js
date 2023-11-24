@@ -10,15 +10,9 @@ import { BsCircleFill } from "react-icons/bs";
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
   const { notificaciones } = useContext(NotificacionesContext);
 
-  function toggleMinimize() {
-    setIsMinimized(!isMinimized);
-  }
 
   return (
     <>
-      <button className="relative  z-50 ms-2 text-xl" onClick={toggleMinimize}>
-        ☰
-      </button>
 
       <aside
         id="default-sidebar"
@@ -27,6 +21,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
         }`}
         aria-label="Sidenav"
       >
+        
         <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <ul className="space-y-2">
             <li>
@@ -76,18 +71,18 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown buttonText="Materias" icon={<FaCog />}>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/materias">Materias</NavLink>
                 </li>
-                <li>
-                  <NavLink to="/tipoMaterias">Tipo de Materias</NavLink>
+                <li className="ml-5">
+                  <NavLink to="/tipoMaterias" >Tipo de Materias</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
             <li>
               <CollapsibleDropdown buttonText="Asesores" icon={<FaAmilia />}>
-                <li>
+                <li className="mr-2">
                   <NavLink to="/asesores">
                     <button
                       type="button"
@@ -101,7 +96,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     </button>
                   </NavLink>
                 </li>
-                <li>
+                <li  className="ml-2">
                   <NavLink
                     to="/skills"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -109,7 +104,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     Skills
                   </NavLink>
                 </li>
-                <li>
+                <li  className="ml-2">
                   <NavLink
                     to="/especialidades"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -127,10 +122,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown buttonText="Actividades" icon={<FaCog />}>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/actividades">Actividades</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/tipoActividades">Tipo de Actividades</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
@@ -138,10 +133,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown buttonText="Planes" icon={<FaCog />}>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/planes">Planes</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/descuentos">Descuentos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
@@ -149,10 +144,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown buttonText="Cotizaciones" icon={<FaCog />}>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/cotizaciones">Cotizaciones</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/estadosCotizaciones">
                     Estados Cotizaciones
                   </NavLink>
@@ -171,10 +166,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   )
                 }
               >
-                <li>
+                <li className="ml-5">
                   <NavLink to="/cursosv2">Cursos</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/estadosCursosv2">Estados Cursos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
@@ -182,7 +177,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/actividadesReportes">
                     Reporte Actividades
                   </NavLink>
@@ -253,7 +248,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
           </ul>
         </div>
-        <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700">
+        {/* <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700">
           <a
             href="#"
             className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
@@ -329,7 +324,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </g>
             </svg>
           </button>
-        </div>
+        </div> */}
       </aside>
     </>
   );
