@@ -31,6 +31,22 @@ function getAsignamientoById(id) {
   return documents;
 }
 
+function getAsignamientosByIdCurso(idCurso) {
+  const collectionName = "asignamientos"; // Replace with your collection name
+  const mongoDB = new MongoDBLib(collectionName);
+
+  const query = {
+    curso: { $oid: idCurso },
+  };
+
+  const order = {};
+  const limit = 10;
+
+  const documents = mongoDB.getDocuments("find", query, order, limit);
+  console.log("Documents with related Items:", documents);
+  return documents;
+}
+
 function updateAsignamientoById(idObject, data) {
   const update = {
     $set: data,

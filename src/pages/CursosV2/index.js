@@ -5,6 +5,7 @@ import Loader from "../../components/Loader.js";
 import { NotificacionesContext } from "../../context/NotificacionesContext.js";
 import AsignamientoComponent from "./components/Asignamientos/AsignamientoComponent.js";
 import OperacionComponent from "./components/Operaciones/OperacionComponent.js";
+import CalificacionComponent from "./components/Calificaciones/CalificacionComponent.js";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -58,39 +59,9 @@ function Cursos() {
                 <OperacionComponent data={selectedCurso}></OperacionComponent>
               </Tabs.Item>
               <Tabs.Item title="Calificaciones">
-                <Table striped={true}>
-                  <Table.Head>
-                    <Table.HeadCell>Estudiante</Table.HeadCell>
-                    <Table.HeadCell>Entregable</Table.HeadCell>
-                    <Table.HeadCell>Nota</Table.HeadCell>
-                    <Table.HeadCell>Estado</Table.HeadCell>
-                    <Table.HeadCell>Comentarios</Table.HeadCell>
-                    <Table.HeadCell>Acciones</Table.HeadCell>
-                  </Table.Head>
-                  <Table.Body className="divide-y">
-                    {Array.from({ length: 5 }, (_, index) => (
-                      <Table.Row key={index}>
-                        <Table.Cell>Estudiante {index + 1}</Table.Cell>
-                        <Table.Cell>Entregable {index + 1}</Table.Cell>
-                        <Table.Cell>
-                          {(Math.random() * 10).toFixed(2)}
-                        </Table.Cell>
-                        <Table.Cell>
-                          {Math.random() > 0.5 ? "Aprobado" : "Pendiente"}
-                        </Table.Cell>
-                        <Table.Cell>Comentarios de ejemplo</Table.Cell>
-                        <Table.Cell>
-                          <Button size="xs" color="gray">
-                            Editar
-                          </Button>
-                          <Button size="xs" color="red">
-                            Eliminar
-                          </Button>
-                        </Table.Cell>
-                      </Table.Row>
-                    ))}
-                  </Table.Body>
-                </Table>
+                <CalificacionComponent
+                  data={selectedCurso}
+                ></CalificacionComponent>
               </Tabs.Item>
             </Tabs.Group>
           )}
