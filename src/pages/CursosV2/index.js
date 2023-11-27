@@ -26,7 +26,7 @@ function Cursos() {
 
   return (
     <div className="container p-6">
-      <h1 className="text-3xl mb-4 font-semibold text-gray-700">Cursos V2</h1>
+      <h1 className="text-3xl mb-4 font-semibold text-gray-700 ">Cursos V2</h1>
       <div className="flex">
         <aside className="p-3 shadow mr-3">
           <h2 className="text-xl mb-3 font-semibold text-gray-600">

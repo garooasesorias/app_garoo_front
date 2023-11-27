@@ -142,4 +142,29 @@ p {
   background-color: #e9e7e7;
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: #f0f0f0;
+}
+
+::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb:horizontal {
+  background-color: #ccc;
+}
+
+::-webkit-scrollbar-track:horizontal {
+  background-color: #f0f0f0;
+}
+
 /*# sourceMappingURL=index.12039506.css.map */
