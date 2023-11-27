@@ -1,9 +1,10 @@
 import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
-import { FaCog, FaBookOpen, FaChalkboardTeacher, FaDollarSign, FaPercentage, FaGraduationCap, FaChartLine } from "react-icons/fa";
+import { FaBookOpen, FaChalkboardTeacher, FaDollarSign, FaPercentage, FaGraduationCap, FaChartLine } from "react-icons/fa";
 import { NotificacionesContext } from "../context/NotificacionesContext";
 import { IoPeopleSharp } from "react-icons/io5";
+import { FaPen } from "react-icons/fa6";
 
 import { BsCircleFill } from "react-icons/bs";
 // {/* <BsCircleFill style={{ color: "red" }} /> */}
@@ -112,7 +113,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </ul>
             </li>
             <li>
-              <CollapsibleDropdown buttonText={<b>Actividades</b>} icon={<FaCog className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />}>
+              <CollapsibleDropdown buttonText={<b>Actividades</b>} icon={<FaPen className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />}>
                 <li className="ml-5">
                   <NavLink to="/actividades">Actividades</NavLink>
                 </li>
