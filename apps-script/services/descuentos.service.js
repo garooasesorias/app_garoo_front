@@ -54,3 +54,15 @@ function updateDescuentoById(id, data) {
   );
   return result;
 }
+
+function deleteDescuentoById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("descuentos").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}

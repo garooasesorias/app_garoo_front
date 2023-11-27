@@ -21,6 +21,18 @@ function insertEspecialidades(document) {
     return result;
   }
   
+function deleteEspecialidadById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("especialidades").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+  
   function getEspecialidadesById() {}
   
   function updateEspecialidadesById() {}
