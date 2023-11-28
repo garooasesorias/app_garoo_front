@@ -21,6 +21,18 @@ function insertActividad(document) {
     return result;
   }
   
+  function deleteActividadById(id) {
+    const filter = {
+      _id: { $oid: id },
+    };
+  
+    const result = new MongoDBLib("actividades").deleteDocument(
+      "deleteOne",
+      filter,
+    );
+    return result;
+  }
+
   function getActividadById() {}
   
   function updateActividadById() {}
