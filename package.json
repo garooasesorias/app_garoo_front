@@ -3,26 +3,18 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "glogin": "clasp login",
-    "glogout": "clasp logout",
-    "gcreate": "clasp create --title 'MesaSoporte_Garoo_Project' --rootDir ./apps-script",
-    "gclone": "clasp clone 1CdK0myVVbAnblIz2hOJ_QaNy5UM3toI8ShjSQiCs94LNnPomft2D9xFT --rootDir ./apps-script",
-    "gpull": "clasp pull",
-    "gpush": "clasp push",
-    "gstart": "clasp push --watch",
-    "start": "parcel src/index.html --dist-dir ./apps-script",
-    "build": "parcel build src/index.html --dist-dir ./apps-script"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@google/clasp": "^2.4.2",
-    "@parcel/transformer-sass": "^2.9.3",
-    "@types/google-apps-script": "^1.0.65",
-    "parcel": "^2.9.3",
     "postcss": "^8.4.27",
     "process": "^0.11.10",
+    "react-scripts": "^5.0.1",
     "tailwindcss": "^3.3.3"
   },
   "dependencies": {
@@ -38,5 +30,17 @@
     "react-router-dom": "^6.17.0",
     "react-select": "^5.7.4",
     "sass": "^1.64.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

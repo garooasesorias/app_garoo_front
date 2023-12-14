@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Label, Table } from "flowbite-react";
 import Select from "react-select";
-import PdfButton from "./PDFButton";
+import PdfButton from "./PdfButton";
 
 function CotizacionForm() {
   let { id } = useParams();
