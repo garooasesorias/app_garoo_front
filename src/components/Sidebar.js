@@ -1,8 +1,17 @@
 import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
-import { FaCog, FaAmilia } from "react-icons/fa";
+import {
+  FaBookOpen,
+  FaChalkboardTeacher,
+  FaDollarSign,
+  FaPercentage,
+  FaGraduationCap,
+  FaChartLine,
+} from "react-icons/fa";
 import { NotificacionesContext } from "../context/NotificacionesContext";
+import { IoPeopleSharp } from "react-icons/io5";
+import { FaPen } from "react-icons/fa6";
 
 import { BsCircleFill } from "react-icons/bs";
 // {/* <BsCircleFill style={{ color: "red" }} /> */}
@@ -29,35 +38,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   aria-controls="dropdown-pages"
                   data-collapse-toggle="dropdown-pages"
                 >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
+                  <IoPeopleSharp className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
                   <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                    Clientes
+                    <b>Clientes</b>
                   </span>
-                  <svg
-                    aria-hidden="true"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
                 </button>
               </Link>
               <ul id="dropdown-pages" className="hidden py-2 space-y-2">
@@ -67,7 +51,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </ul>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Materias" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText={<b>Materias</b>}
+                icon={
+                  <FaBookOpen className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="ml-5">
                   <NavLink to="/materias">Materias</NavLink>
                 </li>
@@ -78,7 +67,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Asesores" icon={<FaAmilia />}>
+              <CollapsibleDropdown
+                buttonText={<b>Asesores</b>}
+                icon={
+                  <FaChalkboardTeacher className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="mr-2">
                   <NavLink to="/asesores">
                     <button
@@ -118,7 +112,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </ul>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Actividades" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText={<b>Actividades</b>}
+                icon={
+                  <FaPen className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="ml-5">
                   <NavLink to="/actividades">Actividades</NavLink>
                 </li>
@@ -129,7 +128,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Planes" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText={<b>Planes</b>}
+                icon={
+                  <FaPercentage className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="ml-5">
                   <NavLink to="/planes">Planes</NavLink>
                 </li>
@@ -140,7 +144,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Cotizaciones" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText={<b>Cotizaciones</b>}
+                icon={
+                  <FaDollarSign className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="ml-5">
                   <NavLink to="/cotizaciones">Cotizaciones</NavLink>
                 </li>
@@ -154,12 +163,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             </li>
             <li>
               <CollapsibleDropdown
-                buttonText="CursosV2"
+                buttonText={<b>CursosV2</b>}
                 icon={
                   notificaciones && notificaciones.length > 0 ? (
                     <BsCircleFill style={{ color: "red" }} />
                   ) : (
-                    <FaCog style={{ color: "gray" }} />
+                    <FaGraduationCap className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
                   )
                 }
               >
@@ -173,7 +182,12 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
+              <CollapsibleDropdown
+                buttonText={<b>Reportes</b>}
+                icon={
+                  <FaChartLine className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
                 <li className="ml-5">
                   <NavLink to="/actividadesReportes">
                     Reporte Actividades

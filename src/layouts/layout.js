@@ -21,9 +21,7 @@ export function Layout({ children }) {
     <>
       <div className="shadow w-full h-15 flex justify-between p-5 items-center">
         <button
-          className={`accordion ${
-            isMinimized ? " z-50 text-xl ml-20" : " z-50 text-xl ml-64"
-          }`}
+          className={`accordion ${isMinimized ? ' z-50 text-xl ml-0' : ' z-50 text-xl ml-64'}`}
           onClick={toggleMinimize}
         >
           ☰
