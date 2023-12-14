@@ -2,18 +2,16 @@ import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
 import { FaCog, FaAmilia } from "react-icons/fa";
-import { NotificacionesContext } from "../context/NotificacionesContext";
+// import { NotificacionesContext } from "../context/NotificacionesContext";
 
 import { BsCircleFill } from "react-icons/bs";
 // {/* <BsCircleFill style={{ color: "red" }} /> */}
 
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
-  const { notificaciones } = useContext(NotificacionesContext);
-
+  // const { notificaciones } = useContext(NotificacionesContext);
 
   return (
     <>
-
       <aside
         id="default-sidebar"
         className={`fixed top-0 left-0 z-40 h-screen transition-transform sm:translate-x-0 ${
@@ -21,7 +19,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
         }`}
         aria-label="Sidenav"
       >
-        
         <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
           <ul className="space-y-2">
             <li>
@@ -75,7 +72,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   <NavLink to="/materias">Materias</NavLink>
                 </li>
                 <li className="ml-5">
-                  <NavLink to="/tipoMaterias" >Tipo de Materias</NavLink>
+                  <NavLink to="/tipoMaterias">Tipo de Materias</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
@@ -96,7 +93,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     </button>
                   </NavLink>
                 </li>
-                <li  className="ml-2">
+                <li className="ml-2">
                   <NavLink
                     to="/skills"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -104,7 +101,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     Skills
                   </NavLink>
                 </li>
-                <li  className="ml-2">
+                <li className="ml-2">
                   <NavLink
                     to="/especialidades"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -158,13 +155,13 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
             <li>
               <CollapsibleDropdown
                 buttonText="CursosV2"
-                icon={
-                  notificaciones && notificaciones.length > 0 ? (
-                    <BsCircleFill style={{ color: "red" }} />
-                  ) : (
-                    <FaCog style={{ color: "gray" }} />
-                  )
-                }
+                // icon={
+                //   notificaciones && notificaciones.length > 0 ? (
+                //     <BsCircleFill style={{ color: "red" }} />
+                //   ) : (
+                //     <FaCog style={{ color: "gray" }} />
+                //   )
+                // }
               >
                 <li className="ml-5">
                   <NavLink to="/cursosv2">Cursos</NavLink>

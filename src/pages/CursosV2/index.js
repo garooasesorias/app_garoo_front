@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react";
 import { Table, Button, Tabs } from "flowbite-react";
 import Select from "react-select";
 import Loader from "../../components/Loader.js";
-import { NotificacionesContext } from "../../context/NotificacionesContext.js";
 import AsignamientoComponent from "./components/Asignamientos/AsignamientoComponent.js";
 import OperacionComponent from "./components/Operaciones/OperacionComponent.js";
 import CalificacionComponent from "./components/Calificaciones/CalificacionComponent.js";
