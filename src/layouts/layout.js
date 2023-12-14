@@ -3,10 +3,10 @@ import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import { FiBell } from "react-icons/fi";
 import { Dropdown } from "flowbite-react";
-// import { NotificacionesContext } from "../context/NotificacionesContext";
+import { NotificacionesContext } from "../context/NotificacionesContext";
 
 export function Layout({ children }) {
-  // const { notificaciones } = useContext(NotificacionesContext);
+  const { notificaciones } = useContext(NotificacionesContext);
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -38,20 +38,20 @@ export function Layout({ children }) {
             >
               <FiBell size={24} />
               <span className="sr-only">Notifications</span>
-              {/* {notificaciones.length > 0 && (
+              {notificaciones.length > 0 && (
                 <div className="absolute inline-flex items-center justify-center w-6 h-6 text-xs font-bold text-white bg-red-500 border-2 border-white rounded-full -top-2 -right-2 dark:border-gray-900">
                   {notificaciones.reduce(
                     (acc, curr) => acc + curr.actividades.length,
                     0
                   )}
                 </div>
-              )} */}
+              )}
             </div>
           }
           show={dropdownOpen}
           onClose={() => setDropdownOpen(false)}
         >
-          {/* {notificaciones.map((notificationGroup, indexNotificacionGroup) =>
+          {notificaciones.map((notificationGroup, indexNotificacionGroup) =>
             notificationGroup.actividades.map((actividad, indexActividad) => (
               <Dropdown.Item
                 key={`${indexNotificacionGroup}-${indexActividad}`}
@@ -60,7 +60,7 @@ export function Layout({ children }) {
                 Una actividad necesita revisión
               </Dropdown.Item>
             ))
-          )} */}
+          )}
         </Dropdown>
       </div>
       <Sidebar

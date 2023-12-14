@@ -31,11 +31,11 @@ import FormEspecialidades from "./pages/Especialidades/components/Form";
 import ActividadesReportes from "./pages/ActividadesReportes";
 import Descuentos from "./pages/Descuentos";
 import FormDescuentos from "./pages/Descuentos/components/Form";
-// import { NotificacionesProvider } from "./context/NotificacionesContext";
+import { NotificacionesProvider } from "./context/NotificacionesContext";
 
 function App() {
   return (
-    // <NotificacionesProvider>
+    <NotificacionesProvider>
     <Layout>
       <Nav />
       <Routes>
@@ -78,7 +78,7 @@ function App() {
         <Route path="*" element={<Home />} />
       </Routes>
     </Layout>
-    // </NotificacionesProvider>
+    </NotificacionesProvider>
   );
 }
 
