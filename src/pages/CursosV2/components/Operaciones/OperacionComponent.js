@@ -14,7 +14,6 @@ export default function OperacionComponent({ data }) {
   const fetchData = async () => {
     await google.script.run
       .withSuccessHandler((response) => {
-        console.log("response operaciones by Curso", response);
         setFormData({
           items: response.map((operacion) => ({
             _id: operacion._id,
@@ -55,7 +54,6 @@ export default function OperacionComponent({ data }) {
 
   // Función para abrir el modal con la información del item seleccionado
   const handleEdit = (item, index) => {
-    console.log(item);
     setCurrentItem({ ...item, index });
     setOpenModal(true);
   };
@@ -78,15 +76,11 @@ export default function OperacionComponent({ data }) {
       ? { $oid: currentItem.estado._id }
       : null;
 
-    console.log("Actualizar", objectToSend);
     google.script.run
       .withSuccessHandler((response) => {
-        console.log("respuesta actualización operación");
-        console.log(response);
         fetchData();
       })
       .updateOperacionById({ _id: objectToSend._id }, objectToSend);
-    console.log("FormData", formData);
     // Aquí puedes agregar la lógica para actualizar el item
     setOpenModal(false); // Cerrar el modal después de actualizar
   };

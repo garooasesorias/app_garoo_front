@@ -4,7 +4,6 @@ import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 
 export default function AsignamientoComponent({ data }) {
-  console.log(data);
   const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
     items: data.actividades.map((actividad, index) => ({
@@ -26,8 +25,6 @@ export default function AsignamientoComponent({ data }) {
     };
     fetchData();
   }, []);
-
-  console.log(formData);
 
   const handleDateChange = (date, itemIndex) => {
     setFormData((prevFormData) => {
@@ -61,7 +58,6 @@ export default function AsignamientoComponent({ data }) {
 
     google.script.run
       .withSuccessHandler((response) => {
-        console.log(response);
         alert("Éxito");
       })
       .updateAsignamientoById(
