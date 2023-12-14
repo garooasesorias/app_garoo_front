@@ -21,6 +21,18 @@ function getTiposActividad() {
   return result;
 }
 
+function deleteTiposActividadById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("tipoActividades").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+
 function getTipoActividadById() {}
 
 function updateTipoActividadById() {}

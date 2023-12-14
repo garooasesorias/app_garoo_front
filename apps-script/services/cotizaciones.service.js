@@ -65,3 +65,14 @@ function getImagenesCotizacion() {
 
   return filesArray;
 }
+function deleteCotizacionesById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("cotizaciones").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}

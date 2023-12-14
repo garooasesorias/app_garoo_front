@@ -21,6 +21,18 @@ function getEstadosCotizaciones() {
   return result;
 }
 
+function deleteEstadoCotizacionesById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("estadosCotizaciones").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+
 function getEstadoCotizacionById() {}
 
 function updateEstadoCotizacionById() {}

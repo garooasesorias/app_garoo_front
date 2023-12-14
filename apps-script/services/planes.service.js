@@ -21,6 +21,19 @@ function getPlanes() {
   return documents;
 }
 
+
+function deletePlanById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("planes").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
+
 function getPlanById() {}
 
 function updatePlanById() {}

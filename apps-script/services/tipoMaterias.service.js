@@ -21,6 +21,17 @@ function getTiposMateria() {
   return result;
 }
 
+function deleteTiposmById(id) {
+  const filter = {
+    _id: { $oid: id },
+  };
+
+  const result = new MongoDBLib("tipoMaterias").deleteDocument(
+    "deleteOne",
+    filter,
+  );
+  return result;
+}
 function getTipoMateriaById() {}
 
 function updateTipoMateriaById() {}

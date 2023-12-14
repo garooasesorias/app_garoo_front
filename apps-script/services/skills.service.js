@@ -21,6 +21,19 @@ function insertSkill(document) {
     return result;
   }
   
+
+  function deleteSkillsById(id) {
+    const filter = {
+      _id: { $oid: id },
+    };
+  
+    const result = new MongoDBLib("skills").deleteDocument(
+      "deleteOne",
+      filter,
+    );
+    return result;
+  }
+
   function getSkillsById() {}
   
   function updateSkillsById() {}
