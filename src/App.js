@@ -11,7 +11,6 @@ import FormMaterias from "./pages/Materias/components/Form";
 import FormTipoMaterias from "./pages/TipoMaterias/components/Form";
 import FormCotizaciones from "./pages/Cotizaciones/components/Form";
 import FormEstadosCotizaciones from "./pages/EstadosCotizaciones/components/Form";
-import FormEstadosCursos from "./pages/EstadosCursos/components/Form";
 import Footer from "./components/Footer";
 import Nav from "./components/Nav";
 import Layout from "./layouts/layout";
@@ -24,12 +23,7 @@ import Materias from "./pages/Materias";
 import TiposMateria from "./pages/TipoMaterias";
 import Cotizaciones from "./pages/Cotizaciones";
 import EstadosCotizaciones from "./pages/EstadosCotizaciones";
-import Cursos from "./pages/Cursos";
-import EstadosCursos from "./pages/EstadosCursos";
 import CursosV2 from "./pages/CursosV2";
-// import EstadosCursosV2 from "./pages/EstadosCursosV2";
-import CursosFormV2 from "./pages/Cursos/components/Form";
-import FormCursos from "./pages/Cursos/components/Form";
 import Skills from "./pages/Skills";
 import FormSkills from "./pages/Skills/components/Form";
 import Especialidades from "./pages/Especialidades";
@@ -37,9 +31,11 @@ import FormEspecialidades from "./pages/Especialidades/components/Form";
 import ActividadesReportes from "./pages/ActividadesReportes";
 import Descuentos from "./pages/Descuentos";
 import FormDescuentos from "./pages/Descuentos/components/Form";
+import { NotificacionesProvider } from "./context/NotificacionesContext";
 
 function App() {
   return (
+    <NotificacionesProvider>
     <Layout>
       <Nav />
       <Routes>
@@ -59,8 +55,6 @@ function App() {
         <Route path="/tipoMaterias" element={<TiposMateria />} />
         <Route path="/cotizaciones" element={<Cotizaciones />} />
         <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} />
-        <Route path="/cursos" element={<Cursos />} />
-        <Route path="/estadosCursos" element={<EstadosCursos />} />
         <Route path="/cursosv2" element={<CursosV2 />} />
         {/* <Route path="/estadosCursosv2" element={<EstadosCursos />} /> */}
         <Route path="/formAsesores" element={<FormAsesores />} />
@@ -81,13 +75,10 @@ function App() {
         <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
         <Route path="/descuentos" element={<Descuentos />} />
         <Route path="/actividadesReportes" element={<ActividadesReportes />} />
-        <Route path="/formCursos" element={<FormCursos />} />
-        <Route path="/formCursosV2" element={<CursosFormV2 />} />
-        <Route path="/formCursos/:id" element={<FormCursos />} />
-        <Route path="/formEstadosCursos" element={<FormEstadosCursos />} />
         <Route path="*" element={<Home />} />
       </Routes>
     </Layout>
+    </NotificacionesProvider>
   );
 }
 

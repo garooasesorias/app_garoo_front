@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
+import { Card, Avatar, Table, Button, Progress, ModalBodyProps, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
-import styles from '../../styles/main.scss';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 
 function Asesores() {
@@ -10,7 +10,9 @@ function Asesores() {
   const [collapsedIndex, setCollapsedIndex] = useState(null);
   const [asesores, setAsesores] = useState([]);
   const [loading, setLoading] = useState(true);
-
+  const [openModal, setOpenModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedAsesorId, setSelectedAsesorId] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       await google.script.run
@@ -39,6 +41,29 @@ function Asesores() {
     // plan.actividades.some((actividad) => actividad.nombre.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
+  
+const handleDeleteClick = () => {
+  if (selectedAsesorId) {
+    setDeleting(true);
+    google.script.run
+      .withSuccessHandler((response) => {
+        console.log(response);
+        setAsesores((prevAsesores) => prevAsesores.filter(asesor => asesor._id !== selectedAsesorId));
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedAsesorId(null); // Limpia el ID almacenado
+      })
+      .deleteAsesorById(selectedAsesorId);
+  }
+};
+  const passAsesorId = (asesorId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedAsesorId(asesorId);
+  
+    // Abre el modal
+    setOpenModal(true);
+  };
+  
   return (
     <>
       <h1 className="PagesTitles">Asesores</h1>
@@ -73,6 +98,43 @@ function Asesores() {
                 Editar
               </Button>
             </Link>
+            
+                  <Button
+                    onClick={() => passAsesorId(asesor._id)}
+                    className=" text-red-600 hover:underline shadow mb-2 ms-auto" color="success"
+                  >
+                    Borrar
+                  </Button>
+                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+                    <Modal.Header />
+                    <Modal.Body>
+                      <div className="text-center">
+                        {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
+                          <div className="LoaderContainerDelete"><Loader /></div>
+                        ) : (
+                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                        )}
+                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                          {deleting
+                            ? "Eliminando..."
+                            : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
+                        </h3>
+                        <div className="flex justify-center gap-4">
+                          <Button
+                            color="failure"
+                            onClick={() => handleDeleteClick(asesor._id)}
+                            disabled={deleting} // Deshabilita el botón durante la eliminación
+                          >
+                            {deleting ? "Eliminando..." : "Sí, eliminar"}
+                          </Button>
+                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                            No, cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    </Modal.Body>
+                  </Modal>
+                
             <div className="flex flex-col items-center pb-4">
               <Avatar
                 alt={`${asesor.nombre} image`}

@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Link, TableCell } from "flowbite-react";
+import React, { useState, useEffect, useContext } from "react";
+import { Table, Button, Tabs } from "flowbite-react";
+import Select from "react-select";
 import Loader from "../../components/Loader.js";
+import AsignamientoComponent from "./components/Asignamientos/AsignamientoComponent.js";
+import OperacionComponent from "./components/Operaciones/OperacionComponent.js";
+import CalificacionComponent from "./components/Calificaciones/CalificacionComponent.js";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -21,11 +25,10 @@ function Cursos() {
   }, []);
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl mb-4 font-semibold text-gray-700">Cursos V2</h1>
-
+    <div className="container p-6">
+      <h1 className="text-3xl mb-4 font-semibold text-gray-700 ">Cursos V2</h1>
       <div className="flex">
-        <aside className="w-1/4 pr-6 shadow">
+        <aside className="p-3 shadow mr-3">
           <h2 className="text-xl mb-3 font-semibold text-gray-600">
             Lista de Cursos
           </h2>
@@ -43,49 +46,23 @@ function Cursos() {
           </ul>
         </aside>
 
-        <main className="w-3/4 pl-6">
-          {selectedCurso && (
-            <>
-              <h2 className="text-2xl mb-4 font-semibold text-gray-700">
-                Actividades para {selectedCurso.materia.nombre}
-              </h2>
-              <Table variant="striped">
-                <thead>
-                  <tr>
-                    <th className="px-4 py-2">Nombre</th>
-                    <th className="px-4 py-2">Asesor</th>
-                    <th className="px-4 py-2">Estado Adm</th>
-                    <th className="px-4 py-2">Fecha Límite</th>
-                    {/* ... otros encabezados ... */}
-                  </tr>
-                </thead>
-                <tbody>
-                  {selectedCurso.actividades.map((actividad) => (
-                    <tr key={actividad._id}>
-                      <td className="px-4 py-2">{actividad.nombre}</td>
-                      <td className="px-4 py-2">
-                        <select>
-                          <option>Asesor 1</option>
-                          <option>Asesor 2</option>
-                          <option>Asesor 3</option>
-                        </select>
-                      </td>
-                      <td className="px-4 py-2">
-                        <select>
-                          <option>Envado</option>
-                          <option>Pendiente</option>
-                          {/* <option>Asesor 3</option> */}
-                        </select>
-                      </td>
-                      <td className="px-4 py-2">
-                        <input type="date"></input>
-                      </td>
-                      {/* ... otras celdas ... */}
-                    </tr>
-                  ))}
-                </tbody>
-              </Table>
-            </>
+        <main className="w-full">
+          {selectedCurso?.fecha && (
+            <Tabs.Group aria-label="Tabs with underline" style="underline">
+              <Tabs.Item title="Asignamientos">
+                <AsignamientoComponent
+                  data={selectedCurso}
+                ></AsignamientoComponent>
+              </Tabs.Item>
+              <Tabs.Item title="Operaciones">
+                <OperacionComponent data={selectedCurso}></OperacionComponent>
+              </Tabs.Item>
+              <Tabs.Item title="Calificaciones">
+                <CalificacionComponent
+                  data={selectedCurso}
+                ></CalificacionComponent>
+              </Tabs.Item>
+            </Tabs.Group>
           )}
         </main>
       </div>

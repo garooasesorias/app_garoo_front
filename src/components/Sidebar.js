@@ -1,21 +1,26 @@
+import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
-import { FaCog, FaAmilia } from "react-icons/fa";
-import React, { useState } from "react";
+import {
+  FaBookOpen,
+  FaChalkboardTeacher,
+  FaDollarSign,
+  FaPercentage,
+  FaGraduationCap,
+  FaChartLine,
+} from "react-icons/fa";
+import { NotificacionesContext } from "../context/NotificacionesContext";
+import { IoPeopleSharp } from "react-icons/io5";
+import { FaPen } from "react-icons/fa6";
+
+import { BsCircleFill } from "react-icons/bs";
+// {/* <BsCircleFill style={{ color: "red" }} /> */}
 
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
-  // Recibimos las props
-  // Movemos el método para alternar isMinimized aquí
-  function toggleMinimize() {
-    setIsMinimized(!isMinimized);
-  }
+  const { notificaciones } = useContext(NotificacionesContext);
 
   return (
     <>
-      <button className="relative  z-50 ms-2 text-xl" onClick={toggleMinimize}>
-        ☰
-      </button>
-
       <aside
         id="default-sidebar"
         className={`fixed top-0 left-0 z-40 h-screen transition-transform sm:translate-x-0 ${
@@ -33,35 +38,10 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   aria-controls="dropdown-pages"
                   data-collapse-toggle="dropdown-pages"
                 >
-                  <svg
-                    aria-hidden="true"
-                    className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
+                  <IoPeopleSharp className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
                   <span className="flex-1 ml-3 text-left whitespace-nowrap">
-                    Clientes
+                    <b>Clientes</b>
                   </span>
-                  <svg
-                    aria-hidden="true"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
                 </button>
               </Link>
               <ul id="dropdown-pages" className="hidden py-2 space-y-2">
@@ -71,19 +51,29 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </ul>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Materias" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Materias</b>}
+                icon={
+                  <FaBookOpen className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/materias">Materias</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/tipoMaterias">Tipo de Materias</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Asesores" icon={<FaAmilia />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Asesores</b>}
+                icon={
+                  <FaChalkboardTeacher className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="mr-2">
                   <NavLink to="/asesores">
                     <button
                       type="button"
@@ -97,7 +87,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     </button>
                   </NavLink>
                 </li>
-                <li>
+                <li className="ml-2">
                   <NavLink
                     to="/skills"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -105,7 +95,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                     Skills
                   </NavLink>
                 </li>
-                <li>
+                <li className="ml-2">
                   <NavLink
                     to="/especialidades"
                     className="flex-1 ml-3 text-left whitespace-nowrap"
@@ -122,33 +112,48 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </ul>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Actividades" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Actividades</b>}
+                icon={
+                  <FaPen className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/actividades">Actividades</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/tipoActividades">Tipo de Actividades</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Planes" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Planes</b>}
+                icon={
+                  <FaPercentage className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/planes">Planes</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/descuentos">Descuentos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Cotizaciones" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Cotizaciones</b>}
+                icon={
+                  <FaDollarSign className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/cotizaciones">Cotizaciones</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/estadosCotizaciones">
                     Estados Cotizaciones
                   </NavLink>
@@ -157,30 +162,33 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Cursos" icon={<FaCog />}>
-                <li>
-                  <NavLink to="/cursos">Cursos</NavLink>
-                </li>
-                <li>
-                  <NavLink to="/estadosCursos">Estados Cursos</NavLink>
-                </li>
-                {/* Other sub-options for "Actividades" */}
-              </CollapsibleDropdown>
-            </li>
-            <li>
-              <CollapsibleDropdown buttonText="CursosV2" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>CursosV2</b>}
+                icon={
+                  notificaciones && notificaciones.length > 0 ? (
+                    <BsCircleFill style={{ color: "red" }} />
+                  ) : (
+                    <FaGraduationCap className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                  )
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/cursosv2">Cursos</NavLink>
                 </li>
-                <li>
+                <li className="ml-5">
                   <NavLink to="/estadosCursosv2">Estados Cursos</NavLink>
                 </li>
                 {/* Other sub-options for "Actividades" */}
               </CollapsibleDropdown>
             </li>
             <li>
-              <CollapsibleDropdown buttonText="Reportes" icon={<FaCog />}>
-                <li>
+              <CollapsibleDropdown
+                buttonText={<b>Reportes</b>}
+                icon={
+                  <FaChartLine className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                }
+              >
+                <li className="ml-5">
                   <NavLink to="/actividadesReportes">
                     Reporte Actividades
                   </NavLink>
@@ -250,83 +258,6 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               </a>
             </li>
           </ul>
-        </div>
-        <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20 border-r border-gray-200 dark:border-gray-700">
-          <a
-            href="#"
-            className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-600"
-          >
-            <svg
-              aria-hidden="true"
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path d="M5 4a1 1 0 00-2 0v7.268a2 2 0 000 3.464V16a1 1 0 102 0v-1.268a2 2 0 000-3.464V4zM11 4a1 1 0 10-2 0v1.268a2 2 0 000 3.464V16a1 1 0 102 0V8.732a2 2 0 000-3.464V4zM16 3a1 1 0 011 1v7.268a2 2 0 010 3.464V16a1 1 0 11-2 0v-1.268a2 2 0 010-3.464V4a1 1 0 011-1z"></path>
-            </svg>
-          </a>
-          <a
-            href="#"
-            data-tooltip-target="tooltip-settings"
-            className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:text-gray-400 dark:hover:text-white hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
-          >
-            <svg
-              aria-hidden="true"
-              className="w-6 h-6"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                fillRule="evenodd"
-                d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z"
-                clipRule="evenodd"
-              ></path>
-            </svg>
-          </a>
-          <div
-            id="tooltip-settings"
-            role="tooltip"
-            className="inline-block absolute invisible z-10 py-2 px-3 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-sm opacity-0 transition-opacity duration-300 tooltip"
-          >
-            Settings page
-            <div className="tooltip-arrow" data-popper-arrow></div>
-          </div>
-          <button
-            type="button"
-            data-dropdown-toggle="language-dropdown"
-            className="inline-flex justify-center p-2 text-gray-500 rounded cursor-pointer dark:hover:text-white dark:text-gray-400 hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-600"
-          >
-            <svg
-              aria-hidden="true"
-              className="h-5 w-5 rounded-full mt-0.5"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 3900 3900"
-            >
-              <path fill="#b22234" d="M0 0h7410v3900H0z" />
-              <path
-                d="M0 450h7410m0 600H0m0 600h7410m0 600H0m0 600h7410m0 600H0"
-                stroke="#fff"
-                strokeWidth="300"
-              />
-              <path fill="#3c3b6e" d="M0 0h2964v2100H0z" />
-              <g fill="#fff">
-                <g id="d">
-                  <g id="c">
-                    <g id="e">
-                      <g id="b">
-                        <path
-                          id="a"
-                          d="M247 90l70.534 217.082-184.66-134.164h228.253L176.466 307.082z"
-                        />
-                      </g>
-                    </g>
-                  </g>
-                </g>
-              </g>
-            </svg>
-          </button>
         </div>
       </aside>
     </>

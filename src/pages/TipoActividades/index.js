@@ -1,24 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "flowbite-react";
-import { Button } from "flowbite-react";
+import { Table, Card } from "flowbite-react";
+import { Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
-import styles from '../../styles/main.scss';
+import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function TiposActividad() {
   const [tiposActividad, setTiposActividad] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedTiposActividadId, setSelectedTiposActividadId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
+    
     const fetchData = async () => {
-      // try {
-      //   const response = await fetch("your_api_endpoint_here");
-      //   const data = await response.json();
-      //   setTiposActividad(data);
-      // } catch (error) {
-      //   console.error("Error fetching data:", error);
-      // }
+      
       await google.script.run
         .withSuccessHandler((data) => {
           setTiposActividad(data);
@@ -29,6 +27,29 @@ function TiposActividad() {
 
     fetchData();
   }, []);
+
+  const handleDeleteClick = () => {
+    if (selectedTiposActividadId) {
+      setDeleting(true);
+      google.script.run
+        .withSuccessHandler((response) => {
+          console.log(response);
+          setTiposActividad((prevTiposActividades) => prevTiposActividades.filter(tipoActividad => tipoActividad._id !== selectedTiposActividadId));
+          setDeleting(false);
+          setOpenModal(false);
+          setSelectedTiposActividadId(null); // Limpia el ID almacenado
+        })
+        .deleteTiposActividadById(selectedTiposActividadId);
+    }
+  };
+    const passTiposActividadId = (tipoActividadId) => {
+      // Tomamos el Id del cliente que viene del botón borrar
+      setSelectedTiposActividadId(tipoActividadId);
+    
+      // Abre el modal
+      setOpenModal(true);
+    };
+  
 
   return (
     <>
@@ -70,6 +91,43 @@ function TiposActividad() {
                     Edit
                   </Link>
                 </Table.Cell>
+                <TableCell>
+                  <button
+                    onClick={() => passTiposActividadId(tipoActividad._id)}
+                    className="font-medium text-red-600 hover:underline dark:text-red-500"
+                  >
+                    Borrar
+                  </button>
+                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+                    <Modal.Header />
+                    <Modal.Body>
+                      <div className="text-center">
+                        {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
+                          <div className="LoaderContainerDelete"><Loader /></div>
+                        ) : (
+                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                        )}
+                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                          {deleting
+                            ? "Eliminando..."
+                            : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
+                        </h3>
+                        <div className="flex justify-center gap-4">
+                          <Button
+                            color="failure"
+                            onClick={() => handleDeleteClick(tipoActividad._id)}
+                            disabled={deleting} // Deshabilita el botón durante la eliminación
+                          >
+                            {deleting ? "Eliminando..." : "Sí, eliminar"}
+                          </Button>
+                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                            No, cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    </Modal.Body>
+                  </Modal>
+                </TableCell>
               </Table.Row>
             ))}
         </Table.Body>

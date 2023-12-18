@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Card, Avatar, Table, Button, Progress } from "flowbite-react";
+import { Card, Table, Button, Progress, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
-import styles from '../../styles/main.scss';
 import Loader from '../../components/Loader.js';
+import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collapsedIndex, setCollapsedIndex] = useState(null);
   const [planes, setPlanes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [openModal, setOpenModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,6 +41,28 @@ function Planes() {
     // || Add more filtering based on plan properties
     // plan.actividades.some((actividad) => actividad.nombre.toLowerCase().includes(searchQuery.toLowerCase()))
   );
+
+  const handleDeleteClick = () => {
+    if (selectedPlanId) {
+      setDeleting(true);
+      google.script.run
+        .withSuccessHandler((response) => {
+          console.log(response);
+          setPlanes((prevPlanes) => prevPlanes.filter(plan => plan._id !== selectedPlanId));
+          setDeleting(false);
+          setOpenModal(false);
+          setSelectedPlanId(null); // Limpia el ID almacenado
+        })
+        .deletePlanById(selectedPlanId);
+    }
+  };
+    const passPlantId = (planId) => {
+      // Tomamos el Id del cliente que viene del botón borrar
+      setSelectedPlanId(planId);
+    
+      // Abre el modal
+      setOpenModal(true);
+    };
 
   return (
     <>
@@ -72,6 +98,42 @@ function Planes() {
                 Editar
               </Button>
             </Link>
+            <Button
+                    onClick={() => passPlantId(plan._id)}
+                    className=" text-red-600 hover:underline shadow mb-2 ms-auto" color="success"
+                  >
+                    Borrar
+                  </Button>
+                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+                    <Modal.Header />
+                    <Modal.Body>
+                      <div className="text-center">
+                        {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
+                          <div className="LoaderContainerDelete"><Loader /></div>
+                        ) : (
+                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                        )}
+                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                          {deleting
+                            ? "Eliminando..."
+                            : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
+                        </h3>
+                        <div className="flex justify-center gap-4">
+                          <Button
+                            color="failure"
+                            onClick={() => handleDeleteClick(plan._id)}
+                            disabled={deleting} // Deshabilita el botón durante la eliminación
+                          >
+                            {deleting ? "Eliminando..." : "Sí, eliminar"}
+                          </Button>
+                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                            No, cancelar
+                          </Button>
+                        </div>
+                      </div>
+                    </Modal.Body>
+                  </Modal>
+
             <div className="flex flex-col items-center pb-4">
               <h5 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">
                 {plan.nombre}
