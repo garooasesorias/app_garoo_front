@@ -80,7 +80,7 @@ function Skills() {
                 {/*<Table.Cell>{materia.tipoNombre}</Table.Cell>*/}
                 <Table.Cell>
                   <Link
-                    to={`/editSkill/${skill.id}`}
+                    to={`/formSkills/${skill._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

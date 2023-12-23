@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card } from "flowbite-react";
-import { Button, Modal } from "flowbite-react";
+import especialidadService from "../../services/especialidadService.js";
+import { Table, Card, Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 const { jsPDF } = window.jspdf;
@@ -451,33 +451,37 @@ function Especialidades() {
   const [selectedEspecialidadId, setSelectedEspecialidadId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setEspecialidades(data);
-          setLoading(false);
-        })
-        .getEspecialidades();
+      try {
+        const especialidadesObtenidos = await especialidadService.getEspecialidades();
+        
+        setEspecialidades(especialidadesObtenidos.data);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error al cargar especialidades:", error);
+      }
+    
     };
 
     fetchData();
   }, []);
 
+
   const handleDeleteClick = () => {
     if (selectedEspecialidadId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setEspecialidades((prevEspecialidades) => prevEspecialidades.filter(especialidad => especialidad._id !== selectedEspecialidadId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedEspecialidadId(null); // Limpia el ID almacenado
-        })
-        .deleteEspecialidadById(selectedEspecialidadId);
+      especialidadService.deleteEspecialidadById(selectedEspecialidadId).then((response) => {
+        console.log(response);
+        setEspecialidades((prevEspecialidades) =>
+          prevEspecialidades.filter((especialidad) => especialidad._id !== selectedEspecialidadId)
+        );
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedEspecialidadId(null); // Limpia el ID almacenado
+      });
     }
   };
+
     const passEspecialidadId = (especialidadId) => {
       // Tomamos el Id del cliente que viene del botón borrar
       setSelectedEspecialidadId(especialidadId);
@@ -516,7 +520,7 @@ function Especialidades() {
                 {/*<Table.Cell>{materia.tipoNombre}</Table.Cell>*/}
                 <Table.Cell>
                   <Link
-                    to={`/editEspecialidad/${especialidad.id}`}
+                    to={`/formEspecialidades/${especialidad._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
