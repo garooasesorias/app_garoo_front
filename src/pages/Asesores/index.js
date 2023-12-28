@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import asesorService from "../../services/asesorService.js";
 import { Card, Avatar, Table, Button, Progress, ModalBodyProps, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
@@ -13,19 +14,23 @@ function Asesores() {
   const [openModal, setOpenModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [selectedAsesorId, setSelectedAsesorId] = useState(null);
+  
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          console.log(data);
-          setAsesores(data);
-          setLoading(false);
-        })
-        .getAsesores();
+      try {
+        const asesoresObtenidos = await asesorService.getAsesores();
+       
+        setAsesores(asesoresObtenidos.data);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error al cargar asesores:", error);
+      }
+      
     };
 
     fetchData();
   }, []);
+
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -42,22 +47,23 @@ function Asesores() {
   );
 
   
-const handleDeleteClick = () => {
-  if (selectedAsesorId) {
-    setDeleting(true);
-    google.script.run
-      .withSuccessHandler((response) => {
+  const handleDeleteClick = () => {
+    if (selectedAsesorId) {
+      setDeleting(true);
+      asesorService.deleteAsesorById(selectedAsesorId).then((response) => {
         console.log(response);
-        setAsesores((prevAsesores) => prevAsesores.filter(asesor => asesor._id !== selectedAsesorId));
+        setAsesores((prevAsesores) =>
+          prevAsesores.filter((asesor) => asesor._id !== selectedAsesorId)
+        );
         setDeleting(false);
         setOpenModal(false);
         setSelectedAsesorId(null); // Limpia el ID almacenado
-      })
-      .deleteAsesorById(selectedAsesorId);
-  }
-};
+      });
+    }
+    
+  };
   const passAsesorId = (asesorId) => {
-    // Tomamos el Id del cliente que viene del botón borrar
+    // Tomamos el Id del asesor que viene del botón borrar
     setSelectedAsesorId(asesorId);
   
     // Abre el modal

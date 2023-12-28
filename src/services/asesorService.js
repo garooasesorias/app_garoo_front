@@ -54,7 +54,29 @@ const asesorService = {
       throw error;
     }
   },
+
+  
+  getSkills: async () => {
+    try {
+      const response = await api.get("/skill/getSkills");
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener los skills:", error);
+      throw error;
+    }
+  },
+
+  getEspecialidades: async () => {
+    try {
+      const response = await api.get("/especialidad/getEspecialidades");
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener los Especialidades:", error);
+      throw error;
+    }
+  },
   // Aquí puedes agregar más funciones para interactuar con la API de asesor
 };
 
-export default asesorService;
+
+export default asesorService ;

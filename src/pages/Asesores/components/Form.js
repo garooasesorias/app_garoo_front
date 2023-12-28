@@ -1,10 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import asesorService from "../../../services/asesorService.js";
 import { Button, Label, TextInput, FileInput, Toast } from "flowbite-react";
 import Select from "react-select";
+import { useParams } from "react-router-dom";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
 
 function Form() {
+  const formRef = useRef();
   //const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
     avatar: "",
@@ -23,28 +26,77 @@ function Form() {
   const props = { showToast, setShowToast };
 
   const [action, setAction] = useState("creado");
+  const { id } = useParams(); // Extrae el id desde la URL
+
 
   /*const handleFileInputChange = (event) => {
     const file = event.target.files[0];
     setSelectedFile(file ? file.name : null);
   };*/
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setSkills(data);
-        })
-        .getSkills();
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setEspecialidades(data);
-        })
-        .getEspecialidades();
-    };
+  // useEffect(() => {
+  //   console.log(id);
+  //   if (id) {
+  //     setLoading(true);
+  //     asesorService
+  //       .getAsesorById(id)
+  //       .then((response) => {
+        
+  //         setAsesor(response.data);
+  //         setLoading(false);
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error al obtener el asesor:", error);
+  //         setLoading(false);
+  //         // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+  //       });
+  //   }
+  // }, [id]);
 
+  useEffect(() => {
+    // Obtener las especialidades y skills al montar el componente
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+  
+        if (id) {
+          // Obtener el asesor por ID
+          const asesorData = await asesorService.getAsesorById(id);
+          setAsesor(asesorData);
+        }
+  
+        // Obtener las especialidades
+        const especialidadesData = await asesorService.getEspecialidades();
+        setEspecialidades(especialidadesData);
+  
+        // Obtener los skills
+        const skillsData = await asesorService.getSkills();
+        setSkills(skillsData);
+  
+        setLoading(false);
+      } catch (error) {
+        console.error("Error al obtener datos:", error);
+        setLoading(false);
+        // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+      }
+    };
+  
     fetchData();
-  }, []);
+  }, [id]);
+
+  const setAsesor = (asesor) => {
+    setFormData({
+      identificacion: asesor.identificacion || "",
+      cargo: asesor.cargo || "",
+      nombre: asesor.nombre || "",
+      avatar: asesor.avatar || "",
+      especialidades: asesor.especialidades || "",
+      skills: asesor.skills || "",
+      celular: asesor.celular || "",
+     
+      // ...otros campos
+    });
+  };
 
   function guardarArchivo(e) {
     var file = e.target.files[0]; // El archivo seleccionado
@@ -57,14 +109,16 @@ function Form() {
         var rawLog = reader.result.split(",")[1]; // Extrae solo los datos del archivo
         var dataSend = {
           dataReq: { data: rawLog, name: file.name, type: file.type },
-          fname: "uploadFilesToGoogleDrive",
-        }; // Prepara la información para enviar a la API
+          //fname: "uploadFilesToGoogleDrive",
+        }; 
   
-        google.script.run.withSuccessHandler((response) => {
-           console.log(response);
-           const fileId = response.id; 
-           const baseUrl = "https://drive.google.com/uc?export=view&id=";
-           const nuevaUrl = baseUrl + fileId;
+    const apiUrl = 'http://localhost:3000/api/asesor/uploadFilesToGoogleDrive'; // Ajusta la URL según tu configuración
+
+    axios.post(apiUrl, dataSend)
+    .then(response => {
+      const fileId = response.data.id;
+      const baseUrl = "https://drive.google.com/uc?export=view&id=";
+      const nuevaUrl = baseUrl + fileId;
 
            console.log('Nueva URL formateada:', nuevaUrl);
     
@@ -82,18 +136,58 @@ function Form() {
   
 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creado"); 
+
+    try {
+      let response;
+
+      if (id) {
+        // Actualizar asesor existente
+        console.log("intenta actualizar");
+        console.log(formData);
+        response = await asesorService.updateAsesorById(id, formData);
+        console.log(response);
+        setAction("actualizado");
+        props.setShowToast(true, "asesor actualizado");
+      } else {
+        // Insertar nuevo cliente
+        console.log("intenta crear");
+        response = await asesorService.insertAsesor(formData);
+        props.setShowToast(true, "Cliente creado");asesor
+      }
+
+      console.log(response);
       setLoading(false);
-      props.setShowToast(!props.showToast);
-      })
-      .insertAsesor(formData);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    }
   };
 
+  const handleResetForm = () => {
+    setFormData({
+      identificacion:  "",
+      cargo:  "",
+      nombre:  "",
+      avatar:  "",
+      especialidades:  "",
+      skills:  "",
+      celular:  "",
+    });
+  };
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
     setFormData((prevData) => ({
@@ -151,7 +245,10 @@ function Form() {
 
   return (
     <>
-      <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
+      <form ref={formRef}
+       className="flex max-w-md flex-col gap-4 m-auto" 
+       onSubmit={handleSubmit}>
+        
         <div className="max-w-md">
           <div className="mb-2 block">
           <Label htmlFor="customFile" value="Avatar"/>
