@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import tipoActividadService from "../../services/tiposActividadesService.js";
 import { Table, Card } from "flowbite-react";
 import { Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
@@ -13,42 +14,66 @@ function TiposActividad() {
   const [deleting, setDeleting] = useState(false);
   const [selectedTiposActividadId, setSelectedTiposActividadId] = useState(null);
 
-  useEffect(() => {
+  // useEffect(() => {
     
-    const fetchData = async () => {
+  //   const fetchData = async () => {
       
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setTiposActividad(data);
-          setLoading(false);
-        })
-        .getTiposActividad();
-    };
+  //     await google.script.run
+  //       .withSuccessHandler((data) => {
+  //         setTiposActividad(data);
+  //         setLoading(false);
+  //       })
+  //       .getTiposActividad();
+  //   };
 
+  //   fetchData();
+  // }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tiposActividad = await tipoActividadService.getTiposActividad();
+        setTiposActividad(tiposActividad.data);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error al cargar tipos actividades:", error);
+      }
+    };
+  
     fetchData();
   }, []);
+  
+
+
 
   const handleDeleteClick = () => {
     if (selectedTiposActividadId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
+      tipoActividadService.deleteTiposActividadById(selectedTiposActividadId)
+        .then((response) => {
           console.log(response);
-          setTiposActividad((prevTiposActividades) => prevTiposActividades.filter(tipoActividad => tipoActividad._id !== selectedTiposActividadId));
+          setTiposActividad((prevTiposActividades) =>
+            prevTiposActividades.filter((tipoActividad) => tipoActividad._id !== selectedTiposActividadId)
+          );
           setDeleting(false);
           setOpenModal(false);
-          setSelectedTiposActividadId(null); // Limpia el ID almacenado
+          setSelectedTiposActividadId(null);
         })
-        .deleteTiposActividadById(selectedTiposActividadId);
+        .catch((error) => {
+          console.error("Error al eliminar tipos de actividad:", error);
+          setDeleting(false);
+          setOpenModal(false);
+        });
     }
   };
-    const passTiposActividadId = (tipoActividadId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedTiposActividadId(tipoActividadId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+  
+  const passTiposActividadId = (tipoActividadId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedTiposActividadId(tipoActividadId);
+  
+    // Abre el modal
+    setOpenModal(true);
+  };
   
 
   return (
