@@ -5,6 +5,11 @@ import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import axios from 'axios';
+import materiasService from "../../services/materiasService.js";
+import tipoMateriasService from "../../services/tipoMateriasService.js";
+
+
 
 function Materias() {
   const [materias, setMaterias] = useState([]);
@@ -19,33 +24,18 @@ function Materias() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // const materiasResponse = await google.script.run.getmaterias();
-        // const tipoDataResponse = await google.script.run.getTiposmateria();
-        const materiasResponse = await new Promise((resolve) => {
-          google.script.run
-            .withSuccessHandler((response) => {
-              resolve(response);
-            })
-            .getMaterias();
-          });
-          
-
-        const tipoDataResponse = await new Promise((resolve) => {
-          google.script.run
-            .withSuccessHandler((response) => {
-              resolve(response);
-            })
-            .getTiposMateria();
-        });
+        // Reemplaza las URLs con las rutas de tu API
+        const materiasResponse = await materiasService.getMaterias();
+        const tipoDataResponse = await tipoMateriasService.getTiposMateria();
         setLoading(false);
 
-        // Assuming tipoDataResponse contains an array of tipo objects
-        const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
+        // Suponiendo que tipoDataResponse.data contiene un array de objetos tipo
+        const tipoDataMap = tipoDataResponse.data.reduce((acc, tipo) => {
           acc[tipo._id] = tipo.nombre;
           return acc;
         }, {});
 
-        const materiasWithTipoNombre = materiasResponse.map((materia) => ({
+        const materiasWithTipoNombre = materiasResponse.data.map((materia) => ({
           ...materia,
           tipoNombre: tipoDataMap[materia.tipo] || "Unknown Tipo",
         }));
@@ -55,7 +45,6 @@ function Materias() {
         console.error("Error fetching data:", error);
       }
     };
-    
 
     fetchData();
   }, []);
@@ -76,15 +65,20 @@ function Materias() {
   const handleDeleteClick = () => {
     if (selectedMateriaId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
+  
+      // Cambia la URL al endpoint correcto de tu backend
+      axios.delete(`/materia/${selectedMateriaId}`)
+        .then((response) => {
+          console.log(response.data);
           setMaterias((prevMaterias) => prevMaterias.filter(materia => materia._id !== selectedMateriaId));
           setDeleting(false);
           setOpenModal(false);
           setSelectedMateriaId(null); // Limpia el ID almacenado
         })
-        .deleteMateriaById(selectedMateriaId);
+        .catch((error) => {
+          console.error("Error deleting materia:", error);
+          setDeleting(false);
+        });
     }
   };
     const passMateriaId = (materiaId) => {

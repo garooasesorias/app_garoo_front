@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import Loader from '../../../components/Loader.js';
 import { HiCheck } from "react-icons/hi";
+import axios from 'axios';
+import tipoMateriasService from "../../../services/tipoMateriasService.js";
+
 
 function Form() {
   const [tiposMateria, setTiposMateria] = useState([]);
@@ -18,29 +21,33 @@ function Form() {
 
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setTiposMateria(data);
-        })
-        .getTiposMateria();
+      try {
+        const tiposMateriaResponse = await tipoMateriasService.getTiposMateria();
+        setTiposMateria(tiposMateriaResponse.data);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
-
+  
     fetchData();
   }, []);
-
-  const handleSubmit = (e) => {
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setLoading(false);
-        props.setShowToast(!props.showToast);
-        console.log(response);
-      })
-      .insertMateria(formData);
+  
+    try {
+      const response = await axios.post('/materias/insertMateria', formData);
+      setLoading(false);
+      props.setShowToast(!props.showToast);
+      console.log(response.data);
+    } catch (error) {
+      setLoading(false);
+      console.error("Error inserting materia:", error);
+    }
   };
+  
 
   const handleNombreChange = (e) => {
     const newName = e.target.value;

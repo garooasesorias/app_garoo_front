@@ -2,22 +2,19 @@ import React, { useState } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import tipoMateriasService from "../../../services/tipoMateriasService.js";
+
 
 function Form() {
   const [formData, setFormData] = useState({
     nombre: "",
   });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {})
-      .insertTipoMateria(formData);
-      setAction("creada"); 
-      setLoading(false);
-      props.setShowToast(!props.showToast);
-  };
+  const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [action, setAction] = useState("creada");
+
+  const props = { showToast, setShowToast };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,14 +24,25 @@ function Form() {
     }));
   };
 
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const props = { showToast, setShowToast };
-
-  const [action, setAction] = useState("creada");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+  
+    try {
+      const response = await tipoMateriasService.insertTipoMateria(formData);
+      // Lógica tras una inserción exitosa
+      setAction("creada");
+      setShowToast(true); // Usamos setShowToast directamente
+      // Otras acciones después de la creación exitosa...
+    } catch (error) {
+      console.error('Error al insertar tipo materia:', error);
+      // Lógica en caso de error
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const goBack = () => {
-    
     window.history.back();
   };
 

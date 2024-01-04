@@ -7,6 +7,7 @@ import Loader from "../../components/Loader.js";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 
+
 function Clientes() {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(true);

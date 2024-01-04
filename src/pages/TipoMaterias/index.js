@@ -6,6 +6,7 @@ import styles from '../../styles/main.scss';
 import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import tipoMateriasService from "../../services/tipoMateriasService.js";
 
 function TiposMateria() {
   const [tiposMateria, setTiposMateria] = useState([]);
@@ -15,34 +16,44 @@ function TiposMateria() {
   const [selectedTipomId, setSelectedTipomId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-     
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setTiposMateria(data);
-          setLoading(false);
-        })
-        .getTiposMateria();
+      setLoading(true);
+      try {
+        const response = await tipoMateriasService.getTiposMateria();
+        if (response.ok && Array.isArray(response.data)) {
+          setTiposMateria(response.data);
+        } else {
+          // Manejar casos donde la respuesta no es lo que se espera
+          setTiposMateria([]);
+          console.error('La respuesta no es un arreglo:', response);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
     };
-
+  
     fetchData();
   }, []);
-
-  const handleDeleteClick = () => {
+        
+  const handleDeleteClick = async () => {
     if (selectedTipomId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setTiposMateria((prevTiposMaterias) => prevTiposMaterias.filter(tipoMateria => tipoMateria._id !== selectedTipomId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedTipomId(null); // Limpia el ID almacenado
-        })
-        .deleteTiposmById(selectedTipomId);
+  
+      try {
+        await tipoMateriaService.deleteTipoMateriaById(selectedTipomId);
+        setTiposMateria(prevTiposMaterias => prevTiposMaterias.filter(tipoMateria => tipoMateria._id !== selectedTipomId));
+      } catch (error) {
+        console.error('Error deleting tipos materia:', error);
+      } finally {
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedTipomId(null); // Limpia el ID almacenado
+      }
     }
   };
+  
     const passTiposmId = (tipoMateriaId) => {
       // Tomamos el Id del cliente que viene del botón borrar
       setSelectedTipomId(tipoMateriaId);
