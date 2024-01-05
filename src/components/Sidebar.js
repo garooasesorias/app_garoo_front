@@ -21,6 +21,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
 
   return (
     <>
+    {!isMinimized && (
       <aside
         id="default-sidebar"
         className={`fixed top-0 left-0 z-40 h-screen transition-transform sm:translate-x-0 ${
@@ -260,6 +261,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
           </ul>
         </div>
       </aside>
+      )}
     </>
   );
 }

@@ -2,8 +2,10 @@ import React, { useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import tiposActividadesService from "../../../services/tiposActividadesService.js";
+import actividadesService from "../../../services/actividadesService.js";
 
-function Form() {
+function Form(props) {
   const [tiposActividad, setTiposActividad] = useState([]);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -12,29 +14,31 @@ function Form() {
   });
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setTiposActividad(data);
-        })
-        .getTiposActividad();
+      try {
+        const data = await tiposActividadesService.getTiposActividad();
+        setTiposActividad(data || []); // Asegura que sea un array
+      } catch (error) {
+        console.error("Error fetching tipos de actividad:", error);
+      }
     };
 
     fetchData();
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creada"); 
-        setLoading(false);
-      props.setShowToast(!props.showToast);
-        console.log(response);
-      })
-      .insertActividad(formData);
+    try {
+      const response = await actividadesService.insertActividad(formData);
+      setAction("creada");
+      setLoading(false);
+      setShowToast(!showToast);
+      console.log(response);
+    } catch (error) {
+      console.error("Error inserting actividad:", error);
+      setLoading(false);
+    }
   };
 
   const handleNombreChange = (e) => {
@@ -54,13 +58,9 @@ function Form() {
   };
 
   const handleTipoChange = (selectedTipo) => {
-    console.log("Selected Tipo:", selectedTipo);
-
     const selectedTipoObj = tiposActividad.find(
       (tipo) => tipo._id === selectedTipo
     );
-
-    console.log("Selected Tipo Object:", selectedTipoObj);
 
     setFormData((prevData) => ({
       ...prevData,
@@ -74,19 +74,15 @@ function Form() {
   };
 
   const goBack = () => {
-    
     window.history.back();
   };
 
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
-  const props = { showToast, setShowToast };
-
   const [action, setAction] = useState("creada");
 
   return (
     <>
- 
       <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -113,11 +109,13 @@ function Form() {
             required
           >
             <option value="">Selecciona un tipo</option>
-            {tiposActividad.map((tipo) => (
-              <option key={tipo._id} value={tipo._id}>
-                {tipo.nombre}
-              </option>
-            ))}
+            {Array.isArray(tiposActividad) &&
+              tiposActividad.map((tipo) => (
+                <option key={tipo._id} value={tipo._id}>
+                  {tipo.nombre}
+                </option>
+              ))}
+
           </select>
         </div>
         <div className="max-w-md">
@@ -143,10 +141,10 @@ function Form() {
       </Button>
 
       <div className="LoaderContainerForm">
-      {loading ? <Loader /> : null}
+        {loading ? <Loader /> : null}
       </div>
 
-      {props.showToast && (
+      {showToast && (
         <Toast style={{ maxWidth: '250px' }} className="Toast" >
           <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
             <HiCheck className="h-5 w-5" />
@@ -154,10 +152,11 @@ function Form() {
           <div className="ml-3 text-sm font-normal">
             Actividad {action} con éxito
           </div>
-          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
     </>
   );
 }
+
 export default Form;
