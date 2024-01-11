@@ -89,18 +89,13 @@ function Materias() {
       setOpenModal(true);
     };
 
-  const filteredMaterias = materias.filter((materia) => {
-    return (
-      (!filters.nombre ||
-        materia.nombre
-          .toLowerCase()
-          .includes(filters.nombre.toLowerCase())) &&
-      (!filters.tipo ||
-        materia.tipo
-        .toLowerCase()
-        .includes(filters.tipo.toLowerCase())) 
-    );
-  });
+    const filteredMaterias = materias.filter((materia) => {
+      return (
+        (!filters.nombre || materia.nombre.toLowerCase().includes(filters.nombre.toLowerCase())) &&
+        (!filters.tipo || materia.tipoNombre.toLowerCase().includes(filters.tipo.toLowerCase()))
+      );
+    });
+        
   return (
     <>
     <h1 className="PagesTitles">Materias</h1>
