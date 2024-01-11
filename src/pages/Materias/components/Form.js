@@ -24,18 +24,41 @@ function Form() {
 
 
   useEffect(() => {
-    const fetchData = async () => {
+    setLoading(true);
+  
+    const fetchTiposMateria = async () => {
       try {
         const tiposMateriaResponse = await tipoMateriasService.getTiposMateria();
         setTiposMateria(tiposMateriaResponse.data);
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error fetching tipos de materia:", error);
       }
     };
   
+    const fetchMateriaData = async () => {
+      if (id) {
+        try {
+          const materiaResponse = await materiaService.getMateriaById(id);
+          const materiaData = materiaResponse.data;
+          setFormData({
+            nombre: materiaData.nombre || "",
+            tipo: materiaData.tipo || "", // Asegúrate de que esto corresponde al _id del tipo de materia
+          });
+        } catch (error) {
+          console.error("Error fetching materia data:", error);
+        }
+      }
+    };
+  
+    const fetchData = async () => {
+      await fetchTiposMateria();
+      await fetchMateriaData(); // Esto esperará a que fetchTiposMateria haya terminado
+      setLoading(false);
+    };
+  
     fetchData();
-  }, []);
-  //Prueba
+  }, [id]); // Este efecto se ejecutará cuando el componente se monte y cada vez que el id cambie
+    
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
