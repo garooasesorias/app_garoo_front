@@ -1,27 +1,101 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import { useParams } from "react-router-dom"; 
 import tiposActividadesService from "../../../services/tiposActividadesService.js";
-import actividadesService from "../../../services/actividadesService.js";
+
 
 function Form() {
+  const formRef = useRef();
   const [formData, setFormData] = useState({
     nombre: "",
   });
+  
+  const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const props = { showToast, setShowToast };
+
+  const { id } = useParams(); // Extrae el id desde la URL
+
+  const [action, setAction] = useState("creado");
+
+  useEffect(() => {
+    console.log(id);
+    if (id) {
+      setLoading(true);
+      tiposActividadesService
+        .getTipoActividadById(id)
+        .then((response) => {
+          setTipoActividad(response.data);    
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener el tipo actividad:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
+  }, [id]);
+
+  const setTipoActividad = (tipoActividad) => {
+    setFormData({
+      nombre: tipoActividad.nombre || "",
+    });
+  };
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     const response = await tiposActividadesService.insertTipoActividad(formData);
+  //     setAction("creada");
+  //     setLoading(false);
+  //     setShowToast(!showToast);
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.error("Error inserting tipo de actividad:", error);
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     try {
-      const response = await tiposActividadesService.insertTipoActividad(formData);
-      setAction("creada");
-      setLoading(false);
-      setShowToast(!showToast);
+      let response;
+
+      if (id) {
+        // Actualizar cliente existente
+        console.log("intenta actualizar");
+        console.log(formData);
+        response = await tiposActividadesService.updateTipoActividadById(id, formData);
+        console.log(response);
+        setAction("actualizado");
+        props.setShowToast(true, "Tipo Actividad Actualizado");
+      } else {
+        // Insertar nuevo cliente
+        console.log("intenta crear");
+        response = await tiposActividadesService.insertTipoActividad(formData);
+        props.setShowToast(true, "Tipo Actividad creado");
+      }
+
       console.log(response);
-    } catch (error) {
-      console.error("Error inserting tipo de actividad:", error);
       setLoading(false);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
     }
   };
 
@@ -37,9 +111,24 @@ function Form() {
     window.history.back();
   };
 
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [action, setAction] = useState("creada");
+  // const handleResetForm = () => {
+  //   setFormData({
+  //     referencia: "",
+  //     cedula: "",
+  //     nombre: "",
+  //     fechaNacimiento: "",
+  //     genero: "",
+  //     usuario: "",
+  //     contrasena: "",
+  //     correo: "",
+  //     celular: "",
+  //     carrera: "",
+  //   });
+  // };
+
+  // const [showToast, setShowToast] = useState(false);
+  // const [loading, setLoading] = useState(false);
+  // const [action, setAction] = useState("creada");
 
   return (
     <>

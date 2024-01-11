@@ -23,32 +23,47 @@ function Actividades() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const actividadesResponse = await actividadesService.getActividades();
-        const tipoDataResponse = await tiposActividadesService.getTiposActividad();
-        setLoading(false);
-  
-        // Assuming tipoDataResponse contains an array of tipo objects
-        const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
-          acc[tipo._id] = tipo.nombre;
-          return acc;
-        }, {});
-  
-        const actividadesWithTipoNombre = actividadesResponse.map(
-          (actividad) => ({
-            ...actividad,
-            tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
-          })
-        );
-  
-        setActividades(actividadesWithTipoNombre);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+        try {
+            const actividadesResponse = await actividadesService.getActividades();
+            const tipoDataResponse = await tiposActividadesService.getTiposActividad();
+            setLoading(false);
+
+            console.log("actividadesResponse:", actividadesResponse);
+            console.log("tipoDataResponse:", tipoDataResponse);
+
+            const tipoDataArray = tipoDataResponse.data || [];
+            console.log("tipoDataArray:", tipoDataArray);
+
+            const tipoDataMap = tipoDataArray.reduce((acc, tipo) => {
+                acc[tipo._id] = tipo.nombre;
+                return acc;
+            }, {});
+
+            console.log("tipoDataMap:", tipoDataMap);
+
+            const actividadesArray = actividadesResponse.data || [];
+            console.log("actividadesArray:", actividadesArray);
+
+            const actividadesWithTipoNombre = actividadesArray.map(
+                (actividad) => ({
+                    ...actividad,
+                    tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
+                })
+            );
+
+            console.log("actividadesWithTipoNombre:", actividadesWithTipoNombre);
+
+            setActividades(actividadesWithTipoNombre);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
     };
-  
+
     fetchData();
-  }, []);
+}, []);
+
+
+
   
   const renderFilterInput = (label, filterKey) => (
     <div className="flex-1 px-2 mb-4">
@@ -149,7 +164,7 @@ function Actividades() {
                 <Table.Cell>{actividad.precio}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/editactividad/${actividad.id}`}
+                    to={`/editactividad/${actividad._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

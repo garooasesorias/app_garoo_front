@@ -110,7 +110,7 @@ function TiposActividad() {
 
                 <Table.Cell>
                   <Link
-                    to={`/editTipoActividad/${tipoActividad.id}`} // Assuming you have an edit route
+                    to={`/editTipoActividad/${tipoActividad._id}`} // Assuming you have an edit route
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

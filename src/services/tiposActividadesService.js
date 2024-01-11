@@ -31,6 +31,31 @@ const tipoActividadService = {
     }
   },
 
+  updateTipoActividadById: async (id, data) => {
+    try {
+      const response = await api.put("/tipoActividades/updateTipoActividadById", {
+        id,
+        data,
+      });
+      return response.data; // Respuesta de la API tras insertar el cliente
+    } catch (error) {
+      console.error("Error al actualizar el tipo de actividad:", error);
+      throw error;
+    }
+  },
+
+  getTipoActividadById: async (id) => {
+    try {
+      // Asegúrate de incluir el ID en la URL
+      const response = await api.get(`/tipoActividades/getTipoActividadById/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error al obtener el tipo actividad:", error);
+      throw error;
+    }
+  },
+
+
 
 };
 
