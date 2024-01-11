@@ -4,6 +4,8 @@ import Loader from '../../../components/Loader.js';
 import { HiCheck } from "react-icons/hi";
 import axios from 'axios';
 import tipoMateriasService from "../../../services/tipoMateriasService.js";
+import materiaService from "../../../services/materiasService.js";
+import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 
 
 function Form() {
@@ -18,6 +20,7 @@ function Form() {
   const props = { showToast, setShowToast };
 
   const [action, setAction] = useState("creada");
+  const { id } = useParams(); // Extrae el id desde la URL
 
 
   useEffect(() => {
@@ -38,16 +41,25 @@ function Form() {
     setLoading(true);
   
     try {
-      const response = await axios.post('/materias/insertMateria', formData);
-      setLoading(false);
-      props.setShowToast(!props.showToast);
+      let response;
+      if (id) {
+        // Actualizar la materia existente
+        response = await materiaService.updateMateriaById(id, formData);
+        setAction("actualizada");
+      } else {
+        // Crear una nueva materia
+        response = await materiaService.insertMateria(formData);
+        setAction("creada");
+      }
       console.log(response.data);
-    } catch (error) {
+      props.setShowToast(!props.showToast);
       setLoading(false);
-      console.error("Error inserting materia:", error);
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
     }
   };
-  
+    
 
   const handleNombreChange = (e) => {
     const newName = e.target.value;

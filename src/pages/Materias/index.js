@@ -67,7 +67,7 @@ function Materias() {
       setDeleting(true);
   
       // Cambia la URL al endpoint correcto de tu backend
-      axios.delete(`/materia/${selectedMateriaId}`)
+      materiasService.deleteMateriaById(selectedMateriaId)
         .then((response) => {
           console.log(response.data);
           setMaterias((prevMaterias) => prevMaterias.filter(materia => materia._id !== selectedMateriaId));
@@ -143,7 +143,7 @@ function Materias() {
                 <Table.Cell>{materia.tipoNombre}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/editmateria/${materia.id}`}
+                    to={`/formMaterias/${materia._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

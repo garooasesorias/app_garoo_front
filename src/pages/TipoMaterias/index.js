@@ -40,9 +40,8 @@ function TiposMateria() {
   const handleDeleteClick = async () => {
     if (selectedTipomId) {
       setDeleting(true);
-  
       try {
-        await tipoMateriaService.deleteTipoMateriaById(selectedTipomId);
+        await tipoMateriasService.deleteTipoMateriaById(selectedTipomId);
         setTiposMateria(prevTiposMaterias => prevTiposMaterias.filter(tipoMateria => tipoMateria._id !== selectedTipomId));
       } catch (error) {
         console.error('Error deleting tipos materia:', error);
@@ -94,7 +93,7 @@ function TiposMateria() {
 
                 <Table.Cell>
                   <Link
-                    to={`/editTipoMateria/${tipoMateria.id}`} // Assuming you have an edit route
+                    to={`/formTipoMaterias/${tipoMateria._id}`} // Assuming you have an edit route
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

@@ -13,7 +13,7 @@ const materiaService = {
 
   getMateriaById: async (id) => {
     try {
-      const response = await api.get(`/materias/getMateriaById/${id}`);
+      const response = await api.get(`/materia/getMateriaById/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error al obtener la materia:", error);
@@ -23,7 +23,7 @@ const materiaService = {
 
   insertMateria: async (datosMateria) => {
     try {
-      const response = await api.post("/materias/insertMateria", datosMateria);
+      const response = await api.post("/materia/insertMateria", datosMateria);
       return response.data; // Respuesta de la API tras insertar la materia
     } catch (error) {
       console.error("Error al insertar la materia:", error);
@@ -33,7 +33,7 @@ const materiaService = {
 
   updateMateriaById: async (id, data) => {
     try {
-      const response = await api.put("/materias/updateMateriaById", {
+      const response = await api.put("/materia/updateMateriaById", {
         id,
         data,
       });
@@ -46,7 +46,7 @@ const materiaService = {
 
   deleteMateriaById: async (id) => {
     try {
-      const response = await api.delete(`/materias/deleteMateriaById/${id}`);
+      const response = await api.delete(`/materia/deleteMateriaById/${id}`);
       return response.data; // Respuesta de la API tras eliminar la materia
     } catch (error) {
       console.error("Error al eliminar la materia:", error);

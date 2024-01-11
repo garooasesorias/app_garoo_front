@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
 import tipoMateriasService from "../../../services/tipoMateriasService.js";
+import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 
 
 function Form() {
@@ -13,8 +14,35 @@ function Form() {
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const [action, setAction] = useState("creada");
+  const { id } = useParams();
+
 
   const props = { showToast, setShowToast };
+  useEffect(() => {
+    console.log(id);
+    if (id) {
+      setLoading(true);
+      tipoMateriasService
+        .getTipoMateriaById(id)
+        .then((response) => {
+          setTipoMateria(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener el tipo materia:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
+  }, [id]);
+
+  const setTipoMateria = (tipoMateria) => {
+    setFormData({
+      nombre: tipoMateria.nombre || "",
+      // ...otros campos
+    });
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,20 +55,49 @@ function Form() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     try {
-      const response = await tipoMateriasService.insertTipoMateria(formData);
-      // Lógica tras una inserción exitosa
-      setAction("creada");
-      setShowToast(true); // Usamos setShowToast directamente
-      // Otras acciones después de la creación exitosa...
-    } catch (error) {
-      console.error('Error al insertar tipo materia:', error);
-      // Lógica en caso de error
-    } finally {
+      let response;
+
+      if (id) {
+        // Actualizar tipo materia existente
+      console.log("intenta actualizar");
+        console.log(formData);
+        response = await tipoMateriasService.updateTipoMateriaById(id, formData);
+        console.log(response);
+        setAction("actualizado");
+        props.setShowToast(true, "Tipo Materia actualizado");
+      } else {
+        // Insertar nuevo tipo materia
+        console.log("intenta crear");
+        response = await tipoMateriasService.insertTipoMateria(formData);
+        props.setShowToast(true, "Tipo Materia creado");
+      }
+
+      console.log(response);
       setLoading(false);
-    }
-  };
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    }
+  };
+
+const handleResetForm = () => {
+  setFormData({
+    nombre: ""
+  });
+};
 
   const goBack = () => {
     window.history.back();
@@ -48,7 +105,8 @@ function Form() {
 
   return (
     <>
-      <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
+      <form className="flex max-w-md flex-col gap-4 m-auto" 
+       onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="nombre" value="Username" />
@@ -63,7 +121,7 @@ function Form() {
           />
         </div>
         <Button type="submit" color="dark">
-          Submit
+          {id ? "Actualizar" : "Crear"}
         </Button>
       </form>
 
