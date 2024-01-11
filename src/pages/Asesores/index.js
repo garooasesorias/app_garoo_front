@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from "react";
 import asesorService from "../../services/asesorService.js";
-import { Card, Avatar, Table, Button, Progress, ModalBodyProps, Modal } from "flowbite-react";
+import { Card, Avatar, Table, Button, Progress, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
 
-function Asesores() {
+function Advisors() {
   const [searchQuery, setSearchQuery] = useState("");
   const [collapsedIndex, setCollapsedIndex] = useState(null);
-  const [asesores, setAsesores] = useState([]);
+  const [advisors, setAdvisors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [selectedAsesorId, setSelectedAsesorId] = useState(null);
+  const [selectedAdviserId, setSelectedAdviserId] = useState(null);
   
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const asesoresObtenidos = await asesorService.getAsesores();
+        const advisorsObtenidos = await asesorService.getAdvisors();
        
-        setAsesores(asesoresObtenidos.data);
+        setAdvisors(advisorsObtenidos.data);
         setLoading(false);
       } catch (error) {
-        console.log("Error al cargar asesores:", error);
+        console.log("Error al cargar Advisors:", error);
       }
       
     };
@@ -37,34 +37,35 @@ function Asesores() {
   };
 
   const handleCollapseToggle = (index) => {
-    setCollapsedIndex(collapsedIndex === index ? null : index);
+    setCollapsedIndex((prevIndex) => (prevIndex === index ? null : index));
   };
+  
 
-  const filteredAsesores = asesores.filter(
-    (asesor) => asesor.nombre.toLowerCase().includes(searchQuery.toLowerCase())
+  const filteredAdvisors = advisors.filter(
+    (adviser) => adviser.nombre.toLowerCase().includes(searchQuery.toLowerCase())
     // || Add more filtering based on plan properties
     // plan.actividades.some((actividad) => actividad.nombre.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   
   const handleDeleteClick = () => {
-    if (selectedAsesorId) {
+    if (selectedAdviserId) {
       setDeleting(true);
-      asesorService.deleteAsesorById(selectedAsesorId).then((response) => {
+      asesorService.deleteAdviserById(selectedAdviserId).then((response) => {
         console.log(response);
-        setAsesores((prevAsesores) =>
-          prevAsesores.filter((asesor) => asesor._id !== selectedAsesorId)
+        setAdvisors((prevAdvisors) =>
+          prevAdvisors.filter((adviser) => adviser._id !== selectedAdviserId)
         );
         setDeleting(false);
         setOpenModal(false);
-        setSelectedAsesorId(null); // Limpia el ID almacenado
+        setSelectedAdviserId(null); // Limpia el ID almacenado
       });
     }
     
   };
-  const passAsesorId = (asesorId) => {
-    // Tomamos el Id del asesor que viene del botón borrar
-    setSelectedAsesorId(asesorId);
+  const passAdviserId = (adviserId) => {
+    // Tomamos el Id del Adviser que viene del botón borrar
+    setSelectedAdviserId(adviserId);
   
     // Abre el modal
     setOpenModal(true);
@@ -93,20 +94,20 @@ function Asesores() {
         </div>
       </div>
       <div className="flex flex-wrap gap-4">
-        {filteredAsesores.map((asesor, index) => (
+        {filteredAdvisors.map((adviser, index) => (
           <Card
-            key={asesor._id}
+            key={adviser._id}
             className="w-full md:w-1/2 lg:w-1/3"
             style={{ maxWidth: "600px" }}
           >
-            <Link to={`/editAsesor/${asesor.id}`}>
+            <Link to={`/formAsesores/${adviser._id}`}>
               <Button className="shadow mb-2 ms-auto" color="success">
                 Editar
               </Button>
             </Link>
             
                   <Button
-                    onClick={() => passAsesorId(asesor._id)}
+                    onClick={() => passAdviserId(adviser._id)}
                     className=" text-red-600 hover:underline shadow mb-2 ms-auto" color="success"
                   >
                     Borrar
@@ -128,7 +129,7 @@ function Asesores() {
                         <div className="flex justify-center gap-4">
                           <Button
                             color="failure"
-                            onClick={() => handleDeleteClick(asesor._id)}
+                            onClick={() => handleDeleteClick(adviser._id)}
                             disabled={deleting} // Deshabilita el botón durante la eliminación
                           >
                             {deleting ? "Eliminando..." : "Sí, eliminar"}
@@ -143,24 +144,24 @@ function Asesores() {
                 
             <div className="flex flex-col items-center pb-4">
               <Avatar
-                alt={`${asesor.nombre} image`}
+                alt={`${adviser.nombre} image`}
                 className="mb-2 rounded-full shadow-lg"
                 height="auto" // Cambio de "64" a "auto" para mantener proporciones
-                img={asesor.avatar}
+                img={adviser.avatar}
                 width="100%" // Cambio de "64" a "100%" para ajustar al contenedor
                 status="online"
               />
               <h5 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">
-                {asesor.nombre}
+                {adviser.nombre}
               </h5>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {asesor.identificacion}
+                {adviser.identificacion}
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {asesor.cargo}
+                {adviser.cargo}
               </span>
               <span className="text-sm text-gray-500 dark:text-gray-400">
-                {asesor.celular}
+                {adviser.celular}
               </span>
 
               {/* <div className="mt-2 flex space-x-2">
@@ -177,30 +178,29 @@ function Asesores() {
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
-              <div
-                className="text-base font-medium cursor-pointer dark:text-dark"
-                onClick={() => handleCollapseToggle(index)}
-              >
-                Ver Especialidades {">"}
-              </div>
-              {collapsedIndex === index && (
-                <div className="grid gap-2">
-                  {asesor.especialidades_relacionadas.map(
-                    (especialidad, especialidadIndex) => (
-                      <div
-                        key={especialidadIndex}
-                        className="text-sm text-gray-500"
-                      >
-                        {especialidad.nombre}
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-            </div>
+  <div
+    className="text-base font-medium cursor-pointer dark:text-dark"
+    onClick={() => handleCollapseToggle(index)}
+  >
+    Ver Especialidades {">"}
+  </div>
+  {collapsedIndex === index && (
+    <div className="grid gap-2">
+      {adviser.specialties_relacionadas && adviser.specialties_relacionadas.map((specialty, specialtyIndex) => (
+        <div
+          key={specialtyIndex}
+          className="text-sm text-gray-500"
+        >
+          {specialty.nombre}
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
             <div className="flex flex-col gap-2 mt-2">
               <div className="text-base font-medium dark:text-dark">SKILLS</div>
-              {asesor.skills.map((skill, index) => (
+              {adviser.skills && adviser.skills.map((skill, index) => (
                 <Progress
                   key={index}
                   labelText
@@ -221,4 +221,4 @@ function Asesores() {
   );
 }
 
-export default Asesores;
+export default Advisors;

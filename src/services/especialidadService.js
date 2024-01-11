@@ -1,54 +1,54 @@
 import api from "./api";
 
-const especialidadService = {
-  getEspecialidades: async () => {
+const SpecialtyService = {
+  getSpecialties: async () => {
     try {
-      const response = await api.get("/especialidad/getEspecialidades");
+      const response = await api.get("/especialidad/getSpecialties");
       return response.data;
     } catch (error) {
-      console.error("Error al obtener los Especialidades:", error);
+      console.error("Error al obtener los Specialities:", error);
       throw error;
     }
   },
   
 
-  getEspecialidadById: async (id) => {
+  getSpecialtyById: async (id) => {
     try {
       // Asegúrate de incluir el ID en la URL
-      const response = await api.get(`/especialidad/getEspecialidadById/${id}`);
+      const response = await api.get(`/especialidad/getSpecialtyById/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error al obtener el Especialidades:", error);
+      console.error("Error al obtener el Specialities:", error);
       throw error;
     }
   },
 
-  insertEspecialidad: async (datosEspecialidad) => {
+  insertSpecialty: async (datosSpecialty) => {
     try {
-      const response = await api.post("/especialidad/insertEspecialidad", datosEspecialidad);
+      const response = await api.post("/especialidad/insertSpecialty", datosSpecialty);
       return response.data; // Respuesta de la API tras insertar el cliente
     } catch (error) {
-      console.error("Error al insertar el Especialidad:", error);
+      console.error("Error al insertar el Specialty:", error);
       throw error;
     }
   },
 
-  updateEspecialidadById: async (id, data) => {
+  updateSpecialtyById: async (id, data) => {
     try {
-      const response = await api.put("/especialidad/updateEspecialidadById", {
+      const response = await api.put("/especialidad/updateSpecialtyById", {
         id,
         data,
       });
       return response.data; // Respuesta de la API tras insertar el cliente
     } catch (error) {
-      console.error("Error al actualizar el Especialidades:", error);
+      console.error("Error al actualizar el Specialities:", error);
       throw error;
     }
   },
-  deleteEspecialidadById: async (id) => {
+  deleteSpecialtyById: async (id) => {
     console.log(id);
     try {
-      const response = await api.delete(`/especialidad/deleteEspecialidadById/${id}`);
+      const response = await api.delete(`/especialidad/deleteSpecialtyById/${id}`);
       return response.data; // Respuesta de la API tras insertar el cliente
     } catch (error) {
       console.error("Error al actualizar el Especialidad:", error);
@@ -58,4 +58,4 @@ const especialidadService = {
   // Aquí puedes agregar más funciones para interactuar con la API de clientes
 };
 
-export default especialidadService;
+export default SpecialtyService;

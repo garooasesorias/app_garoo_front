@@ -25,14 +25,14 @@ function Form() {
     if (id) {
       setLoading(true);
       especialidadService
-        .getEspecialidadById(id)
+        .getSpecialtyById(id)
         .then((response) => {
         
-          setEspecialidad(response.data);
+          setSpecialty(response.data);
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error al obtener el Especialidad:", error);
+          console.error("Error al obtener el Specialty:", error);
           setLoading(false);
           // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
         });
@@ -40,9 +40,9 @@ function Form() {
   }, [id]);
 
 
-  const setEspecialidad = (especialidad) => {
+  const setSpecialty = (Specialty) => {
     setFormData({
-      nombre: especialidad.nombre || "",
+      nombre: Specialty.nombre || "",
       
     });
   };
@@ -57,14 +57,14 @@ function Form() {
       if (id) {
         // Actualizar especialidad existente
         console.log(formData);
-        response = await especialidadService.updateEspecialidadById(id, formData);
+        response = await especialidadService.updateSpecialtyById(id, formData);
         console.log(response);
         setAction("actualizado");
         props.setShowToast(true, "Especialidad actualizado");
       } else {
         // Insertar nuevo especialidad
         console.log("intenta crear");
-        response = await especialidadService.insertEspecialidad(formData);
+        response = await especialidadService.insertSpecialty(formData);
         props.setShowToast(true, "especialidad creado");
       }
 

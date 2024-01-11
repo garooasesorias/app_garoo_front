@@ -60,6 +60,7 @@ function App() {
         <Route path="/cursosv2" element={<CursosV2 />} />
         {/* <Route path="/estadosCursosv2" element={<EstadosCursos />} /> */}
         <Route path="/formAsesores" element={<FormAsesores />} />
+        <Route path="/formAsesores/:id" element={<FormAsesores />} />
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formClientes/:id" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />

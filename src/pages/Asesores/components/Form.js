@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import asesorService from "../../../services/asesorService.js";
+import skillService from "../../../services/skillService.js";
+import especialidadService from "../../../services/especialidadService.js";
 import { Button, Label, TextInput, FileInput, Toast } from "flowbite-react";
 import Select from "react-select";
 import { useParams } from "react-router-dom";
@@ -10,89 +12,96 @@ function Form() {
   const formRef = useRef();
   //const [selectedFile, setSelectedFile] = useState(null);
   const [formData, setFormData] = useState({
-    avatar: "",
+    //avatar: "",
     identificacion: "",
     nombre: "",
     cargo: "",
     celular: "",
-    skills: [],
-    especialidades: [],
+    skills: "",
+    specialties: "",
   });
 
   const [skills, setSkills] = useState([]);
-  const [especialidades, setEspecialidades] = useState([]);
+  const [specialties, setSpecialties] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const props = { showToast, setShowToast };
 
   const [action, setAction] = useState("creado");
   const { id } = useParams(); // Extrae el id desde la URL
-
-
-  /*const handleFileInputChange = (event) => {
-    const file = event.target.files[0];
-    setSelectedFile(file ? file.name : null);
-  };*/
-
+  
   // useEffect(() => {
-  //   console.log(id);
-  //   if (id) {
-  //     setLoading(true);
-  //     asesorService
-  //       .getAsesorById(id)
-  //       .then((response) => {
-        
-  //         setAsesor(response.data);
-  //         setLoading(false);
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error al obtener el asesor:", error);
-  //         setLoading(false);
-  //         // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
-  //       });
-  //   }
-  // }, [id]);
-
+  //   const fetchData = async () => {
+  //     try {
+  //       const skillResponse = await skillService.getSkills();
+  //       setSkills(skillResponse.data);
+  //       const specialtyResponse = await especialidadService.getSpecialties();
+  //       setSpecialties(specialtyResponse.data);
+  //       // setAdviser(response.data);
+  //       setLoading(false);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
+  
+  //   fetchData();
+  // }, []);
   useEffect(() => {
-    // Obtener las especialidades y skills al montar el componente
-    const fetchData = async () => {
-      try {
-        setLoading(true);
+    // Primero, verifica si hay un ID válido
+    if (id) {
+      setLoading(true);
+      // Obtiene el asesor por ID
+      const adviserPromise = asesorService.getAdviserById(id)
+        .then((response) => {
+          setAdviser(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener el adviser:", error);
+          setLoading(false);
+          
+        });
   
-        if (id) {
-          // Obtener el asesor por ID
-          const asesorData = await asesorService.getAsesorById(id);
-          setAsesor(asesorData);
+      // Luego, obtén las habilidades y especialidades
+      const fetchData = async () => {
+        try {
+          const skillResponse = await skillService.getSkills();
+          setSkills(skillResponse.data);
+  
+          const specialtyResponse = await especialidadService.getSpecialties();
+          setSpecialties(specialtyResponse.data);
+  
+          
+        } catch (error) {
+          console.error("Error fetching data:", error);
+          setLoading(false);
         }
+      };
   
-        // Obtener las especialidades
-        const especialidadesData = await asesorService.getEspecialidades();
-        setEspecialidades(especialidadesData);
-  
-        // Obtener los skills
-        const skillsData = await asesorService.getSkills();
-        setSkills(skillsData);
-  
-        setLoading(false);
-      } catch (error) {
-        console.error("Error al obtener datos:", error);
-        setLoading(false);
-        // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
-      }
-    };
-  
-    fetchData();
+      // Ejecuta ambas llamadas en paralelo
+      Promise.all([adviserPromise, fetchData()])
+        .then(() => {
+          // Todo se completó con éxito
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error en alguna de las llamadas:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
   }, [id]);
-
-  const setAsesor = (asesor) => {
+  
+  
+  const setAdviser = (adviser) => {
     setFormData({
-      identificacion: asesor.identificacion || "",
-      cargo: asesor.cargo || "",
-      nombre: asesor.nombre || "",
-      avatar: asesor.avatar || "",
-      especialidades: asesor.especialidades || "",
-      skills: asesor.skills || "",
-      celular: asesor.celular || "",
+      identificacion: adviser.identificacion || "",
+      cargo: adviser.cargo || "",
+      nombre: adviser.nombre || "",
+      avatar: adviser.avatar || "",
+      specialties: adviser.specialties || "",
+      skills: adviser.skills || "",
+      celular: adviser.celular || "",
      
       // ...otros campos
     });
@@ -147,15 +156,15 @@ function Form() {
         // Actualizar asesor existente
         console.log("intenta actualizar");
         console.log(formData);
-        response = await asesorService.updateAsesorById(id, formData);
+        response = await asesorService.updateAdviserById(id, formData);
         console.log(response);
         setAction("actualizado");
         props.setShowToast(true, "asesor actualizado");
       } else {
-        // Insertar nuevo cliente
+        // Insertar nuevo asesor
         console.log("intenta crear");
-        response = await asesorService.insertAsesor(formData);
-        props.setShowToast(true, "Cliente creado");asesor
+        response = await asesorService.insertAdviser(formData);
+        props.setShowToast(true, "Asesor creado");
       }
 
       console.log(response);
@@ -183,7 +192,7 @@ function Form() {
       cargo:  "",
       nombre:  "",
       avatar:  "",
-      especialidades:  "",
+      specialties:  "",
       skills:  "",
       celular:  "",
     });
@@ -217,25 +226,32 @@ function Form() {
     }));
   };
   const handleSkillsChange = (selectedOptions) => {
+    console.log("Selected Skills:", selectedOptions);
+  
+    // Mapear los objetos seleccionados a sus IDs
+    const selectedSkillsIds = selectedOptions.map
+    ((selectedOption) => selectedOption.value);
+  
+    console.log("Selected Skills IDs:", selectedSkillsIds);
+  
     setFormData((prevData) => ({
       ...prevData,
-      skills: selectedOptions.map((option) => option.value),
+      skills: selectedSkillsIds,
     }));
   };
-  const selectedOptions = skills.filter((skill) =>
-    formData.skills.includes(skill._id)
-  );
-  const handleEspecialidadesChange = (selectedOptionsEspecialidades) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      especialidades: selectedOptionsEspecialidades.map(
-        (option) => option.value
-      ),
-    }));
+ 
+  const handleSpecialtiesChange = (selectedOptionsSpecialties) => {
+   
+    const selectedSpecialtiesIds = selectedOptionsSpecialties.map
+  ((selectedOptionsSpecialties) => selectedOptionsSpecialties.value);
+
+  console.log("Selected specialties ids", selectedSpecialtiesIds);
+
+  setFormData((prevData) =>({
+    ...prevData,
+    specialties: selectedSpecialtiesIds
+  }));
   };
-  const selectedOptionsEspecialidades = especialidades.filter((especialidad) =>
-    formData.especialidades.includes(especialidad._id)
-  );
 
   const goBack = () => {
     
@@ -259,7 +275,7 @@ function Form() {
             name="avatar"
             accept="image/*"
             onChange={(e) => guardarArchivo(e)}
-            required
+            // required
           />
           <input type="hidden" name="avatar" value={formData.avatar} />
            {/* <p >Archivo seleccionado: {selectedFile || 'Ningún archivo seleccionado'}</p>*/}
@@ -316,44 +332,45 @@ function Form() {
             required
           />
         </div>
+       <div className="max-w-md">
+  <div className="mb-2 block">
+    <Label htmlFor="skills" value="Skills" />
+  </div>
+  <Select
+    id="skills"
+    name="skills"
+    options={skills.map((skill) => ({
+      label: skill.nombre,
+      value: skill._id,
+    }))}
+    isMulti
+    value={(Array.isArray(formData.skills) ? formData.skills : []).map((selectedSkillId) => ({
+      label: skills.find((skill) => skill._id === selectedSkillId)?.nombre || "",
+      value: selectedSkillId,
+    }))}
+    onChange={handleSkillsChange}
+  />
+</div>
         <div className="max-w-md">
-          <div className="mb-2 block">
-            <Label htmlFor="skills" value="Skills" />
-          </div>
-          <Select
-            id="skills"
-            name="skills"
-            options={skills.map((skill) => ({
-              label: skill.nombre,
-              value: skill._id,
-            }))}
-            isMulti
-            value={selectedOptions.map((skill) => ({
-              label: skill.nombre, // Display activity names instead of IDs
-              value: skill._id,
-            }))}
-            onChange={handleSkillsChange}
-          />
-        </div>
-        <div className="max-w-md">
-          <div className="mb-2 block">
-            <Label htmlFor="especialidades" value="Especialidades" />
-          </div>
-          <Select
-            id="especialidades"
-            name="especialidades"
-            options={especialidades.map((especialidad) => ({
-              label: especialidad.nombre,
-              value: especialidad._id,
-            }))}
-            isMulti
-            value={selectedOptionsEspecialidades.map((especialidad) => ({
-              label: especialidad.nombre, // Display activity names instead of IDs
-              value: especialidad._id,
-            }))}
-            onChange={handleEspecialidadesChange}
-          />
-        </div>
+  <div className="mb-2 block">
+    <Label htmlFor="especialidades" value="Especialidades" />
+  </div>
+  <Select
+    id="especialidades"
+    name="especialidades"
+    options= {specialties.map((specialty) =>({
+      label: specialty.nombre,
+      value: specialty._id
+    }))}
+    isMulti
+    value={(Array.isArray(formData.specialties) ? formData.specialties : []).map((selectedSpecialtyId) => ({
+      label: specialties.find((specialty) => specialty._id === selectedSpecialtyId)?.nombre || "",
+      value: selectedSpecialtyId,
+    }))}
+    onChange={handleSpecialtiesChange}
+  />
+</div>
+
         <Button type="submit" color="dark"  
        // value={formData.avatar} 
        // onChange={(e) => guardarArchivo(e)}
