@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import actividadesService from '../../services/actividadesService.js'
+import tiposActividadesService from '../../services/tiposActividadesService.js'
 import { Table, Card } from "flowbite-react";
 import { Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
@@ -21,46 +23,48 @@ function Actividades() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const actividadesResponse = await new Promise((resolve) => {
-          google.script.run
-            .withSuccessHandler((response) => {
-              resolve(response);
-            })
-            .getActividades();
-        });
+        try {
+            const actividadesResponse = await actividadesService.getActividades();
+            const tipoDataResponse = await tiposActividadesService.getTiposActividad();
+            setLoading(false);
 
-        const tipoDataResponse = await new Promise((resolve) => {
-          google.script.run
-            .withSuccessHandler((response) => {
-              resolve(response);
-            })
-            .getTiposActividad();
-        });
-        setLoading(false);
+            console.log("actividadesResponse:", actividadesResponse);
+            console.log("tipoDataResponse:", tipoDataResponse);
 
-        // Assuming tipoDataResponse contains an array of tipo objects
-        const tipoDataMap = tipoDataResponse.reduce((acc, tipo) => {
-          acc[tipo._id] = tipo.nombre;
-          return acc;
-        }, {});
+            const tipoDataArray = tipoDataResponse.data || [];
+            console.log("tipoDataArray:", tipoDataArray);
 
-        const actividadesWithTipoNombre = actividadesResponse.map(
-          (actividad) => ({
-            ...actividad,
-            tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
-          })
-        );
+            const tipoDataMap = tipoDataArray.reduce((acc, tipo) => {
+                acc[tipo._id] = tipo.nombre;
+                return acc;
+            }, {});
 
-        setActividades(actividadesWithTipoNombre);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
+            console.log("tipoDataMap:", tipoDataMap);
+
+            const actividadesArray = actividadesResponse.data || [];
+            console.log("actividadesArray:", actividadesArray);
+
+            const actividadesWithTipoNombre = actividadesArray.map(
+                (actividad) => ({
+                    ...actividad,
+                    tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
+                })
+            );
+
+            console.log("actividadesWithTipoNombre:", actividadesWithTipoNombre);
+
+            setActividades(actividadesWithTipoNombre);
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
     };
 
     fetchData();
-  }, []);
+}, []);
 
+
+
+  
   const renderFilterInput = (label, filterKey) => (
     <div className="flex-1 px-2 mb-4">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
@@ -74,7 +78,7 @@ function Actividades() {
       />
     </div>
   );
-
+  
   const filteredActividades = actividades.filter((actividad) => {
     return (
       (!filters.nombre ||
@@ -89,28 +93,32 @@ function Actividades() {
           .includes(filters.precio.toLowerCase())) 
     );
   });
-
-  const handleDeleteClick = () => {
+  
+  const handleDeleteClick = async () => {
     if (selectedActividadId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setActividades((prevActividades) => prevActividades.filter(actividad => actividad._id !== selectedActividadId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedActividadId(null); // Limpia el ID almacenado
-        })
-        .deleteActividadById(selectedActividadId);
+      try {
+        const response = await actividadesService.deleteActividadById(selectedActividadId);
+        console.log(response);
+        setActividades((prevActividades) => prevActividades.filter(actividad => actividad._id !== selectedActividadId));
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedActividadId(null); // Limpia el ID almacenado
+      } catch (error) {
+        console.log("Error al eliminar actividad:", error);
+        setDeleting(false);
+      }
     }
   };
-    const passActividadId = (actividadId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedActividadId(actividadId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+  
+  const passActividadId = (actividadId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedActividadId(actividadId);
+  
+    // Abre el modal
+    setOpenModal(true);
+  };
+  
 
   return (
     <>
@@ -156,7 +164,7 @@ function Actividades() {
                 <Table.Cell>{actividad.precio}</Table.Cell>
                 <Table.Cell>
                   <Link
-                    to={`/editactividad/${actividad.id}`}
+                    to={`/editactividad/${actividad._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
