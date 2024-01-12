@@ -45,8 +45,10 @@ function App() {
         <Route path="/asesores" element={<Asesores />} />
         <Route path="/skills" element={<Skills />} />
         <Route path="/formSkills" element={<FormSkills />} />
+        <Route path="/formSkills/:id" element={<FormSkills />} />
         <Route path="/especialidades" element={<Especialidades />} />
         <Route path="/formEspecialidades" element={<FormEspecialidades />} />
+        <Route path="/formEspecialidades/:id" element={<FormEspecialidades />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/actividades" element={<Actividades />} />
         <Route path="/tipoActividades" element={<TipoActividades />} />
@@ -58,6 +60,7 @@ function App() {
         <Route path="/cursosv2" element={<CursosV2 />} />
         {/* <Route path="/estadosCursosv2" element={<EstadosCursos />} /> */}
         <Route path="/formAsesores" element={<FormAsesores />} />
+        <Route path="/formAsesores/:id" element={<FormAsesores />} />
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formClientes/:id" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />

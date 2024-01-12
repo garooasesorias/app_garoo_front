@@ -1,23 +1,89 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import skillService from "../../../services/skillService.js";
 import { Button, Label, TextInput, Toast} from "flowbite-react";
+
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
+
 
 function Form() {
+  const formRef = useRef();
+
   const [formData, setFormData] = useState({
     nombre: "",
   });
+  const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const props = { showToast, setShowToast };
+  const { id } = useParams(); // Extrae el id desde la URL
+  const [action, setAction] = useState("creada");
+  // Si hay un id, obtén los datos del cliente por el id
+  useEffect(() => {
+    console.log(id);
+    if (id) {
+      setLoading(true);
+      skillService
+        .getSkillById(id)
+        .then((response) => {
+          setSkill(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener el skill:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
+  }, [id]);
 
-  const handleSubmit = (e) => {
+  const setSkill = (skill) => {
+    setFormData({
+     
+      nombre: skill.nombre || "",
+     
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creada"); 
+
+    try {
+      let response;
+
+      if (id) {
+        // Actualizar skill existente
+      
+        console.log(formData);
+        response = await skillService.updateSkillById(id, formData);
+        console.log(response);
+        setAction("actualizado");
+        props.setShowToast(true, "skill actualizado");
+      } else {
+        // Insertar nuevo skill
+        console.log("intenta crear");
+        response = await skillService.insertSkill(formData);
+        props.setShowToast(true, "skill creado");
+      }
+
+      console.log(response);
       setLoading(false);
-      props.setShowToast(!props.showToast);
-      })
-      .insertSkill(formData);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -32,16 +98,21 @@ function Form() {
     
     window.history.back();
   };
-
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const props = { showToast, setShowToast };
-
-  const [action, setAction] = useState("creada");
+ 
+  const handleResetForm = () => {
+    setFormData({
+    
+      nombre: "",
+      
+    });
+  };
+  
 
   return (
     <>
-      <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
+      <form ref={formRef} 
+      className="flex max-w-md flex-col gap-4 m-auto" 
+      onSubmit={handleSubmit}>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="nombre" value="Username" />

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card } from "flowbite-react";
-import { Button, Modal } from "flowbite-react";
+import especialidadService from "../../services/especialidadService.js";
+import { Table, Card, Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 const { jsPDF } = window.jspdf;
@@ -443,44 +443,48 @@ const generatePDF = async () => {
 //     .getImagenesCotizacion();
 // };
 
-function Especialidades() {
-  const [especialidades, setEspecialidades] = useState([]);
+function Specialties() {
+  const [specialties, setSpecialties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [selectedEspecialidadId, setSelectedEspecialidadId] = useState(null);
+  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setEspecialidades(data);
-          setLoading(false);
-        })
-        .getEspecialidades();
+      try {
+        const specialtiesObtenidos = await especialidadService.getSpecialties();
+        
+        setSpecialties(specialtiesObtenidos.data);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error al cargar Specialities:", error);
+      }
+    
     };
 
     fetchData();
   }, []);
 
+
   const handleDeleteClick = () => {
-    if (selectedEspecialidadId) {
+    if (selectedSpecialtyId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setEspecialidades((prevEspecialidades) => prevEspecialidades.filter(especialidad => especialidad._id !== selectedEspecialidadId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedEspecialidadId(null); // Limpia el ID almacenado
-        })
-        .deleteEspecialidadById(selectedEspecialidadId);
+      especialidadService.deleteSpecialtyById(selectedSpecialtyId).then((response) => {
+        console.log(response);
+        setSpecialties((prevSpecialties) =>
+          prevSpecialties.filter((specialty) => specialty._id !== selectedSpecialtyId)
+        );
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedSpecialtyId(null); // Limpia el ID almacenado
+      });
     }
   };
-    const passEspecialidadId = (especialidadId) => {
+
+    const passEspecialidadId = (specialtyId) => {
       // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedEspecialidadId(especialidadId);
+      setSelectedSpecialtyId(specialtyId);
     
       // Abre el modal
       setOpenModal(true);
@@ -506,17 +510,17 @@ function Especialidades() {
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
-          {especialidades &&
-            especialidades.map((especialidad) => (
+          {specialties &&
+            specialties.map((Specialty) => (
               <Table.Row
-                key={especialidad._id}
+                key={Specialty._id}
                 className="bg-white dark:border-gray-700 dark:bg-gray-800"
               >
-                <Table.Cell>{especialidad.nombre}</Table.Cell>
+                <Table.Cell>{Specialty.nombre}</Table.Cell>
                 {/*<Table.Cell>{materia.tipoNombre}</Table.Cell>*/}
                 <Table.Cell>
                   <Link
-                    to={`/editEspecialidad/${especialidad.id}`}
+                    to={`/formEspecialidades/${Specialty._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit
@@ -524,7 +528,7 @@ function Especialidades() {
                 </Table.Cell>
                 <TableCell>
                   <button
-                    onClick={() => passEspecialidadId(especialidad._id)}
+                    onClick={() => passEspecialidadId(Specialty._id)}
                     className="font-medium text-red-600 hover:underline dark:text-red-500"
                   >
                     Borrar
@@ -546,7 +550,7 @@ function Especialidades() {
                         <div className="flex justify-center gap-4">
                           <Button
                             color="failure"
-                            onClick={() => handleDeleteClick(especialidad._id)}
+                            onClick={() => handleDeleteClick(Specialty._id)}
                             disabled={deleting} // Deshabilita el botón durante la eliminación
                           >
                             {deleting ? "Eliminando..." : "Sí, eliminar"}
@@ -571,4 +575,4 @@ function Especialidades() {
   );
 }
 
-export default Especialidades;
+export default Specialties;
