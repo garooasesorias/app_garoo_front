@@ -3,9 +3,9 @@ import { Table, Card } from "flowbite-react";
 import { Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
-import Loader from '../../components/Loader.js';
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
-
+import Loader from "../../components/Loader.js";
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import cotizacionService from "../../services/cotizacionService.js";
 
 function Cotizaciones() {
   const [cotizaciones, setCotizaciones] = useState([]);
@@ -17,64 +17,25 @@ function Cotizaciones() {
     fecha: "",
     cliente: "",
     total: "",
-    estado: ""
-    });
+    estado: "",
+  });
 
-    useEffect(() => {
-      const fetchData = async () => {
-        try {
-          const cotizacionesResponse = await new Promise((resolve) => {
-            google.script.run
-              .withSuccessHandler((response) => {
-                resolve(response);
-              })
-              .getCotizaciones();
-          });        
-          const estadosResponse = await new Promise((resolve) => {
-            google.script.run
-              .withSuccessHandler((response) => {
-                resolve(response);
-              })
-              .getEstadosCotizaciones();
-          });
-    
-          const clientesResponse = await new Promise((resolve) => {
-            google.script.run
-              .withSuccessHandler((response) => {
-                resolve(response);
-              })
-              .getClientes();
-          });
-          setLoading(false);
-          
-          const estadoDataMap = estadosResponse.reduce((acc, estado) => {
-          acc[estado._id] = estado.nombre;
-          return acc;
-          }, {});
-    
-          const clienteDataMap = clientesResponse.reduce((acc, cliente) => {
-            acc[cliente._id] = cliente.nombre;
-            return acc;
-          }, {});
-    
-          const cotizacionesWithClienteEstado = cotizacionesResponse.map(
-            (cotizacion) => ({
-              ...cotizacion, 
-              clienteNombre: clienteDataMap[cotizacion.cliente] || "Cliente Desconocido",
-              estadoNombre: estadoDataMap[cotizacion.estado] || "Estado Desconocido",
-            })
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await cotizacionService
+          .getCotizaciones()
+          .then(setCotizaciones(cotizacionesResponse));
 
-          );
-    
-          setCotizaciones(cotizacionesWithClienteEstado);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      };
-    
-      fetchData();
-    }, []);
-    
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const renderFilterInput = (label, filterKey) => (
     <div className="flex-1 px-2 mb-4">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
@@ -92,19 +53,17 @@ function Cotizaciones() {
   const filteredCotizaciones = cotizaciones.filter((cotizacion) => {
     return (
       (!filters.fecha ||
-        cotizacion.fecha
-          .toLowerCase()
-          .includes(filters.fecha.toLowerCase())) &&
+        cotizacion.fecha.toLowerCase().includes(filters.fecha.toLowerCase())) &&
       (!filters.cliente ||
         cotizacion.clienteNombre
-        .toLowerCase().includes(filters.cliente.toLowerCase())) &&
+          .toLowerCase()
+          .includes(filters.cliente.toLowerCase())) &&
       (!filters.total ||
-        cotizacion.total
-        .toString()
-        .includes(filters.total.toLowerCase())) &&
+        cotizacion.total.toString().includes(filters.total.toLowerCase())) &&
       (!filters.estado ||
         cotizacion.estadoNombre
-        .toLowerCase().includes(filters.estado.toLowerCase())) 
+          .toLowerCase()
+          .includes(filters.estado.toLowerCase()))
     );
   });
 
@@ -114,7 +73,11 @@ function Cotizaciones() {
       google.script.run
         .withSuccessHandler((response) => {
           console.log(response);
-          setCotizacion((prevCotizacion) => prevCotizacion.filter(cotizacion => cotizacion._id !== selectedCotizacionId));
+          setCotizacion((prevCotizacion) =>
+            prevCotizacion.filter(
+              (cotizacion) => cotizacion._id !== selectedCotizacionId
+            )
+          );
           setDeleting(false);
           setOpenModal(false);
           setSelectedCotizacionId(null); // Limpia el ID almacenado
@@ -122,18 +85,18 @@ function Cotizaciones() {
         .deleteCotizacionesById(selectedCotizacionId);
     }
   };
-    const passCotizacionId = (cotizacionId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedCotizacionId(cotizacionId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+  const passCotizacionId = (cotizacionId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedCotizacionId(cotizacionId);
+
+    // Abre el modal
+    setOpenModal(true);
+  };
 
   return (
     <>
-    <h1 className="PagesTitles">Cotizaciones</h1>
-    <div className="w-full mb-3">
+      <h1 className="PagesTitles">Cotizaciones</h1>
+      <div className="w-full mb-3">
         <Card>
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             Filtros
@@ -146,7 +109,13 @@ function Cotizaciones() {
           </div>
         </Card>
       </div>
-    <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          paddingRight: "20px",
+        }}
+      >
         <Link to="/formCotizaciones">
           <Button className="shadow mb-5" color="success">
             Crear Cotización +
@@ -173,11 +142,7 @@ function Cotizaciones() {
                 <TableCell>{cotizacion.fecha}</TableCell>
                 <Table.Cell>
                   {/* Muestra la información del cliente */}
-                  {cotizacion.cliente && (
-                    <>
-                      {cotizacion.cliente.nombre} 
-                    </>
-                  )}
+                  {cotizacion.cliente && <>{cotizacion.cliente.nombre}</>}
                 </Table.Cell>
                 <Table.Cell>${cotizacion.total}</Table.Cell>
                 <Table.Cell>
@@ -198,12 +163,19 @@ function Cotizaciones() {
                   >
                     Borrar
                   </button>
-                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+                  <Modal
+                    show={openModal}
+                    size="md"
+                    onClose={() => setOpenModal(false)}
+                    popup
+                  >
                     <Modal.Header />
                     <Modal.Body>
                       <div className="text-center">
                         {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
-                          <div className="LoaderContainerDelete"><Loader /></div>
+                          <div className="LoaderContainerDelete">
+                            <Loader />
+                          </div>
                         ) : (
                           <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                         )}
@@ -220,7 +192,11 @@ function Cotizaciones() {
                           >
                             {deleting ? "Eliminando..." : "Sí, eliminar"}
                           </Button>
-                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                          <Button
+                            color="gray"
+                            onClick={() => setOpenModal(false)}
+                            disabled={deleting}
+                          >
                             No, cancelar
                           </Button>
                         </div>
@@ -232,9 +208,7 @@ function Cotizaciones() {
             ))}
         </Table.Body>
       </Table>
-      <div className="LoaderContainer">
-            {loading ? <Loader /> : null}
-            </div>
+      <div className="LoaderContainer">{loading ? <Loader /> : null}</div>
     </>
   );
 }
