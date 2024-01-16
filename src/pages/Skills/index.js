@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table } from "flowbite-react";
-import { Button, Label, Modal } from "flowbite-react";
+import skillService from "../../services/skillService.js";
+import { Button, Label, Modal,Table } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
@@ -14,14 +14,16 @@ function Skills() {
   const [selectedSkillId, setSelectedSkillId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setSkills(data);
-          setLoading(false);
-        })
-        .getSkills();
+      try {
+        const skillsObtenidos = await skillService.getSkills();
+      
+        setSkills(skillsObtenidos.data);
+        setLoading(false);
+      } catch (error) {
+        console.log("Error al cargar skills:", error);
+      }
+    
     };
 
     fetchData();
@@ -30,16 +32,17 @@ function Skills() {
   const handleDeleteClick = () => {
     if (selectedSkillId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setSkills((prevSkills) => prevSkills.filter(skill => skill._id !== selectedSkillId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedSkillId(null); // Limpia el ID almacenado
-        })
-        .deleteSkillsById(selectedSkillId);
+      skillService.deleteSkillById(selectedSkillId).then((response) => {
+        console.log(response);
+        setSkills((prevSkills) =>
+          prevSkills.filter((skill) => skill._id !== selectedSkillId)
+        );
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedSkillId(null); // Limpia el ID almacenado
+      });
     }
+   
   };
     const passSkillId = (skillId) => {
       // Tomamos el Id del cliente que viene del botón borrar
@@ -77,7 +80,7 @@ function Skills() {
                 {/*<Table.Cell>{materia.tipoNombre}</Table.Cell>*/}
                 <Table.Cell>
                   <Link
-                    to={`/editSkill/${skill.id}`}
+                    to={`/formSkills/${skill._id}`}
                     className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
                   >
                     Edit

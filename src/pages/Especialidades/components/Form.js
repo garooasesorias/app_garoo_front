@@ -1,23 +1,90 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import especialidadService from "../../../services/especialidadService.js";
+import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
 
+
 function Form() {
+  const formRef = useRef();
   const [formData, setFormData] = useState({
     nombre: "",
   });
 
-  const handleSubmit = (e) => {
+  const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const props = { showToast, setShowToast };
+
+  const { id } = useParams(); // Extrae el id desde la URL
+
+  const [action, setAction] = useState("creada");
+
+  useEffect(() => {
+    console.log(id);
+    if (id) {
+      setLoading(true);
+      especialidadService
+        .getSpecialtyById(id)
+        .then((response) => {
+        
+          setSpecialty(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener el Specialty:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
+  }, [id]);
+
+
+  const setSpecialty = (Specialty) => {
+    setFormData({
+      nombre: Specialty.nombre || "",
+      
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creada"); 
-        setLoading(false);
-      props.setShowToast(!props.showToast);
-      })
-      .insertEspecialidades(formData);
+
+    try {
+      let response;
+
+      if (id) {
+        // Actualizar especialidad existente
+        console.log(formData);
+        response = await especialidadService.updateSpecialtyById(id, formData);
+        console.log(response);
+        setAction("actualizado");
+        props.setShowToast(true, "Especialidad actualizado");
+      } else {
+        // Insertar nuevo especialidad
+        console.log("intenta crear");
+        response = await especialidadService.insertSpecialty(formData);
+        props.setShowToast(true, "especialidad creado");
+      }
+
+      console.log(response);
+      setLoading(false);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -33,15 +100,22 @@ function Form() {
     window.history.back();
   };
 
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const props = { showToast, setShowToast };
-
-  const [action, setAction] = useState("creada");
+  const handleResetForm = () => {
+    setFormData({
+    
+      nombre: "",
+      
+    });
+  };
+  
 
   return (
     <>
-      <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
+      <form 
+      ref={formRef} 
+      className="flex max-w-md flex-col gap-4 m-auto" 
+      onSubmit={handleSubmit}>
+
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="nombre" value="Username" />

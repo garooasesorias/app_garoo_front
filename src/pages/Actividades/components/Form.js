@@ -1,10 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
+import { useParams } from "react-router-dom"; 
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import tiposActividadesService from "../../../services/tiposActividadesService.js";
+import actividadesService from "../../../services/actividadesService.js";
 
 function Form() {
+  const formRef = useRef();
   const [tiposActividad, setTiposActividad] = useState([]);
+  const [showToast, setShowToast] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const props = { showToast, setShowToast };
+
+  const { id } = useParams(); // Extrae el id desde la URL
+
+  const [action, setAction] = useState("creada");
   const [formData, setFormData] = useState({
     nombre: "",
     tipo: "",
@@ -12,30 +23,119 @@ function Form() {
   });
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
-    const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setTiposActividad(data);
-        })
-        .getTiposActividad();
+    // Función asincrónica para obtener tipos de actividad
+    const obtenerTiposActividad = async () => {
+      try {
+        const data = await tiposActividadesService.getTiposActividad();
+        // console.log("Tipos de actividad obtenidos:", data);
+        setTiposActividad(data?.data || []); // Asegura que sea un array
+      } catch (error) {
+        console.error("Error al obtener tipos de actividad:", error);
+        // Puedes manejar el error aquí según tus necesidades
+      }
     };
+  
+    console.log(id);
+  
+    // Llama a la función para obtener tipos de actividad siempre
+    obtenerTiposActividad();
+  
+    if (id) {
+      setLoading(true);
+      actividadesService
+        .getActividadById(id)
+        .then((response) => {
+          setActividad(response.data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error al obtener la actividad:", error);
+          setLoading(false);
+          // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+        });
+    }
+  }, [id]);
 
-    fetchData();
-  }, []);
+  const setActividad = (Actividad) => {
+    setFormData({
+      nombre: Actividad.nombre || "",
+      tipo: Actividad.tipo || "",
+      precio: Actividad.precio || "",
+    });
+  };
 
-  const handleSubmit = (e) => {
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const data = await tiposActividadesService.getTiposActividad();
+  //       console.log("Tipos de actividad obtenidos:", data);
+  //       setTiposActividad(data?.data || []); // Asegura que sea un array
+  //     } catch (error) {
+  //       console.error("Error fetching tipos de actividad:", error);
+  //     }
+  //   };
+
+  //   fetchData();
+  // }, []);
+
+  
+
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   try {
+  //     const response = await actividadesService.insertActividad(formData);
+  //     setAction("creada");
+  //     setLoading(false);
+  //     setShowToast(!showToast);
+  //     console.log(response);
+  //   } catch (error) {
+  //     console.error("Error inserting actividad:", error);
+  //     setLoading(false);
+  //   }
+  // };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creada"); 
-        setLoading(false);
-      props.setShowToast(!props.showToast);
+
+    try {
+      let response;
+
+      if (id) {
+        // Actualizar cliente existente
+        console.log("intenta actualizar");
+        console.log(formData);
+        response = await actividadesService.updateActividadById(id, formData);
         console.log(response);
-      })
-      .insertActividad(formData);
+        setAction("actualizada");
+        props.setShowToast(true, "Tipo Actividad Actualizado");
+      } else {
+        // Insertar nuevo cliente
+        console.log("intenta crear");
+        response = await actividadesService.insertActividad(formData);
+        props.setShowToast(true, "Tipo Actividad creado");
+      }
+
+      console.log(response);
+      setLoading(false);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+
+      if (!id) {
+        handleResetForm();
+      }
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      setLoading(false);
+      props.setShowToast(true, "Error en la operación");
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    }
   };
+  
 
   const handleNombreChange = (e) => {
     const newName = e.target.value;
@@ -54,40 +154,30 @@ function Form() {
   };
 
   const handleTipoChange = (selectedTipo) => {
-    console.log("Selected Tipo:", selectedTipo);
-
-    const selectedTipoObj = tiposActividad.find(
-      (tipo) => tipo._id === selectedTipo
-    );
-
-    console.log("Selected Tipo Object:", selectedTipoObj);
-
+    // Configurar el estado solo si se selecciona un tipo válido
     setFormData((prevData) => ({
       ...prevData,
-      tipo: selectedTipoObj ? selectedTipoObj._id : "",
+      tipo: selectedTipo || "", // Asegura que el valor no sea nulo
     }));
   };
 
   const handleTipoSelect = (e) => {
     const selectedValue = e.target.value;
+    // Llamamos a handleTipoChange con el valor seleccionado
     handleTipoChange(selectedValue);
   };
 
   const goBack = () => {
-    
     window.history.back();
   };
 
-  const [showToast, setShowToast] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const props = { showToast, setShowToast };
-
-  const [action, setAction] = useState("creada");
-
   return (
     <>
- 
-      <form className="flex max-w-md flex-col gap-4 m-auto" onSubmit={handleSubmit}>
+            <form
+        ref={formRef}
+        className="flex max-w-md flex-col gap-4 m-auto"
+        onSubmit={handleSubmit}
+      >
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="nombre" value="nombre" />
@@ -113,11 +203,12 @@ function Form() {
             required
           >
             <option value="">Selecciona un tipo</option>
-            {tiposActividad.map((tipo) => (
-              <option key={tipo._id} value={tipo._id}>
-                {tipo.nombre}
-              </option>
-            ))}
+            {Array.isArray(tiposActividad) &&
+              tiposActividad.map((tipo) => (
+                <option key={tipo._id} value={tipo._id}>
+                  {tipo.nombre}
+                </option>
+              ))}
           </select>
         </div>
         <div className="max-w-md">
@@ -143,10 +234,10 @@ function Form() {
       </Button>
 
       <div className="LoaderContainerForm">
-      {loading ? <Loader /> : null}
+        {loading ? <Loader /> : null}
       </div>
 
-      {props.showToast && (
+      {showToast && (
         <Toast style={{ maxWidth: '250px' }} className="Toast" >
           <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
             <HiCheck className="h-5 w-5" />
@@ -154,10 +245,11 @@ function Form() {
           <div className="ml-3 text-sm font-normal">
             Actividad {action} con éxito
           </div>
-          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
     </>
   );
 }
+
 export default Form;

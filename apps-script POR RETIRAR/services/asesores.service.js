@@ -52,3 +52,40 @@ function deleteAsesorById(id) {
   );
   return result;
 }
+function guardarArchivo(e) {
+  var file = e.target.files[0];
+
+  var reader = new FileReader();
+  reader.readAsDataURL(file);
+
+  reader.onload = function (e) {
+    var rawLog = reader.result.split(",")[1];
+    var dataSend = {
+      data: rawLog,
+      name: file.name,
+      type: file.type,
+    };
+
+    // Cambia la URL de la API a la nueva ubicación en tu backend
+    const apiUrl = 'http://localhost:puerto/api/uploadFilesToGoogleDrive'; // Ajusta la URL según tu configuración
+
+    // Utiliza Axios u otra biblioteca para realizar solicitudes HTTP
+    axios.post(apiUrl, dataSend)
+      .then(response => {
+        const fileId = response.data.id;
+        const baseUrl = "https://drive.google.com/uc?export=view&id=";
+        const nuevaUrl = baseUrl + fileId;
+
+        console.log('Nueva URL formateada:', nuevaUrl);
+
+        setFormData((prevData) => ({
+          ...prevData,
+          avatar: nuevaUrl,
+        }));
+      })
+      .catch(error => {
+        console.error('Error al subir archivo:', error);
+        // Maneja el error según tus necesidades
+      });
+  };
+}
