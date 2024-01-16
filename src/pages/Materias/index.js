@@ -19,7 +19,7 @@ function Materias() {
   const [selectedMateriaId, setSelectedMateriaId] = useState(null);
   const [filters, setFilters] = useState({
     nombre: "",
-    tipo: "",  
+    tipo: "",
   });
   useEffect(() => {
     const fetchData = async () => {
@@ -65,7 +65,7 @@ function Materias() {
   const handleDeleteClick = () => {
     if (selectedMateriaId) {
       setDeleting(true);
-  
+
       // Cambia la URL al endpoint correcto de tu backend
       materiasService.deleteMateriaById(selectedMateriaId)
         .then((response) => {
@@ -81,25 +81,25 @@ function Materias() {
         });
     }
   };
-    const passMateriaId = (materiaId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedMateriaId(materiaId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+  const passMateriaId = (materiaId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedMateriaId(materiaId);
 
-    const filteredMaterias = materias.filter((materia) => {
-      return (
-        (!filters.nombre || materia.nombre.toLowerCase().includes(filters.nombre.toLowerCase())) &&
-        (!filters.tipo || materia.tipoNombre.toLowerCase().includes(filters.tipo.toLowerCase()))
-      );
-    });
-        
+    // Abre el modal
+    setOpenModal(true);
+  };
+
+  const filteredMaterias = materias.filter((materia) => {
+    return (
+      (!filters.nombre || materia.nombre.toLowerCase().includes(filters.nombre.toLowerCase())) &&
+      (!filters.tipo || materia.tipoNombre.toLowerCase().includes(filters.tipo.toLowerCase()))
+    );
+  });
+
   return (
     <>
-    <h1 className="PagesTitles">Materias</h1>
-    <div className="w-full mb-3">
+      <h1 className="PagesTitles">Materias</h1>
+      <div className="w-full mb-3">
         <Card>
           <h5 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             Filtros
@@ -107,7 +107,7 @@ function Materias() {
           <div className="flex flex-wrap -mx-2">
             {renderFilterInput("Nombre de Materia", "nombre")}
             {renderFilterInput("Tipo de Materia", "tipo")}
-            
+
           </div>
         </Card>
       </div>
@@ -184,11 +184,11 @@ function Materias() {
               </Table.Row>
             ))}
         </Table.Body>
-        
+
       </Table>
       <div className="LoaderContainer">
-            {loading ? <Loader /> : null}
-            </div>
+        {loading ? <Loader /> : null}
+      </div>
     </>
   );
 }

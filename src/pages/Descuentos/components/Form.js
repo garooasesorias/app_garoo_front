@@ -3,6 +3,7 @@ import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { useParams } from "react-router-dom";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
+import descuentosService from '../../../services/descuentosService'; // Importa el servicio de descuentos
 
 function DescuentoForm() {
   const formRef = useRef();
@@ -16,22 +17,21 @@ function DescuentoForm() {
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const props = { showToast, setShowToast };
-
   const [action, setAction] = useState("creado");
-
   const { id } = useParams();
-  
 
   useEffect(() => {
     if (id) {
       setLoading(true);
-      google.script.run
-        .withSuccessHandler((data) => {
-          console.log(data);
-          setDescuento(data[0]);
+      descuentosService.getDescuentoById(id)
+        .then((response) => {
+          setDescuento(response.data);
           setLoading(false);
         })
-        .getDescuentoById(id);
+        .catch((error) => {
+          console.error("Error al obtener el descuento:", error);
+          setLoading(false);
+        });
     }
   }, [id]);
 
@@ -45,25 +45,34 @@ function DescuentoForm() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    if (id) {
-      google.script.run
-        .withSuccessHandler((response) => {
-          setAction("actualizado");
-          setLoading(false);
-          props.setShowToast(!props.showToast);
-        })
-        .updateDescuentoById(id, formData);
-    } else {
-      google.script.run
-        .withSuccessHandler((response) => {
-          setAction("creado");
-          setLoading(false);
-          props.setShowToast(!props.showToast);
-        })
-        .insertDescuento(formData);
+
+    try {
+      let response;
+      if (id) {
+        // Actualizar el descuento existente
+        response = await descuentosService.updateDescuentoById(id, formData);
+        setAction("actualizado");
+      } else {
+        // Crear un nuevo descuento
+        response = await descuentosService.insertDescuento(formData);
+        setAction("creado");
+      }
+      console.log(response);
+      props.setShowToast(true); // Muestra el toast de éxito
+      setTimeout(() => {
+        props.setShowToast(false); // Oculta el toast después de 5 segundos
+      }, 5000);
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      props.setShowToast(true); // Muestra el toast de error
+      setTimeout(() => {
+        props.setShowToast(false); // Oculta el toast después de 5 segundos
+      }, 5000);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,7 +85,6 @@ function DescuentoForm() {
   };
 
   const goBack = () => {
-    
     window.history.back();
   };
 

@@ -5,6 +5,8 @@ import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import descuentosService from '../../services/descuentosService'; // Asegúrate de importar tu servicio de descuentos
+
 
 function Descuentos() {
   const [descuentos, setDescuentos] = useState([]);
@@ -22,13 +24,13 @@ function Descuentos() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          console.log(data);
-          setDescuentos(data);
-          setLoading(false);
-        })
-        .getDescuentos();
+      try {
+        const response = await descuentosService.getDescuentos(); // Utiliza el servicio de descuentos para obtener los datos
+        setDescuentos(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error al obtener los descuentos:", error);
+      }
     };
 
     fetchData();
@@ -67,18 +69,21 @@ function Descuentos() {
     );
   });
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
     if (selectedDescuentoId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setDescuentos((prevDescuentos) => prevDescuentos.filter(descuento => descuento._id !== selectedDescuentoId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedDescuentoId(null); // Limpia el ID almacenado
-        })
-        .deleteDescuentoById(selectedDescuentoId);
+      try {
+        await descuentosService.deleteDescuentoById(selectedDescuentoId);
+        setDescuentos((prevDescuentos) =>
+          prevDescuentos.filter(descuento => descuento._id !== selectedDescuentoId)
+        );
+        setSelectedDescuentoId(null); // Limpia el ID almacenado
+      } catch (error) {
+        console.error("Error al eliminar el descuento:", error);
+      } finally {
+        setDeleting(false);
+        setOpenModal(false);
+      }
     }
   };
     const passDescuentoId = (descuentoId) => {
