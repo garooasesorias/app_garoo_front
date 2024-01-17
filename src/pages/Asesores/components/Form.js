@@ -30,22 +30,6 @@ function Form() {
   const [action, setAction] = useState("creado");
   const { id } = useParams(); // Extrae el id desde la URL
   
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const skillResponse = await skillService.getSkills();
-  //       setSkills(skillResponse.data);
-  //       const specialtyResponse = await especialidadService.getSpecialties();
-  //       setSpecialties(specialtyResponse.data);
-  //       // setAdviser(response.data);
-  //       setLoading(false);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-  
-  //   fetchData();
-  // }, []);
   useEffect(() => {
     // Primero, verifica si hay un ID válido
     if (id) {

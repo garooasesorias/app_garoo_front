@@ -64,6 +64,7 @@ function App() {
         <Route path="/formClientes" element={<FormClientes />} />
         <Route path="/formClientes/:id" element={<FormClientes />} />
         <Route path="/formPlanes" element={<FormPlanes />} />
+        <Route path="/formPlanes/:id" element={<FormPlanes />} />
         <Route path="/formMaterias" element={<FormMaterias />} />
         <Route path="/formActividades" element={<FormActividades />} />
         <Route path="/editactividad/:id" element={<FormActividades />} /> 

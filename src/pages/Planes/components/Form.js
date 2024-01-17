@@ -3,51 +3,111 @@ import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
 import Select from "react-select";
+import planesService from '../../../services/planesService'; // Asegúrate de importar tu servicio de planes
+import actividadesService from '../../../services/actividadesService'; // Importa el servicio de actividades
+import { useParams } from "react-router-dom"; // Importa si estás usando react-router
 
 function Form() {
   const [formData, setFormData] = useState({
     nombre: "",
     precio: "",
-    actividades: [],
+    actividades: "",
   });
-  const [actividades, setActividades] = useState([]);
+  const [actividadesOptions, setActividadesOptions] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const props = { showToast, setShowToast };
-
   const [action, setAction] = useState("creado");
+  const { id } = useParams(); // Extrae el id desde la URL si es necesario
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
-    const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setActividades(data);
-        })
-        .getActividades();
+    const fetchActividades = async () => {
+      try {
+        const actividadesResponse = await actividadesService.getActividades();
+        const actividadesData = actividadesResponse.data.map(a => ({
+          label: a.nombre,
+          value: a._id
+        }));
+        setActividadesOptions(actividadesData);
+  
+        // Si no hay un 'id', significa que estamos creando un nuevo plan, no editando uno existente.
+        if (!id) {
+          setFormData(prevFormData => ({
+            ...prevFormData,
+            actividades: [] // Asegurarse de que se inicializa como un array vacío para la creación
+          }));
+        }
+  
+        return actividadesData; // Devuelve esto para usarlo en el siguiente paso
+      } catch (error) {
+        console.error("Error fetching actividades:", error);
+      }
     };
+  
+    const fetchPlanData = async (actividadesData) => {
+      if (id) {
+        try {
+          const planResponse = await planesService.getPlanById(id);
+          const selectedActividades = planResponse.data.actividades.map(a => {
+            return actividadesData.find(option => option.value === a) || a;
+          }).filter(a => a); // Filtrar elementos falsy
+          setFormData({
+            nombre: planResponse.data.nombre || "",
+            precio: planResponse.data.precio || "",
+            actividades: selectedActividades
+          });
+        } catch (error) {
+          console.error("Error fetching plan data:", error);
+        }
+      }
+    };
+  
+    // Llama a fetchActividades y luego a fetchPlanData con los resultados.
+    fetchActividades().then(actividadesData => {
+      if (id) {
+        fetchPlanData(actividadesData);
+      }
+    }).finally(() => setLoading(false));
+  }, [id]);
+    
+      
 
-    fetchData();
-  }, []);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    const formattedData = {
-      ...formData,
-      actividades: formData.actividades.map((activity) => ({ $oid: activity })),
+  
+    // Crear un objeto con los datos a enviar
+    const dataToSend = {
+      nombre: formData.nombre,
+      precio: formData.precio,
+      actividades: formData.actividades.map(a => a.value), // Solo envía los IDs
     };
-
-    google.script.run
-      .withSuccessHandler((response) => {
-        setAction("creado"); 
-        setLoading(false);
-      props.setShowToast(!props.showToast);
-      })
-      .insertPlan(formattedData);
+  
+    try {
+      let response;
+      if (id) {
+        response = await planesService.updatePlanById(id, dataToSend);
+        setAction("actualizado");
+      } else {
+        response = await planesService.insertPlan(dataToSend);
+        setAction("creado");
+      }
+      console.log(response.data);
+      props.setShowToast(true);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    } catch (error) {
+      console.error("Error en la operación:", error);
+      props.setShowToast(true);
+      setTimeout(() => {
+        props.setShowToast(false);
+      }, 5000);
+    } finally {
+      setLoading(false);
+    }
   };
-
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -59,16 +119,14 @@ function Form() {
   const handleActividadesChange = (selectedOptions) => {
     setFormData((prevData) => ({
       ...prevData,
-      actividades: selectedOptions.map((option) => option.value),
+      actividades: selectedOptions || [],
     }));
   };
-
-  const selectedOptions = actividades.filter((actividad) =>
-    formData.actividades.includes(actividad._id)
-  );
+  
+  // Asegúrate de implementar la lógica correcta para renderizar las opciones de actividades
+  // y enlazarlas correctamente con el estado del formulario.
 
   const goBack = () => {
-    
     window.history.back();
   };
 
@@ -108,19 +166,15 @@ function Form() {
             <Label htmlFor="celular" value="Actividades" />
           </div>
           <Select
-            id="actividades"
-            name="actividades"
-            options={actividades.map((actividad) => ({
-              label: actividad.nombre,
-              value: actividad._id,
-            }))}
-            isMulti
-            value={selectedOptions.map((actividad) => ({
-              label: actividad.nombre, // Display activity names instead of IDs
-              value: actividad._id,
-            }))}
-            onChange={handleActividadesChange}
-          />
+  id="actividades"
+  name="actividades"
+  options={actividadesOptions}
+  isMulti
+  value={formData.actividades}
+  getOptionLabel={(option) => option.label}
+  getOptionValue={(option) => option.value}
+  onChange={handleActividadesChange}
+/>
         </div>
         <Button type="submit" color="dark">
           Submit
@@ -131,7 +185,7 @@ function Form() {
       </Button>
 
       <div className="LoaderContainerForm">
-      {loading ? <Loader /> : null}
+        {loading ? <Loader /> : null}
       </div>
 
       {props.showToast && (

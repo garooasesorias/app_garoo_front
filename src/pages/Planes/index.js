@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import planesService from '../../services/planesService'; // Asegúrate de importar tu servicio de planes
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,13 +17,14 @@ function Planes() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          console.log(data);
-          setPlanes(data);
-          setLoading(false);
-        })
-        .getPlanes();
+      try {
+        const response = await planesService.getPlanes(); // Utiliza el servicio de planes para obtener los datos
+        setPlanes(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error al obtener los planes:", error);
+        setLoading(false);
+      }
     };
 
     fetchData();
@@ -42,20 +44,23 @@ function Planes() {
     // plan.actividades.some((actividad) => actividad.nombre.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = async () => {
     if (selectedPlanId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setPlanes((prevPlanes) => prevPlanes.filter(plan => plan._id !== selectedPlanId));
-          setDeleting(false);
-          setOpenModal(false);
-          setSelectedPlanId(null); // Limpia el ID almacenado
-        })
-        .deletePlanById(selectedPlanId);
+      try {
+        await planesService.deletePlanById(selectedPlanId);
+        setPlanes((prevPlanes) => prevPlanes.filter(plan => plan._id !== selectedPlanId));
+      } catch (error) {
+        console.error("Error al eliminar el plan:", error);
+        // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
+      } finally {
+        setDeleting(false);
+        setOpenModal(false);
+        setSelectedPlanId(null); // Limpia el ID almacenado
+      }
     }
   };
+  
     const passPlantId = (planId) => {
       // Tomamos el Id del cliente que viene del botón borrar
       setSelectedPlanId(planId);
@@ -93,7 +98,7 @@ function Planes() {
             className="w-full md:w-1/2 lg:w-1/3"
             style={{ maxWidth: "400px" }}
           >
-            <Link to={`/editPlan/${plan.id}`}>
+            <Link to={`/formPlanes/${plan._id}`}>
               <Button className="shadow mb-2 ms-auto" color="success">
                 Editar
               </Button>
