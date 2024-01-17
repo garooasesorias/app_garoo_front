@@ -33,16 +33,14 @@ const planesService = {
 
   updatePlanById: async (id, data) => {
     try {
-      const response = await api.put("/planes/updatePlanById", {
-        id,
-        data,
-      });
+      const response = await api.put(`/planes/updatePlanById/${id}`, data);
       return response.data; // Respuesta de la API tras actualizar el plan
     } catch (error) {
       console.error("Error al actualizar el plan:", error);
       throw error;
     }
   },
+  
   
   deletePlanById: async (id) => {
     try {
