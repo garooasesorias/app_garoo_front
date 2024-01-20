@@ -2,8 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { parseISO, format } from "date-fns";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
+import adviserService from "../../../../services/asesorService";
 
 export default function AsignamientoComponent({ data }) {
+  console.log(data.asignamiento);
   const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
     items: data.actividades.map((actividad, index) => ({
@@ -21,7 +23,8 @@ export default function AsignamientoComponent({ data }) {
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run.withSuccessHandler(setAsesores).getAsesores();
+      const asesores = await adviserService.getAdvisors();
+      setAsesores(asesores.data);
     };
     fetchData();
   }, []);

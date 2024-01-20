@@ -5,6 +5,7 @@ import Loader from "../../components/Loader.js";
 import AsignamientoComponent from "./components/Asignamientos/AsignamientoComponent.js";
 import OperacionComponent from "./components/Operaciones/OperacionComponent.js";
 import CalificacionComponent from "./components/Calificaciones/CalificacionComponent.js";
+import cursoService from "../../services/cursoService.js";
 
 function Cursos() {
   const [cursos, setCursos] = useState([]);
@@ -13,13 +14,9 @@ function Cursos() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          console.log(data);
-          setCursos(data);
-          setLoading(false);
-        })
-        .getCursos();
+      const cursosObtenidos = await cursoService.getCursos();
+      setCursos(cursosObtenidos.data);
+      setLoading(false);
     };
     fetchData();
   }, []);
@@ -36,7 +33,7 @@ function Cursos() {
             {cursos.map((curso) => (
               <li
                 key={curso._id}
-                className="cursor-pointer hover:text-blue-600"
+                className="cursor-pointre hover:text-blue-600"
                 onClick={() => setSelectedCurso(curso)}
               >
                 {curso.materia &&

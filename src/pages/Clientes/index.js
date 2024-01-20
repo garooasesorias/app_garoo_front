@@ -36,13 +36,6 @@ function Clientes() {
       } catch (error) {
         console.log("Error al cargar clientes:", error);
       }
-      // await google.script.run
-      //   .withSuccessHandler((data) => {
-      //     console.log(data);
-      //     setClientes(data);
-      //     setLoading(false);
-      //   })
-      //   .getClientes();
     };
 
     fetchData();

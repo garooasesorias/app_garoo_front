@@ -3,6 +3,8 @@ import { parseISO, format } from "date-fns";
 import { Button, Table, Modal, TextInput } from "flowbite-react";
 import Select from "react-select";
 import { IoMdAttach } from "react-icons/io";
+import operacionService from "../../../../services/operacionService";
+import estadoAdmService from "../../../../services/estadoAdmService";
 
 export default function OperacionComponent({ data }) {
   const [estadosAdm, setEstadosAdm] = useState([]);
@@ -12,35 +14,37 @@ export default function OperacionComponent({ data }) {
   const [formData, setFormData] = useState({});
 
   const fetchData = async () => {
-    await google.script.run
-      .withSuccessHandler((response) => {
-        setFormData({
-          items: response.map((operacion) => ({
-            _id: operacion._id,
-            actividad: operacion.actividad,
-            curso: data._id,
-            nombreActividad: "test",
-            nombreActividad:
-              data.actividades.find(
-                (actividad) => actividad._id === operacion.actividad
-              )?.nombre || "",
-            grupo: operacion.grupo || "",
-            tutor: operacion.tutor || "",
-            archivosURL: operacion.archivosURL || "",
-            comentarios: operacion.comentarios || "",
-            estado: {
-              _id: operacion.estado || "",
-            },
-            formaEnvio: operacion.formaEnvio || "",
-            actividadURL: operacion.actividadURL || "",
-            priorizacion: operacion.priorizacion || "",
-          })),
-        });
-      })
-      .getOperacionesByIdCurso(data._id);
 
-    // await google.script.run.withSuccessHandler(setAsesores).getAsesores();
-    await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
+    const operaciones = await operacionService.getOperacionesByIdCurso(
+      data._id
+    );
+
+    setFormData({
+      items: operaciones?.data.map((operacion) => ({
+        _id: operacion._id,
+        actividad: operacion.actividad,
+        curso: data._id,
+        nombreActividad: "test",
+        nombreActividad:
+          data.actividades.find(
+            (actividad) => actividad._id === operacion.actividad
+          )?.nombre || "",
+        grupo: operacion.grupo || "",
+        tutor: operacion.tutor || "",
+        archivosURL: operacion.archivosURL || "",
+        comentarios: operacion.comentarios || "",
+        estado: {
+          _id: operacion.estado || "",
+        },
+        formaEnvio: operacion.formaEnvio || "",
+        actividadURL: operacion.actividadURL || "",
+        priorizacion: operacion.priorizacion || "",
+      })),
+    });
+
+    // await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
+    const estadosAdm = await estadoAdmService.getEstadosAdm();
+    setEstadosAdm(estadosAdm.data);
   };
   useEffect(() => {
     fetchData();

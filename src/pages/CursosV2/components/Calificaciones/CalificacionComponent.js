@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { Button, Table, Modal, TextInput } from "flowbite-react";
 import Select from "react-select";
+import calificacionService from "../../../../services/calificacionService";
+import clienteService from "../../../../services/clienteService";
 
 export default function CalificacionComponent({ data }) {
   const [calificaciones, setCalificaciones] = useState([]);
@@ -28,18 +30,13 @@ export default function CalificacionComponent({ data }) {
   };
 
   const fetchData = async () => {
-    await google.script.run
-      .withSuccessHandler((response) => {
-        console.log("Calificaciones", response);
-        setCalificaciones(response);
-      })
-      .getCalificacionesByIdCurso(data._id);
+    const resultCalificaciones =
+      await calificacionService.getCalificacionesByIdCurso(data._id);
+    console.log("result calificaciones", resultCalificaciones);
+    setCalificaciones(resultCalificaciones.data);
 
-    await google.script.run
-      .withSuccessHandler((response) => {
-        setClientes(response);
-      })
-      .getClientes(data._id);
+    const clientes = await clienteService.getClientes();
+    setClientes(clientes.data);
   };
 
   useEffect(() => {
