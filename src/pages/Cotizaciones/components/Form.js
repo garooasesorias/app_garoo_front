@@ -132,44 +132,44 @@ function CotizacionForm() {
   };
 
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-  
-    // Formateamos los datos con validación
-    const formattedItems = formData.items.map((item) => ({
-      materia: item.materia ? item.materia.value : null,
-      plan: item.plan ? item.plan.value : null,
-      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
-      descuento: item.descuento ? item.descuento.value : null,
-      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
-      actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
-    }));
-  
-    const formattedFormData = {
-      fecha: formData.fecha,
-      cliente: formData.cliente ? formData.cliente.value : null,
-      estado: formData.estado ? formData.estado.value : null,
-      items: formattedItems,
-      subtotal: calculateTotal(),
-      total: calculateTotal(),
-      divisionPagos: formData.divisionPagos.map((division) => ({
-        numeroDivision: division.numeroDivision,
-        monto: division.monto,
-        fechaLimite: division.fechaLimite,
-      })),
-    };
-  
-    // Enviamos los datos
-    try {
-      const response = await cotizacionService.insertCotizacion(formattedFormData);
-      console.log(response);
-      alert("Cotización creada con éxito.");
-    } catch (error) {
-      console.error("Error al crear la cotización:", error);
-      alert("Ocurrió un error al crear la cotización.");
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  // Formateamos los datos con validación
+  const formattedItems = formData.items.map((item) => ({
+    materia: item.materia ? item.materia.value : null,
+    plan: item.plan ? item.plan.value : null,
+    // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
+    descuento: item.descuento ? item.descuento.value : null,
+    // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
+    actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
+  }));
+
+  const formattedFormData = {
+    fecha: formData.fecha,
+    cliente: formData.cliente ? formData.cliente.value : null,
+    estado: formData.estado ? formData.estado.value : null,
+    items: formattedItems,
+    subtotal: calculateTotal(),
+    total: calculateTotal(),
+    divisionPagos: formData.divisionPagos.map((division) => ({
+      numeroDivision: division.numeroDivision,
+      monto: division.monto,
+      fechaLimite: division.fechaLimite,
+    })),
   };
-  
+
+  // Enviamos los datos
+  try {
+    const response = await cotizacionService.insertCotizacion(formattedFormData);
+    console.log(response);
+    alert("Cotización creada con éxito.");
+  } catch (error) {
+    console.error("Error al crear la cotización:", error);
+    alert("Ocurrió un error al crear la cotización.");
+  }
+};
+
 
   const handleSubmitCurso = async () => {
     for (const item of formData.items) {
