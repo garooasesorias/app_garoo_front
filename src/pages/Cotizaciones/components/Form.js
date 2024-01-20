@@ -3,6 +3,14 @@ import { useParams } from "react-router-dom";
 import { Button, Label, Table } from "flowbite-react";
 import Select from "react-select";
 import PdfButton from "./PdfButton";
+import cotizacionService from "../../../services/cotizacionService"; // Servicio para las operaciones de cotizaciones
+import clienteService from "../../../services/clienteService"; // Servicio para las operaciones de clientes
+import materiaService from "../../../services/materiasService"; // Servicio para las operaciones de materias
+import planService from "../../../services/planesService"; // Servicio para las operaciones de planes
+import actividadService from "../../../services/actividadesService"; // Servicio para las operaciones de actividades
+import estadoCotizacionService from "../../../services/estadosCotizacionesService"; // Servicio para las operaciones de estados de cotizaciones
+import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
+// Otros componentes o servicios que puedas necesitar
 
 function CotizacionForm() {
   let { id } = useParams();
@@ -29,75 +37,56 @@ function CotizacionForm() {
 
   useEffect(() => {
     const fetchData = async () => {
-      await google.script.run.withSuccessHandler(setClientes).getClientes();
-      await google.script.run.withSuccessHandler(setMaterias).getMaterias();
-      await google.script.run.withSuccessHandler(setPlanes).getPlanes();
-      await google.script.run
-        .withSuccessHandler(setActividades)
-        .getActividades();
-      await google.script.run
-        .withSuccessHandler(setEstadosCotizaciones)
-        .getEstadosCotizaciones();
-      await google.script.run.withSuccessHandler(setDescuentos).getDescuentos();
+      try {
+        const clientesRes = await clienteService.getClientes();
+        setClientes(clientesRes.data);
 
-      if (id) {
-        await google.script.run
-          .withSuccessHandler((data) => {
-            const cotizacion = data[0];
-            setCotizacion(data[0]);
+        const materiasRes = await materiaService.getMaterias();
+        setMaterias(materiasRes.data);
 
-            // Prepopulate the form fields with data from cotizacion
-            setFormData({
-              fecha: cotizacion.fecha,
-              cliente: {
-                label: cotizacion.cliente.nombre,
-                value: cotizacion.cliente._id,
-                usuario: cotizacion.cliente.usuario,
-              },
-              items: cotizacion.items.map((item) => ({
-                materia: {
-                  label: item.materia.nombre,
-                  value: item.materia._id,
-                },
-                plan: item.plan
-                  ? {
-                      label: item.plan.nombre,
-                      value: item.plan._id,
-                    }
-                  : null,
-                planSubtotal: item.plan.precio,
-                descuento:
-                  item.descuento && Object.keys(item.descuento).length
-                    ? {
-                        label: `${item.descuento.descripcion} (${item.descuento.porcentaje}%)`,
-                        value: item.descuento._id,
-                      }
-                    : {
-                        label: "Sin Descuento",
-                        value: null,
-                      },
-                actividad: item.actividades.map((act) => ({
-                  label: act.nombre,
-                  value: act._id,
-                })),
-              })),
-              divisionPagos: cotizacion.divisionPagos.map((division) => ({
-                numeroDivision: division.numeroDivision,
-                monto: division.monto,
-                fechaLimite: division.fechaLimite,
-              })),
-              total: cotizacion.total,
-              estado: {
-                label: cotizacion.estado.nombre,
-                value: cotizacion.estado._id,
-              },
-            });
-          })
-          .getCotizacionById(id);
+        const planesRes = await planService.getPlanes();
+        setPlanes(planesRes.data);
+
+        const actividadesRes = await actividadService.getActividades();
+        setActividades(actividadesRes.data.map(act => ({ label: act.nombre, value: act._id })));
+
+        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizaciones();
+        setEstadosCotizaciones(estadosCotizacionesRes.data);
+
+        const descuentosRes = await descuentoService.getDescuentos();
+        setDescuentos(descuentosRes.data);
+
+        if (id) {
+          const cotizacionRes = await cotizacionService.getCotizacionById(id);
+          const cotizacionData = cotizacionRes.data;
+
+          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
+          const itemsConActividades = cotizacionData.items.map(item => {
+            const actividadesOptions = actividadesRes.data.map(act => ({
+              label: act.nombre,
+              value: act._id
+            }));
+
+            return {
+              ...item,
+              actividades: item.actividad.map(actId =>
+                actividadesOptions.find(act => act.value === actId) || null
+              )
+            };
+          });
+
+          setFormData({
+            ...cotizacionData,
+            items: itemsConActividades,
+          });
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
+
     fetchData();
-  }, []);
+  }, [id]); // Dependencia: id
 
   const calculateRowTotal = (row) => {
     let totalRow = 0;
@@ -111,92 +100,107 @@ function CotizacionForm() {
         (descuento) => descuento._id === row.descuento.value
       );
       if (descuentoAplicable) {
-        totalRow = totalRow - totalRow * (descuentoAplicable.porcentaje / 100);
+        totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
       }
     }
 
-    // Si tienes más campos que influyen en el total por fila, puedes añadirlos aquí.
     return totalRow;
   };
 
-  const calculateTotal = () => {
-    let total = 0;
-    for (const fila of formData.items) {
-      if (fila.plan) {
-        const plan = planes.find((plan) => plan._id === fila.plan.value);
-        total += Number(plan?.precio); // Supongamos que el precio del plan está almacenado en la propiedad 'precio'
-      }
+  const calculateRowSubtotal = (row) => {
+    let subtotal = 0;
+    if (row.plan) {
+      const plan = planes.find((p) => p._id === row.plan.value);
+      subtotal += plan ? Number(plan.precio) : 0;
     }
-    return total;
+    // Aquí puedes agregar más lógica si hay otros elementos que contribuyen al subtotal
+    return subtotal;
   };
+  
+  // Calcula el total sin descuentos
+  const calculateTotal = () => {
+    return formData.items.reduce((accum, item) => {
+      return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
+    }, 0);
+  };
+    
+
   const calculateTotalConDescuento = () => {
-    return formData.items.reduce(
-      (accum, fila) => accum + calculateRowTotal(fila),
-      0
-    );
+    return formData.items.reduce((accum, item) => {
+      return accum + calculateRowTotal(item); // Asume que calculateRowTotal devuelve el total de la fila con descuento aplicado
+    }, 0);
   };
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Aquí es donde formateamos y enviamos los datos.
-    // Asegúrate de incluir el descuento cuando estés guardando el formulario.
-
+  
+    // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
-      materia: item.materia ? { $oid: item.materia.value } : null,
-      plan: item.plan ? { $oid: item.plan.value } : null,
-      descuento: item.descuento ? { $oid: item.descuento.value } : null,
-      actividades: item.actividad
-        ? item.actividad.map((act) => ({ $oid: act.value }))
-        : [],
+      materia: item.materia ? item.materia.value : null,
+      plan: item.plan ? item.plan.value : null,
+      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
+      descuento: item.descuento ? item.descuento.value : null,
+      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
+      actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
     }));
-
+  
     const formattedFormData = {
-      fecha: currentDate,
-      cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
-      estado: { $oid: "64e600985fef1743de870cbc" },
+      fecha: formData.fecha,
+      cliente: formData.cliente ? formData.cliente.value : null,
+      estado: formData.estado ? formData.estado.value : null,
       items: formattedItems,
       subtotal: calculateTotal(),
-      total: calculateTotalConDescuento(),
-      divisionPagos: formData.divisionPagos,
+      total: calculateTotal(),
+      divisionPagos: formData.divisionPagos.map((division) => ({
+        numeroDivision: division.numeroDivision,
+        monto: division.monto,
+        fechaLimite: division.fechaLimite,
+      })),
     };
-
-    google.script.run
-      .withSuccessHandler(() => {
-        alert("Éxito");
-      })
-      .insertCotizacion(formattedFormData);
+  
+    // Enviamos los datos
+    try {
+      const response = await cotizacionService.insertCotizacion(formattedFormData);
+      console.log(response);
+      alert("Cotización creada con éxito.");
+    } catch (error) {
+      console.error("Error al crear la cotización:", error);
+      alert("Ocurrió un error al crear la cotización.");
+    }
   };
+  
 
-  const handleSubmitCurso = () => {
-    formData.items.forEach(async (item) => {
-      const formatedFormData = {
+  const handleSubmitCurso = async () => {
+    for (const item of formData.items) {
+      const formattedFormData = {
         fecha: currentDate,
-        materia: item.materia ? { $oid: item.materia.value } : null,
-        cliente: formData.cliente ? { $oid: formData.cliente.value } : null,
-        estado: { $oid: "64eb986d83c29fa14cbabb69" },
-        actividades: item.actividad
-          ? item.actividad.map((act) => ({ $oid: act.value }))
-          : [],
+        materia: item.materia ? item.materia.value : null,
+        cliente: formData.cliente ? formData.cliente.value : null,
+        estado: "64eb986d83c29fa14cbabb69",
+        actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
       };
 
-      await google.script.run
-        .withSuccessHandler(async ({ insertedId }) => {
-          const actividades = item.actividad
-            ? item.actividad.map((act) => ({
-                actividad: { $oid: act.value },
-                curso: { $oid: insertedId },
-              }))
-            : [];
+      try {
+        const response = await cursoService.insertCurso(formattedFormData);
+        const insertedId = response.data.insertedId;
 
-          await google.script.run
-            .withSuccessHandler((response) => {
-              console.log("Operaciones insertadas: ", response);
-            })
-            .insertOperaciones(actividades);
-        })
-        .insertCurso(formatedFormData);
-    });
+        const actividades = item.actividad
+          ? item.actividad.map((act) => ({
+            actividad: act.value,
+            curso: insertedId,
+          }))
+          : [];
+
+        if (actividades.length > 0) {
+          const operacionesResponse = await operacionesService.insertOperaciones(actividades);
+          console.log("Operaciones insertadas: ", operacionesResponse);
+        }
+      } catch (error) {
+        console.error("Error al insertar curso y operaciones:", error);
+        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+      }
+    }
   };
 
   const handleClienteChange = (selectedOption) => {
@@ -205,6 +209,7 @@ function CotizacionForm() {
       cliente: selectedOption,
     }));
   };
+
 
   const handleMateriaChange = (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
@@ -215,41 +220,51 @@ function CotizacionForm() {
     }));
   };
 
-  const handlePlanChange = (selectedOption, rowIndex) => {
+  const handlePlanChange = async (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
     updatedFilas[rowIndex].plan = selectedOption;
 
-    // Precio por defecto, puede ser cambiado según la estructura de datos.
+    // Inicializa el precio del plan y las actividades relacionadas
     let planPrice = 0;
+    let actividadesRelacionadas = [];
 
     if (selectedOption.value !== "personalizado") {
-      const plan = planes.find((plan) => plan._id === selectedOption.value);
+      try {
+        // Obtiene los detalles del plan, incluyendo las actividades relacionadas
+        const planDetails = await planService.getPlanById(selectedOption.value);
+        const plan = planDetails.data;
 
-      // Suponiendo que cada plan tiene un precio asociado
-      planPrice = plan.precio;
+        planPrice = plan.precio || 0; // Asume un precio por defecto si no está definido
 
-      const actividadesRelacionadas = plan.actividades_relacionadas.map(
-        (actividad, actividadIndex) => ({
-          label: actividad.nombre,
-          value: actividad._id,
-          key: `${rowIndex}-${actividadIndex}`,
-        })
-      );
-      updatedFilas[rowIndex].actividad = actividadesRelacionadas;
-    } else {
-      updatedFilas[rowIndex].actividad = [];
+        // Mapea las actividades relacionadas para usar en el Select
+        if (plan.actividades_relacionadas && plan.actividades_relacionadas.length > 0) {
+          actividadesRelacionadas = plan.actividades_relacionadas.map(actividad => ({
+            label: actividad.nombre,
+            value: actividad._id
+          }));
+        }
+      } catch (error) {
+        console.error("Error al obtener los detalles del plan:", error);
+        // Manejar el error, por ejemplo, mostrando un mensaje al usuario
+      }
     }
 
-    // Calcula el subtotal basado en el precio del plan y la cantidad.
-    updatedFilas[rowIndex].planSubtotal = planPrice;
+    // Actualiza las filas con las actividades relacionadas y el precio del plan
+    updatedFilas[rowIndex] = {
+      ...updatedFilas[rowIndex],
+      actividades: actividadesRelacionadas,
+      planSubtotal: planPrice,
+    };
 
+    // Actualiza el estado del formulario con las filas actualizadas
     setFormData((prevData) => ({
       ...prevData,
       items: updatedFilas,
     }));
-
-    setPlanActividades(updatedFilas[rowIndex].actividad);
+    // También puedes actualizar las actividades del plan aquí si es necesario
+    setPlanActividades(actividadesRelacionadas);
   };
+
 
   const handleDescuentoChange = (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
@@ -281,7 +296,7 @@ function CotizacionForm() {
       ...prevData,
       items: [
         ...prevData.items,
-        { materia: null, plan: null, actividad: null, descuento: null },
+        { materia: null, plan: null, actividad: [], descuento: null }, // Asegúrate de que el objeto tenga la estructura correcta
       ],
     }));
   };
@@ -289,34 +304,17 @@ function CotizacionForm() {
   const generateDivisionesPagos = (nuevoNumeroDivisiones) => {
     setFormData((prevData) => {
       const diferencia = nuevoNumeroDivisiones - prevData.divisionPagos.length;
-
-      // Si necesitas agregar más divisiones
       if (diferencia > 0) {
-        return {
-          ...prevData,
-          divisionPagos: [
-            ...prevData.divisionPagos,
-            ...Array.from({ length: diferencia }).map((_, index) => ({
-              numeroDivision: index + 1,
-              monto: (
-                calculateTotalConDescuento() / nuevoNumeroDivisiones
-              ).toFixed(2),
-              fechaLimite: "",
-            })),
-          ],
-        };
+        const nuevasDivisiones = Array.from({ length: diferencia }).map((_, index) => ({
+          numeroDivision: prevData.divisionPagos.length + index + 1,
+          monto: (calculateTotalConDescuento() / nuevoNumeroDivisiones).toFixed(2),
+          fechaLimite: "",
+        }));
+        return { ...prevData, divisionPagos: [...prevData.divisionPagos, ...nuevasDivisiones] };
+      } else if (diferencia < 0) {
+        return { ...prevData, divisionPagos: prevData.divisionPagos.slice(0, nuevoNumeroDivisiones) };
       }
-
-      // Si necesitas eliminar divisiones
-      if (diferencia < 0) {
-        return {
-          ...prevData,
-          divisionPagos: prevData.divisionPagos.slice(0, nuevoNumeroDivisiones),
-        };
-      }
-
-      // Si no hay cambios
-      return prevData;
+      return prevData; // No hay cambios
     });
   };
 
@@ -329,20 +327,12 @@ function CotizacionForm() {
     }));
   };
 
-  const isEstadoGenerada =
-    formData.estado && formData.estado.value === "64e600985fef1743de870cbc";
-
-  const isEstadoEnviada =
-    formData.estado && formData.estado.value === "64e5ffdc0bdfb8235d675878";
-
-  const isEstadoAprobada =
-    formData.estado && formData.estado.value === "64e6003c9f5475c68f9c8098";
-
-  const isEstadoRechazada =
-    formData.estado && formData.estado.value === "64e600235fef1743de86a806";
-
-  const isEstadoGestionada =
-    formData.estado && formData.estado.value === "64ea66fb83c29fa14cfa44bf";
+  // Variables de estado (asegúrate de que los valores son correctos)
+  const isEstadoGenerada = formData.estado?.value === "64e600985fef1743de870cbc";
+  const isEstadoEnviada = formData.estado?.value === "64e5ffdc0bdfb8235d675878";
+  const isEstadoAprobada = formData.estado?.value === "64e6003c9f5475c68f9c8098";
+  const isEstadoRechazada = formData.estado?.value === "64e600235fef1743de86a806";
+  const isEstadoGestionada = formData.estado?.value === "64ea66fb83c29fa14cfa44bf";
 
   const goBack = () => {
     window.history.back();
@@ -403,17 +393,10 @@ function CotizacionForm() {
                 </td>
                 <td>
                   <Select
-                    options={
-                      fila.plan === "personalizado"
-                        ? actividades
-                        : planActividades
-                    }
+                    options={fila.plan && fila.plan.value !== "personalizado" ? planActividades : actividades}
                     value={fila.actividad}
-                    onChange={(selectedOptions) =>
-                      handleActividadChange(selectedOptions, index)
-                    }
-                    isMulti // Habilitar el modo multiselect
-                    isDisabled={fila.plan === "personalizado"} // Deshabilitar si el plan es "Personalizado"
+                    onChange={(selectedOptions) => handleActividadChange(selectedOptions, index)}
+                    isMulti
                   />
                 </td>
                 <td>{fila.planSubtotal ? fila.planSubtotal : "N/A"} COP</td>

@@ -77,10 +77,8 @@ function App() {
         <Route path="/formMaterias/:id" element={<FormMaterias />} />
 
 
-        <Route
-          path="/formEstadosCotizaciones"
-          element={<FormEstadosCotizaciones />}
-        />
+        <Route path="/formEstadosCotizaciones"element={<FormEstadosCotizaciones />}/>
+        <Route path="/formEstadosCotizaciones/:id" element={<FormEstadosCotizaciones />} />
         <Route path="/formDescuentos" element={<FormDescuentos />} />
         <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
         <Route path="/descuentos" element={<Descuentos />} />

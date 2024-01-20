@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Table, Card } from "flowbite-react";
-import { Button, Modal } from "flowbite-react";
+import { Table, Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
-import Loader from '../../components/Loader.js';
-import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
+import Loader from '../../components/Loader';
+import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import estadosCotizacionesService from "../../services/estadosCotizacionesService"; // Asegúrate de crear este servicio
 
 function EstadosCursos() {
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
@@ -14,44 +14,50 @@ function EstadosCursos() {
   const [selectedEstadosCotizacionesId, setSelectedEstadosCotizacionesId] = useState(null);
 
   useEffect(() => {
-    // Fetch data from an external source (assuming it's an array of objects)
     const fetchData = async () => {
-      await google.script.run
-        .withSuccessHandler((data) => {
-          setEstadosCotizaciones(data);
-          setLoading(false);
-        })
-        .getEstadosCotizaciones();
+      try {
+        const estadosCotizacionesResponse = await estadosCotizacionesService.getEstadosCotizaciones();
+        setEstadosCotizaciones(estadosCotizacionesResponse.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
     };
 
     fetchData();
   }, []);
 
+
   const handleDeleteClick = () => {
     if (selectedEstadosCotizacionesId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setEstadosCotizaciones((prevEstadosCotizaciones) => prevEstadosCotizaciones.filter(estadoCotizacion => estadoCotizacion._id !== selectedEstadosCotizacionesId));
+      estadosCotizacionesService.deleteEstadoCotizacionById(selectedEstadosCotizacionesId) // Nombre corregido
+        .then(() => {
+          setEstadosCotizaciones(prevEstados => prevEstados.filter(estado => estado._id !== selectedEstadosCotizacionesId));
           setDeleting(false);
           setOpenModal(false);
-          setSelectedEstadosCotizacionesId(null); // Limpia el ID almacenado
+          setSelectedEstadosCotizacionesId(null);
         })
-        .deleteEstadoCotizacionesById(selectedEstadosCotizacionesId);
+        .catch((error) => {
+          console.error("Error deleting estadoCotizacion:", error);
+          setDeleting(false);
+        });
     }
   };
-    const passEstadoCotizacionId = (estadoCotizacionId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedEstadosCotizacionesId(estadoCotizacionId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+  
+
+  const passEstadoCotizacionId = (estadoCotizacionId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedEstadosCotizacionesId(estadoCotizacionId);
+
+    // Abre el modal
+    setOpenModal(true);
+  };
 
   return (
     <>
-    <h1 className="PagesTitles">Estados Cotizaciones</h1>
+      <h1 className="PagesTitles">Estados Cotizaciones</h1>
       <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
         <Link to="/formEstadosCotizaciones">
           <Button className="shadow mb-5" color="success">
@@ -80,10 +86,7 @@ function EstadosCursos() {
                 <Table.Cell>{estadoCotizacion.nombre}</Table.Cell>
 
                 <Table.Cell>
-                  <Link
-                    to={`/editTipoMateria/${estadoCotizacion.id}`} // Assuming you have an edit route
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-                  >
+                  <Link to={`/formEstadosCotizaciones/${estadoCotizacion._id}`}>
                     Edit
                   </Link>
                 </Table.Cell>
@@ -129,8 +132,8 @@ function EstadosCursos() {
         </Table.Body>
       </Table>
       <div className="LoaderContainer">
-            {loading ? <Loader /> : null}
-            </div>
+        {loading ? <Loader /> : null}
+      </div>
     </>
   );
 }

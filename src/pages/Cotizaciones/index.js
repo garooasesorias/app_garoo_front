@@ -23,10 +23,8 @@ function Cotizaciones() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        await cotizacionService
-          .getCotizaciones()
-          .then(setCotizaciones(cotizacionesResponse));
-
+        const cotizacionesResponse = await cotizacionService.getCotizaciones();
+        setCotizaciones(cotizacionesResponse.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -70,27 +68,24 @@ function Cotizaciones() {
   const handleDeleteClick = () => {
     if (selectedCotizacionId) {
       setDeleting(true);
-      google.script.run
-        .withSuccessHandler((response) => {
-          console.log(response);
-          setCotizacion((prevCotizacion) =>
-            prevCotizacion.filter(
-              (cotizacion) => cotizacion._id !== selectedCotizacionId
-            )
+      cotizacionService.deleteCotizacionById(selectedCotizacionId)
+        .then(() => {
+          setCotizaciones(prevCotizaciones =>
+            prevCotizaciones.filter(cotizacion => cotizacion._id !== selectedCotizacionId)
           );
           setDeleting(false);
           setOpenModal(false);
           setSelectedCotizacionId(null); // Limpia el ID almacenado
         })
-        .deleteCotizacionesById(selectedCotizacionId);
+        .catch((error) => {
+          console.error("Error al eliminar la cotización:", error);
+          setDeleting(false);
+        });
     }
   };
   const passCotizacionId = (cotizacionId) => {
-    // Tomamos el Id del cliente que viene del botón borrar
-    setSelectedCotizacionId(cotizacionId);
-
-    // Abre el modal
-    setOpenModal(true);
+    setSelectedCotizacionId(cotizacionId); // Tomamos el Id de la cotización que viene del botón borrar
+    setOpenModal(true); // Abre el modal
   };
 
   return (
