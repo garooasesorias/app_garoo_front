@@ -1,22 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
-import Loader from '../../components/Loader';
+import Loader from "../../components/Loader";
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell";
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
-import estadosCotizacionesService from "../../services/estadosCotizacionesService"; // Asegúrate de crear este servicio
+import { HiOutlineExclamationCircle } from "react-icons/hi";
+import estadosCotizacionesService from "../../services/estadoCotizacionService"; // Asegúrate de crear este servicio
 
 function EstadosCursos() {
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [selectedEstadosCotizacionesId, setSelectedEstadosCotizacionesId] = useState(null);
+  const [selectedEstadosCotizacionesId, setSelectedEstadosCotizacionesId] =
+    useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const estadosCotizacionesResponse = await estadosCotizacionesService.getEstadosCotizaciones();
+        const estadosCotizacionesResponse =
+          await estadosCotizacionesService.getEstadosCotizacion();
         setEstadosCotizaciones(estadosCotizacionesResponse.data);
         setLoading(false);
       } catch (error) {
@@ -28,13 +30,17 @@ function EstadosCursos() {
     fetchData();
   }, []);
 
-
   const handleDeleteClick = () => {
     if (selectedEstadosCotizacionesId) {
       setDeleting(true);
-      estadosCotizacionesService.deleteEstadoCotizacionById(selectedEstadosCotizacionesId) // Nombre corregido
+      estadosCotizacionesService
+        .deleteEstadoCotizacionById(selectedEstadosCotizacionesId) // Nombre corregido
         .then(() => {
-          setEstadosCotizaciones(prevEstados => prevEstados.filter(estado => estado._id !== selectedEstadosCotizacionesId));
+          setEstadosCotizaciones((prevEstados) =>
+            prevEstados.filter(
+              (estado) => estado._id !== selectedEstadosCotizacionesId
+            )
+          );
           setDeleting(false);
           setOpenModal(false);
           setSelectedEstadosCotizacionesId(null);
@@ -45,7 +51,6 @@ function EstadosCursos() {
         });
     }
   };
-  
 
   const passEstadoCotizacionId = (estadoCotizacionId) => {
     // Tomamos el Id del cliente que viene del botón borrar
@@ -58,7 +63,13 @@ function EstadosCursos() {
   return (
     <>
       <h1 className="PagesTitles">Estados Cotizaciones</h1>
-      <div style={{ display: "flex", justifyContent: "flex-end", paddingRight: "20px" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          paddingRight: "20px",
+        }}
+      >
         <Link to="/formEstadosCotizaciones">
           <Button className="shadow mb-5" color="success">
             Crear Estado Cotización +
@@ -97,12 +108,19 @@ function EstadosCursos() {
                   >
                     Borrar
                   </button>
-                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+                  <Modal
+                    show={openModal}
+                    size="md"
+                    onClose={() => setOpenModal(false)}
+                    popup
+                  >
                     <Modal.Header />
                     <Modal.Body>
                       <div className="text-center">
                         {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
-                          <div className="LoaderContainerDelete"><Loader /></div>
+                          <div className="LoaderContainerDelete">
+                            <Loader />
+                          </div>
                         ) : (
                           <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
                         )}
@@ -114,12 +132,18 @@ function EstadosCursos() {
                         <div className="flex justify-center gap-4">
                           <Button
                             color="failure"
-                            onClick={() => handleDeleteClick(estadoCotizacion._id)}
+                            onClick={() =>
+                              handleDeleteClick(estadoCotizacion._id)
+                            }
                             disabled={deleting} // Deshabilita el botón durante la eliminación
                           >
                             {deleting ? "Eliminando..." : "Sí, eliminar"}
                           </Button>
-                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                          <Button
+                            color="gray"
+                            onClick={() => setOpenModal(false)}
+                            disabled={deleting}
+                          >
                             No, cancelar
                           </Button>
                         </div>
@@ -131,9 +155,7 @@ function EstadosCursos() {
             ))}
         </Table.Body>
       </Table>
-      <div className="LoaderContainer">
-        {loading ? <Loader /> : null}
-      </div>
+      <div className="LoaderContainer">{loading ? <Loader /> : null}</div>
     </>
   );
 }

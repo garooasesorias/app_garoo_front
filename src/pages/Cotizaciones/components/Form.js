@@ -8,7 +8,7 @@ import clienteService from "../../../services/clienteService"; // Servicio para 
 import materiaService from "../../../services/materiasService"; // Servicio para las operaciones de materias
 import planService from "../../../services/planesService"; // Servicio para las operaciones de planes
 import actividadService from "../../../services/actividadesService"; // Servicio para las operaciones de actividades
-import estadoCotizacionService from "../../../services/estadosCotizacionesService"; // Servicio para las operaciones de estados de cotizaciones
+import estadoCotizacionService from "../../../services/estadoCotizacionService"; // Servicio para las operaciones de estados de cotizaciones
 import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
 // Otros componentes o servicios que puedas necesitar
 
@@ -50,7 +50,7 @@ function CotizacionForm() {
         const actividadesRes = await actividadService.getActividades();
         setActividades(actividadesRes.data.map(act => ({ label: act.nombre, value: act._id })));
 
-        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizaciones();
+        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
         setEstadosCotizaciones(estadosCotizacionesRes.data);
 
         const descuentosRes = await descuentoService.getDescuentos();

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Button, Label, TextInput, Toast } from "flowbite-react";
 import { HiCheck } from "react-icons/hi";
 import Loader from '../../../components/Loader.js';
-import estadosCotizacionesService from "../../../services/estadosCotizacionesService.js";
+import estadosCotizacionesService from "../../../services/estadoCotizacionService.js";
 import { useParams } from "react-router-dom"; // Asegúrate de tener react-router-dom instalado
 
 function Form() {

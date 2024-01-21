@@ -1,9 +1,9 @@
 import api from "./api";
 
 const estadosCotizacionesService = {
-  getEstadosCotizaciones: async () => {
+  getEstadosCotizacion: async () => {
     try {
-      const response = await api.get("/estadosCotizaciones/getEstadosCotizaciones");
+      const response = await api.get("/estadoCotizacion/getEstadosCotizacion");
       return response.data;
     } catch (error) {
       console.error("Error al obtener los estados de cotizaciones:", error);
@@ -13,7 +13,7 @@ const estadosCotizacionesService = {
 
   getEstadoCotizacionById: async (id) => {
     try {
-      const response = await api.get(`/estadosCotizaciones/getEstadoCotizacionById/${id}`);
+      const response = await api.get(`/estadoCotizacion/getEstadoCotizacionById/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error al obtener el estado de cotización:", error);
@@ -23,7 +23,7 @@ const estadosCotizacionesService = {
 
   insertEstadoCotizacion: async (datosEstadoCotizacion) => {
     try {
-      const response = await api.post("/estadosCotizaciones/insertEstadoCotizacion", datosEstadoCotizacion);
+      const response = await api.post("/estadoCotizacion/insertEstadoCotizacion", datosEstadoCotizacion);
       return response.data; // Respuesta de la API tras insertar el estado de cotización
     } catch (error) {
       console.error("Error al insertar el estado de cotización:", error);
@@ -33,7 +33,7 @@ const estadosCotizacionesService = {
 
 updateEstadoCotizacionById: async (id, data) => {
   try {
-    const response = await api.put(`/estadosCotizaciones/updateEstadoCotizacionById/${id}`, data);
+    const response = await api.put(`/estadoCotizacion/updateEstadoCotizacionById/${id}`, data);
     return response.data;
   } catch (error) {
     console.error("Error al actualizar el estado de cotización:", error);
@@ -44,7 +44,7 @@ updateEstadoCotizacionById: async (id, data) => {
   
   deleteEstadoCotizacionById: async (id) => {
     try {
-      const response = await api.delete(`/estadosCotizaciones/deleteEstadoCotizacionById/${id}`);
+      const response = await api.delete(`/estadosCotizacion/deleteEstadoCotizacionById/${id}`);
       return response.data; // Respuesta de la API tras eliminar el estado de cotización
     } catch (error) {
       console.error("Error al eliminar el estado de cotización:", error);
