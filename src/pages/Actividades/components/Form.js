@@ -27,7 +27,6 @@ function Form() {
     const obtenerTiposActividad = async () => {
       try {
         const data = await tiposActividadesService.getTiposActividad();
-        // console.log("Tipos de actividad obtenidos:", data);
         setTiposActividad(data?.data || []); // Asegura que sea un array
       } catch (error) {
         console.error("Error al obtener tipos de actividad:", error);

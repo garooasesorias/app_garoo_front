@@ -15,6 +15,7 @@ function Cursos() {
   useEffect(() => {
     const fetchData = async () => {
       const cursosObtenidos = await cursoService.getCursos();
+      console.log("cursosObtenidos", cursosObtenidos);
       setCursos(cursosObtenidos.data);
       setLoading(false);
     };
@@ -30,16 +31,17 @@ function Cursos() {
             Lista de Cursos
           </h2>
           <ul className="space-y-2">
-            {cursos.map((curso) => (
-              <li
-                key={curso._id}
-                className="cursor-pointre hover:text-blue-600"
-                onClick={() => setSelectedCurso(curso)}
-              >
-                {curso.materia &&
-                  `${curso.materia.nombre} - ${curso.cliente.nombre}`}
-              </li>
-            ))}
+            {cursos.length > 0 &&
+              cursos.map((curso) => (
+                <li
+                  key={curso._id}
+                  className="cursor-pointre hover:text-blue-600"
+                  onClick={() => setSelectedCurso(curso)}
+                >
+                  {curso.materia &&
+                    `${curso.materia.nombre} - ${curso.cliente.nombre}`}
+                </li>
+              ))}
           </ul>
         </aside>
 

@@ -95,7 +95,6 @@ function CotizacionForm() {
     };
 
     fetchData();
-    console.log("formData", formData);
   }, [id]); // Dependencia: id
 
   const calculateRowTotal = (row) => {
@@ -172,7 +171,6 @@ function CotizacionForm() {
       const response = await cotizacionService.insertCotizacion(
         formattedFormData
       );
-      console.log(response);
       alert("Cotización creada con éxito.");
     } catch (error) {
       console.error("Error al crear la cotización:", error);
@@ -184,8 +182,8 @@ function CotizacionForm() {
     for (const item of formData.items) {
       const formattedFormData = {
         fecha: currentDate,
-        materia: item.materia ? item.materia.value : null,
-        cliente: formData.cliente ? formData.cliente.value : null,
+        materia: item.materia,
+        cliente: formData.cliente,
         estado: "64eb986d83c29fa14cbabb69",
         actividades: item.actividades
           ? item.actividades.map((act) => act.value)
@@ -206,7 +204,6 @@ function CotizacionForm() {
         if (actividades.length > 0) {
           const operacionesResponse =
             await operacionesService.insertOperaciones(actividades);
-          console.log("Operaciones insertadas: ", operacionesResponse);
         }
       } catch (error) {
         console.error("Error al insertar curso y operaciones:", error);
