@@ -10,6 +10,7 @@ import planService from "../../../services/planesService"; // Servicio para las 
 import actividadService from "../../../services/actividadesService"; // Servicio para las operaciones de actividades
 import estadoCotizacionService from "../../../services/estadoCotizacionService"; // Servicio para las operaciones de estados de cotizaciones
 import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
+import cursoService from "../../../services/cursoService";
 // Otros componentes o servicios que puedas necesitar
 
 function CotizacionForm() {
@@ -48,9 +49,15 @@ function CotizacionForm() {
         setPlanes(planesRes.data);
 
         const actividadesRes = await actividadService.getActividades();
-        setActividades(actividadesRes.data.map(act => ({ label: act.nombre, value: act._id })));
+        setActividades(
+          actividadesRes.data.map((act) => ({
+            label: act.nombre,
+            value: act._id,
+          }))
+        );
 
-        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
+        const estadosCotizacionesRes =
+          await estadoCotizacionService.getEstadosCotizacion();
         setEstadosCotizaciones(estadosCotizacionesRes.data);
 
         const descuentosRes = await descuentoService.getDescuentos();
@@ -61,17 +68,19 @@ function CotizacionForm() {
           const cotizacionData = cotizacionRes.data;
 
           // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
-          const itemsConActividades = cotizacionData.items.map(item => {
-            const actividadesOptions = actividadesRes.data.map(act => ({
+          const itemsConActividades = cotizacionData.items.map((item) => {
+            const actividadesOptions = actividadesRes.data.map((act) => ({
               label: act.nombre,
-              value: act._id
+              value: act._id,
             }));
 
             return {
               ...item,
-              actividades: item.actividad.map(actId =>
-                actividadesOptions.find(act => act.value === actId) || null
-              )
+              actividades: item.actividades.map(
+                (actId) =>
+                  actividadesOptions.find((act) => act.value === actId._id) ||
+                  null
+              ),
             };
           });
 
@@ -86,6 +95,7 @@ function CotizacionForm() {
     };
 
     fetchData();
+    console.log("formData", formData);
   }, [id]); // Dependencia: id
 
   const calculateRowTotal = (row) => {
@@ -116,14 +126,13 @@ function CotizacionForm() {
     // Aquí puedes agregar más lógica si hay otros elementos que contribuyen al subtotal
     return subtotal;
   };
-  
+
   // Calcula el total sin descuentos
   const calculateTotal = () => {
     return formData.items.reduce((accum, item) => {
       return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
     }, 0);
   };
-    
 
   const calculateTotalConDescuento = () => {
     return formData.items.reduce((accum, item) => {
@@ -131,45 +140,45 @@ function CotizacionForm() {
     }, 0);
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+    // Formateamos los datos con validación
+    const formattedItems = formData.items.map((item) => ({
+      materia: item.materia ? item.materia.value : null,
+      plan: item.plan ? item.plan.value : null,
+      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
+      descuento: item.descuento ? item.descuento.value : null,
+      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
+      actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
+    }));
 
-  // Formateamos los datos con validación
-  const formattedItems = formData.items.map((item) => ({
-    materia: item.materia ? item.materia.value : null,
-    plan: item.plan ? item.plan.value : null,
-    // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
-    descuento: item.descuento ? item.descuento.value : null,
-    // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
-    actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
-  }));
+    const formattedFormData = {
+      fecha: formData.fecha,
+      cliente: formData.cliente ? formData.cliente.value : null,
+      estado: formData.estado ? formData.estado.value : null,
+      items: formattedItems,
+      subtotal: calculateTotal(),
+      total: calculateTotal(),
+      divisionPagos: formData.divisionPagos.map((division) => ({
+        numeroDivision: division.numeroDivision,
+        monto: division.monto,
+        fechaLimite: division.fechaLimite,
+      })),
+    };
 
-  const formattedFormData = {
-    fecha: formData.fecha,
-    cliente: formData.cliente ? formData.cliente.value : null,
-    estado: formData.estado ? formData.estado.value : null,
-    items: formattedItems,
-    subtotal: calculateTotal(),
-    total: calculateTotal(),
-    divisionPagos: formData.divisionPagos.map((division) => ({
-      numeroDivision: division.numeroDivision,
-      monto: division.monto,
-      fechaLimite: division.fechaLimite,
-    })),
+    // Enviamos los datos
+    try {
+      const response = await cotizacionService.insertCotizacion(
+        formattedFormData
+      );
+      console.log(response);
+      alert("Cotización creada con éxito.");
+    } catch (error) {
+      console.error("Error al crear la cotización:", error);
+      alert("Ocurrió un error al crear la cotización.");
+    }
   };
-
-  // Enviamos los datos
-  try {
-    const response = await cotizacionService.insertCotizacion(formattedFormData);
-    console.log(response);
-    alert("Cotización creada con éxito.");
-  } catch (error) {
-    console.error("Error al crear la cotización:", error);
-    alert("Ocurrió un error al crear la cotización.");
-  }
-};
-
 
   const handleSubmitCurso = async () => {
     for (const item of formData.items) {
@@ -178,7 +187,9 @@ const handleSubmit = async (e) => {
         materia: item.materia ? item.materia.value : null,
         cliente: formData.cliente ? formData.cliente.value : null,
         estado: "64eb986d83c29fa14cbabb69",
-        actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
+        actividades: item.actividades
+          ? item.actividades.map((act) => act.value)
+          : [],
       };
 
       try {
@@ -187,13 +198,14 @@ const handleSubmit = async (e) => {
 
         const actividades = item.actividad
           ? item.actividad.map((act) => ({
-            actividad: act.value,
-            curso: insertedId,
-          }))
+              actividad: act.value,
+              curso: insertedId,
+            }))
           : [];
 
         if (actividades.length > 0) {
-          const operacionesResponse = await operacionesService.insertOperaciones(actividades);
+          const operacionesResponse =
+            await operacionesService.insertOperaciones(actividades);
           console.log("Operaciones insertadas: ", operacionesResponse);
         }
       } catch (error) {
@@ -209,7 +221,6 @@ const handleSubmit = async (e) => {
       cliente: selectedOption,
     }));
   };
-
 
   const handleMateriaChange = (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
@@ -237,10 +248,10 @@ const handleSubmit = async (e) => {
         planPrice = plan.precio || 0; // Asume un precio por defecto si no está definido
 
         // Mapea las actividades relacionadas para usar en el Select
-        if (plan.actividades_relacionadas && plan.actividades_relacionadas.length > 0) {
-          actividadesRelacionadas = plan.actividades_relacionadas.map(actividad => ({
+        if (plan.actividades && plan.actividades.length > 0) {
+          actividadesRelacionadas = plan.actividades.map((actividad) => ({
             label: actividad.nombre,
-            value: actividad._id
+            value: actividad._id,
           }));
         }
       } catch (error) {
@@ -264,7 +275,6 @@ const handleSubmit = async (e) => {
     // También puedes actualizar las actividades del plan aquí si es necesario
     setPlanActividades(actividadesRelacionadas);
   };
-
 
   const handleDescuentoChange = (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
@@ -296,7 +306,7 @@ const handleSubmit = async (e) => {
       ...prevData,
       items: [
         ...prevData.items,
-        { materia: null, plan: null, actividad: [], descuento: null }, // Asegúrate de que el objeto tenga la estructura correcta
+        { materia: null, plan: null, actividades: [], descuento: null }, // Asegúrate de que el objeto tenga la estructura correcta
       ],
     }));
   };
@@ -305,14 +315,24 @@ const handleSubmit = async (e) => {
     setFormData((prevData) => {
       const diferencia = nuevoNumeroDivisiones - prevData.divisionPagos.length;
       if (diferencia > 0) {
-        const nuevasDivisiones = Array.from({ length: diferencia }).map((_, index) => ({
-          numeroDivision: prevData.divisionPagos.length + index + 1,
-          monto: (calculateTotalConDescuento() / nuevoNumeroDivisiones).toFixed(2),
-          fechaLimite: "",
-        }));
-        return { ...prevData, divisionPagos: [...prevData.divisionPagos, ...nuevasDivisiones] };
+        const nuevasDivisiones = Array.from({ length: diferencia }).map(
+          (_, index) => ({
+            numeroDivision: prevData.divisionPagos.length + index + 1,
+            monto: (
+              calculateTotalConDescuento() / nuevoNumeroDivisiones
+            ).toFixed(2),
+            fechaLimite: "",
+          })
+        );
+        return {
+          ...prevData,
+          divisionPagos: [...prevData.divisionPagos, ...nuevasDivisiones],
+        };
       } else if (diferencia < 0) {
-        return { ...prevData, divisionPagos: prevData.divisionPagos.slice(0, nuevoNumeroDivisiones) };
+        return {
+          ...prevData,
+          divisionPagos: prevData.divisionPagos.slice(0, nuevoNumeroDivisiones),
+        };
       }
       return prevData; // No hay cambios
     });
@@ -328,11 +348,15 @@ const handleSubmit = async (e) => {
   };
 
   // Variables de estado (asegúrate de que los valores son correctos)
-  const isEstadoGenerada = formData.estado?.value === "64e600985fef1743de870cbc";
+  const isEstadoGenerada =
+    formData.estado?.value === "64e600985fef1743de870cbc";
   const isEstadoEnviada = formData.estado?.value === "64e5ffdc0bdfb8235d675878";
-  const isEstadoAprobada = formData.estado?.value === "64e6003c9f5475c68f9c8098";
-  const isEstadoRechazada = formData.estado?.value === "64e600235fef1743de86a806";
-  const isEstadoGestionada = formData.estado?.value === "64ea66fb83c29fa14cfa44bf";
+  const isEstadoAprobada =
+    formData.estado?.value === "64e6003c9f5475c68f9c8098";
+  const isEstadoRechazada =
+    formData.estado?.value === "64e600235fef1743de86a806";
+  const isEstadoGestionada =
+    formData.estado?.value === "64ea66fb83c29fa14cfa44bf";
 
   const goBack = () => {
     window.history.back();
@@ -348,7 +372,12 @@ const handleSubmit = async (e) => {
               label: cliente.nombre,
               value: cliente._id,
             }))}
-            value={formData.cliente}
+            value={clientes
+              .map((cliente) => ({
+                label: cliente.nombre,
+                value: cliente._id,
+              }))
+              .find((option) => option.value === formData.cliente)}
             onChange={handleClienteChange}
           />
         </div>
@@ -373,7 +402,12 @@ const handleSubmit = async (e) => {
                       label: materia.nombre,
                       value: materia._id,
                     }))}
-                    value={fila.materia}
+                    value={materias
+                      .map((materia) => ({
+                        label: materia.nombre,
+                        value: materia._id,
+                      }))
+                      .find((option) => option.value === fila.materia)}
                     onChange={(selectedOption) =>
                       handleMateriaChange(selectedOption, index)
                     }
@@ -385,7 +419,12 @@ const handleSubmit = async (e) => {
                       label: plan.nombre,
                       value: plan._id,
                     }))}
-                    value={fila.plan}
+                    value={planes
+                      .map((plan) => ({
+                        label: plan.nombre,
+                        value: plan._id,
+                      }))
+                      .find((option) => option.value === fila.plan)}
                     onChange={(selectedOption) =>
                       handlePlanChange(selectedOption, index)
                     }
@@ -393,9 +432,21 @@ const handleSubmit = async (e) => {
                 </td>
                 <td>
                   <Select
-                    options={fila.plan && fila.plan.value !== "personalizado" ? planActividades : actividades}
-                    value={fila.actividad}
-                    onChange={(selectedOptions) => handleActividadChange(selectedOptions, index)}
+                    options={
+                      fila.plan && fila.plan.value !== "personalizado"
+                        ? planActividades
+                        : actividades
+                    }
+                    value={
+                      fila.actividades &&
+                      fila.actividades.map((actividad) => ({
+                        label: actividad?.label,
+                        value: actividad?.value,
+                      }))
+                    }
+                    onChange={(selectedOptions) =>
+                      handleActividadChange(selectedOptions, index)
+                    }
                     isMulti
                   />
                 </td>
