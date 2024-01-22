@@ -24,10 +24,9 @@ const operacionService = {
   getOperacionesByIdCurso: async (id) => {
     try {
       // Asegúrate de incluir el ID en la URL
-      const response = await api.post(
-        `/operacion/getOperacionesByIdCurso`,
-        { id }
-      );
+      const response = await api.post(`/operacion/getOperacionesByIdCurso`, {
+        id,
+      });
       return response.data;
     } catch (error) {
       console.error("Error al obtener el operacion:", error);
@@ -47,6 +46,18 @@ const operacionService = {
       throw error;
     }
   },
+  insertOperaciones: async (datosOperacion) => {
+    try {
+      const response = await api.post(
+        "/operacion/insertOperaciones",
+        datosOperacion
+      );
+      return response.data; // Respuesta de la API tras insertar el operacion
+    } catch (error) {
+      console.error("Error al insertar el operaciones:", error);
+      throw error;
+    }
+  },
 
   updateOperacionById: async (id, data) => {
     try {
@@ -63,9 +74,7 @@ const operacionService = {
   deleteOperacionById: async (id) => {
     console.log(id);
     try {
-      const response = await api.delete(
-        `/operacion/deleteOperacionById/${id}`
-      );
+      const response = await api.delete(`/operacion/deleteOperacionById/${id}`);
       return response.data; // Respuesta de la API tras insertar el operacion
     } catch (error) {
       console.error("Error al actualizar el operacion:", error);

@@ -11,6 +11,7 @@ import actividadService from "../../../services/actividadesService"; // Servicio
 import estadoCotizacionService from "../../../services/estadoCotizacionService"; // Servicio para las operaciones de estados de cotizaciones
 import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
 import cursoService from "../../../services/cursoService";
+import operacionService from "../../../services/operacionService";
 // Otros componentes o servicios que puedas necesitar
 
 function CotizacionForm() {
@@ -192,18 +193,22 @@ function CotizacionForm() {
 
       try {
         const response = await cursoService.insertCurso(formattedFormData);
-        const insertedId = response.data.insertedId;
+        const insertedId = response.data._id;
 
-        const actividades = item.actividad
-          ? item.actividad.map((act) => ({
+        console.log("insertedId", insertedId);
+        const actividades = item.actividades
+          ? item.actividades.map((act) => ({
               actividad: act.value,
               curso: insertedId,
             }))
           : [];
-
+        console.log("actividades", actividades);
         if (actividades.length > 0) {
-          const operacionesResponse =
-            await operacionesService.insertOperaciones(actividades);
+          console.log(actividades);
+          const operacionesResponse = await operacionService.insertOperaciones(
+            actividades
+          );
+          console.log("operacionesResponse", operacionesResponse);
         }
       } catch (error) {
         console.error("Error al insertar curso y operaciones:", error);

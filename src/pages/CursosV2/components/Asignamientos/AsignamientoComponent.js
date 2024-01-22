@@ -3,9 +3,9 @@ import { parseISO, format } from "date-fns";
 import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 import adviserService from "../../../../services/asesorService";
+import asignamientoService from "../../../../services/asignamientoService";
 
 export default function AsignamientoComponent({ data }) {
-  console.log(data.asignamiento);
   const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
     items: data.actividades.map((actividad, index) => ({
@@ -48,28 +48,39 @@ export default function AsignamientoComponent({ data }) {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const itemsToSend = formData.items.map((item) => {
       return {
         ...item,
         fechaVencimiento: item.fechaVencimiento,
-        actividad: { $oid: item.actividad },
-        asesor: item.asesor._id ? { $oid: item.asesor._id } : null,
+        actividad: item.actividad,
+        asesor: item.asesor._id ? item.asesor._id : null,
       };
     });
 
-    google.script.run
-      .withSuccessHandler((response) => {
-        alert("Éxito");
-      })
+    console.log("data", data);
+    await asignamientoService
       .updateAsignamientoById(
-        data.asignamiento._id ? { _id: { $oid: data.asignamiento._id } } : {},
+        data.asignamiento?._id ? data.asignamiento._id : null,
         {
-          curso: { $oid: data._id },
+          curso: data._id,
           items: itemsToSend,
         }
-      );
+      )
+      .then(() => alert("success"))
+      .catch(() => alert("error"));
+    // google.script.run
+    //   .withSuccessHandler((response) => {
+    //     alert("Éxito");
+    //   })
+    //   .updateAsignamientoById(
+    //     data.asignamiento._id ? { _id: { $oid: data.asignamiento._id } } : {},
+    //     {
+    //       curso: { $oid: data._id },
+    //       items: itemsToSend,
+    //     }
+    //   );
   };
 
   return (

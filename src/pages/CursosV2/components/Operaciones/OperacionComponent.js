@@ -5,8 +5,10 @@ import Select from "react-select";
 import { IoMdAttach } from "react-icons/io";
 import operacionService from "../../../../services/operacionService";
 import estadoAdmService from "../../../../services/estadoAdmService";
+import Loader from "../../../../components/Loader";
 
 export default function OperacionComponent({ data }) {
+  const [loading, setLoading] = useState(false);
   const [estadosAdm, setEstadosAdm] = useState([]);
   const [openModal, setOpenModal] = useState(false);
   const [currentItem, setCurrentItem] = useState({}); // Estado para almacenar el item actual
@@ -14,7 +16,6 @@ export default function OperacionComponent({ data }) {
   const [formData, setFormData] = useState({});
 
   const fetchData = async () => {
-
     const operaciones = await operacionService.getOperacionesByIdCurso(
       data._id
     );
@@ -71,20 +72,29 @@ export default function OperacionComponent({ data }) {
   };
 
   // // Función para manejar la actualización del item (ajustar según tus necesidades)
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     const objectToSend = currentItem;
-    objectToSend.actividad = { $oid: currentItem.actividad };
-    objectToSend._id = { $oid: currentItem._id };
-    objectToSend.curso = { $oid: currentItem.curso };
+    objectToSend.actividad = currentItem.actividad;
+    objectToSend._id = currentItem._id;
+    objectToSend.curso = currentItem.curso;
     objectToSend.estado = currentItem.estado?._id
-      ? { $oid: currentItem.estado._id }
+      ? currentItem.estado._id
       : null;
 
-    google.script.run
-      .withSuccessHandler((response) => {
-        fetchData();
-      })
-      .updateOperacionById({ _id: objectToSend._id }, objectToSend);
+    // google.script.run
+    //   .withSuccessHandler((response) => {
+    //     fetchData();
+    //   })
+    //   .updateOperacionById({ _id: objectToSend._id }, objectToSend);
+    setLoading(true);
+    const updateResponse = await operacionService.updateOperacionById(
+      objectToSend._id,
+      objectToSend
+    );
+
+    console.log(updateResponse);
+    fetchData().then(() => setLoading(false));
+
     // Aquí puedes agregar la lógica para actualizar el item
     setOpenModal(false); // Cerrar el modal después de actualizar
   };
@@ -164,6 +174,7 @@ export default function OperacionComponent({ data }) {
         </tbody>
       </Table>
       {/* Modal para editar */}
+      <div className="LoaderContainerForm">{loading ? <Loader /> : null}</div>
       {currentItem.index >= 0 && (
         <Modal show={openModal} onClose={() => setOpenModal(false)}>
           <Modal.Header>
