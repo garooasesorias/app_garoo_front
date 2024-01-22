@@ -3,10 +3,12 @@ import { Button, Table, Modal, TextInput } from "flowbite-react";
 import Select from "react-select";
 import calificacionService from "../../../../services/calificacionService";
 import clienteService from "../../../../services/clienteService";
+import Loader from "../../../../components/Loader";
 
 export default function CalificacionComponent({ data }) {
   const [calificaciones, setCalificaciones] = useState([]);
   const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   // Componente de Celda Editable
   const EditableCell = ({ value, onValueChange }) => {
@@ -44,31 +46,31 @@ export default function CalificacionComponent({ data }) {
   }, []);
 
   const handleEstudianteChange = async (selectedOption) => {
-    // const calificaciones = data.actividades.map((actividad) => ({
-    //   estudiante: { $oid: selectedOption.value },
-    //   curso: { $oid: data._id },
-    //   actividad: {$oid: actividad._id},
-    //   nota: 0,
-    //   entregableURL: null,
-    // }));
-
     const calificaciones = {
-      estudiante: {
-        $oid: selectedOption.value,
-      },
-      curso: { $oid: data._id },
+      estudiante: selectedOption.value,
+      curso: data._id,
       notas: data.actividades.map((actividad) => ({
-        actividad: { $oid: actividad._id },
+        actividad: actividad._id,
         puntaje: 0,
         entrableURL: null,
       })),
     };
-    await google.script.run
-      .withSuccessHandler((response) => {
-        console.log("Calificaciones insertadas", response);
-        fetchData();
-      })
-      .insertCalificaciones(calificaciones);
+
+    setLoading(true);
+    const resultInsertion = await calificacionService.insertCalificacion(
+      calificaciones
+    );
+
+    console.log(resultInsertion);
+    fetchData();
+    setLoading(false);
+
+    // await google.script.run
+    //   .withSuccessHandler((response) => {
+    //     console.log("Calificaciones insertadas", response);
+    //     fetchData();
+    //   })
+    //   .insertCalificaciones(calificaciones);
   };
 
   // Función para manejar el cambio en las calificaciones
@@ -94,6 +96,7 @@ export default function CalificacionComponent({ data }) {
 
   return (
     <>
+      <div className="LoaderContainerForm">{loading ? <Loader /> : null}</div>
       <Table striped={true}>
         <Table.Head>
           <Table.HeadCell>Nombre Estudiante</Table.HeadCell>
