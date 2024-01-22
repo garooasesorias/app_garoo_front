@@ -60,6 +60,19 @@ const calificacionService = {
       throw error;
     }
   },
+  updatePuntaje: async (query, value) => {
+    try {
+      const response = await api.put("/calificacion/updatePuntaje", {
+        query,
+        value,
+      });
+      return response.data; // Respuesta de la API tras insertar el calificacion
+    } catch (error) {
+      console.error("Error al actualizar el puntaje:", error);
+      throw error;
+    }
+  },
+
   deleteCalificacionById: async (id) => {
     console.log(id);
     try {

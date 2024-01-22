@@ -74,24 +74,38 @@ export default function CalificacionComponent({ data }) {
   };
 
   // Función para manejar el cambio en las calificaciones
-  const handleNotaChange = (calificacionId, actividadId, newValue) => {
-    // Actualizar el estado con el nuevo valor
-    setCalificaciones(
-      calificaciones.map((calificacion) => {
-        if (calificacion._id === calificacionId) {
-          return {
-            ...calificacion,
-            notas: calificacion.notas.map((nota) => {
-              if (nota.actividad === actividadId) {
-                return { ...nota, puntaje: newValue };
-              }
-              return nota;
-            }),
-          };
-        }
-        return calificacion;
-      })
+  const handleNotaChange = async (calificacionId, actividadId, newValue) => {
+    setLoading(true);
+    console.log(calificacionId, actividadId, newValue);
+    const resultUpdate = await calificacionService.updatePuntaje(
+      {
+        _id: calificacionId,
+        "notas.actividad": actividadId,
+      },
+      newValue
     );
+
+    console.log(resultUpdate);
+    fetchData();
+    setLoading(false);
+
+    // Actualizar el estado con el nuevo valor
+    // setCalificaciones(
+    //   calificaciones.map((calificacion) => {
+    //     if (calificacion._id === calificacionId) {
+    //       return {
+    //         ...calificacion,
+    //         notas: calificacion.notas.map((nota) => {
+    //           if (nota.actividad === actividadId) {
+    //             return { ...nota, puntaje: newValue };
+    //           }
+    //           return nota;
+    //         }),
+    //       };
+    //     }
+    //     return calificacion;
+    //   })
+    // );
   };
 
   return (
