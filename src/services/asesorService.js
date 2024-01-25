@@ -1,6 +1,6 @@
 import api from "./api";
 
-const adviserService = {
+const asesorService = {
   getAdvisors: async () => {
     try {
       const response = await api.get("/asesor/getAdvisors");
@@ -11,10 +11,10 @@ const adviserService = {
     }
   },
 
-  getAdviserById: async (id) => {
+  getAsesorById: async (id) => {
     try {
       // Asegúrate de incluir el ID en la URL
-      const response = await api.get(`/asesor/getAdviserById/${id}`);
+      const response = await api.get(`/asesor/getAsesorById/${id}`);
       return response.data;
     } catch (error) {
       console.error("Error al obtener el asesor:", error);
@@ -22,9 +22,9 @@ const adviserService = {
     }
   },
 
-  insertAdviser: async (datosAdviser) => {
+  insertAsesor: async (datosAsesor) => {
     try {
-      const response = await api.post("/asesor/insertAdviser", datosAdviser);
+      const response = await api.post("/asesor/insertAsesor", datosAsesor);
       return response.data; // Respuesta de la API tras insertar el asesor
     } catch (error) {
       console.error("Error al insertar el asesor:", error);
@@ -32,9 +32,9 @@ const adviserService = {
     }
   },
 
-  updateAdviserById: async (id, data) => {
+  updateAsesorById: async (id, data) => {
     try {
-      const response = await api.put("/asesor/updateAdviserById", {
+      const response = await api.put("/asesor/updateAsesorById", {
         id,
         data,
       });
@@ -44,10 +44,10 @@ const adviserService = {
       throw error;
     }
   },
-  deleteAdviserById: async (id) => {
+  deleteAsesorById: async (id) => {
     console.log(id);
     try {
-      const response = await api.delete(`/asesor/deleteAdviserById/${id}`);
+      const response = await api.delete(`/asesor/deleteAsesorById/${id}`);
       return response.data; // Respuesta de la API tras insertar el asesor
     } catch (error) {
       console.error("Error al actualizar el asesor:", error);
@@ -55,8 +55,17 @@ const adviserService = {
     }
   },
 
+  loginAsesor: async (data) => {
+    try {
+      const response = await api.post(`/asesor/loginAsesor`, data);
+      return response.data; // Respuesta de la API tras insertar el asesor
+    } catch (error) {
+      console.error("No se puedo iniciar la sesión", error);
+      throw error;
+    }
+  },
+
   // Aquí puedes agregar más funciones para interactuar con la API de asesor
 };
 
-
-export default adviserService ;
+export default asesorService;

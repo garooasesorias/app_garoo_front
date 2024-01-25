@@ -37,78 +37,81 @@ import Login from "./pages/Login";
 function App() {
   return (
     <NotificacionesProvider>
-      <Layout>
-        <Nav />
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/sidebar" element={<Sidebar />} />
-          <Route path="/footer" element={<Footer />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/asesores" element={<Asesores />} />
-          <Route path="/skills" element={<Skills />} />
-          <Route path="/formSkills" element={<FormSkills />} />
-          <Route path="/formSkills/:id" element={<FormSkills />} />
-          <Route path="/especialidades" element={<Especialidades />} />
-          <Route path="/formEspecialidades" element={<FormEspecialidades />} />
-          <Route
-            path="/formEspecialidades/:id"
-            element={<FormEspecialidades />}
-          />
-          <Route path="/clientes" element={<Clientes />} />
-          <Route path="/actividades" element={<Actividades />} />
-          <Route path="/tipoActividades" element={<TipoActividades />} />
-          <Route path="/planes" element={<Planes />} />
-          <Route path="/materias" element={<Materias />} />
-          <Route path="/tipoMaterias" element={<TiposMateria />} />
-          <Route path="/cotizaciones" element={<Cotizaciones />} />
-          <Route
-            path="/estadosCotizaciones"
-            element={<EstadosCotizaciones />}
-          />
-          <Route path="/cursosv2" element={<CursosV2 />} />
-          {/* <Route path="/estadosCursosv2" element={<EstadosCursos />} /> */}
-          <Route path="/formAsesores" element={<FormAsesores />} />
-          <Route path="/formAsesores/:id" element={<FormAsesores />} />
-          <Route path="/formClientes" element={<FormClientes />} />
-          <Route path="/formClientes/:id" element={<FormClientes />} />
-          <Route path="/formPlanes" element={<FormPlanes />} />
-          <Route path="/formPlanes/:id" element={<FormPlanes />} />
-          <Route path="/formMaterias" element={<FormMaterias />} />
-          <Route path="/formActividades" element={<FormActividades />} />
-          <Route path="/editactividad/:id" element={<FormActividades />} />
-          <Route
-            path="/formTipoActividades"
-            element={<FormTipoActividades />}
-          />
-          <Route
-            path="/editTipoActividad/:id"
-            element={<FormTipoActividades />}
-          />
-          <Route path="/formTipoMaterias" element={<FormTipoMaterias />} />
-          <Route path="/formCotizaciones" element={<FormCotizaciones />} />
-          <Route path="/formCotizaciones/:id" element={<FormCotizaciones />} />
-          <Route path="/formTipoMaterias/:id" element={<FormTipoMaterias />} />
-          <Route path="/formMaterias/:id" element={<FormMaterias />} />
-
-          <Route
-            path="/formEstadosCotizaciones"
-            element={<FormEstadosCotizaciones />}
-          />
-          <Route
-            path="/formEstadosCotizaciones/:id"
-            element={<FormEstadosCotizaciones />}
-          />
-          <Route path="/formDescuentos" element={<FormDescuentos />} />
-          <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
-          <Route path="/descuentos" element={<Descuentos />} />
-          <Route
-            path="/actividadesReportes"
-            element={<ActividadesReportes />}
-          />
-          <Route path="*" element={<Home />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/*" element={<LayoutWithSidebar />} />
+      </Routes>
     </NotificacionesProvider>
+  );
+}
+
+function LayoutWithSidebar() {
+  return (
+    <Layout>
+      <Nav />
+      {/* ... puedes incluir aquí otros componentes comunes como Sidebar o Footer si son necesarios en todas las páginas excepto en Login */}
+      <Routes>
+        {/* Tus rutas específicas */}
+        <Route path="/" element={<Home />} />
+        <Route path="/sidebar" element={<Sidebar />} />
+        <Route path="/footer" element={<Footer />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/asesores" element={<Asesores />} />
+        <Route path="/skills" element={<Skills />} />
+        <Route path="/formSkills" element={<FormSkills />} />
+        <Route path="/formSkills/:id" element={<FormSkills />} />
+        <Route path="/especialidades" element={<Especialidades />} />
+        <Route path="/formEspecialidades" element={<FormEspecialidades />} />
+        <Route
+          path="/formEspecialidades/:id"
+          element={<FormEspecialidades />}
+        />
+        <Route path="/clientes" element={<Clientes />} />
+        <Route path="/actividades" element={<Actividades />} />
+        <Route path="/tipoActividades" element={<TipoActividades />} />
+        <Route path="/planes" element={<Planes />} />
+        <Route path="/materias" element={<Materias />} />
+        <Route path="/tipoMaterias" element={<TiposMateria />} />
+        <Route path="/cotizaciones" element={<Cotizaciones />} />
+        <Route path="/estadosCotizaciones" element={<EstadosCotizaciones />} />
+        <Route path="/cursosv2" element={<CursosV2 />} />
+        {/* <Route path="/estadosCursosv2" element={<EstadosCursos />} /> */}
+        <Route path="/formAsesores" element={<FormAsesores />} />
+        <Route path="/formAsesores/:id" element={<FormAsesores />} />
+        <Route path="/formClientes" element={<FormClientes />} />
+        <Route path="/formClientes/:id" element={<FormClientes />} />
+        <Route path="/formPlanes" element={<FormPlanes />} />
+        <Route path="/formPlanes/:id" element={<FormPlanes />} />
+        <Route path="/formMaterias" element={<FormMaterias />} />
+        <Route path="/formActividades" element={<FormActividades />} />
+        <Route path="/editactividad/:id" element={<FormActividades />} />
+        <Route path="/formTipoActividades" element={<FormTipoActividades />} />
+        <Route
+          path="/editTipoActividad/:id"
+          element={<FormTipoActividades />}
+        />
+        <Route path="/formTipoMaterias" element={<FormTipoMaterias />} />
+        <Route path="/formCotizaciones" element={<FormCotizaciones />} />
+        <Route path="/formCotizaciones/:id" element={<FormCotizaciones />} />
+        <Route path="/formTipoMaterias/:id" element={<FormTipoMaterias />} />
+        <Route path="/formMaterias/:id" element={<FormMaterias />} />
+
+        <Route
+          path="/formEstadosCotizaciones"
+          element={<FormEstadosCotizaciones />}
+        />
+        <Route
+          path="/formEstadosCotizaciones/:id"
+          element={<FormEstadosCotizaciones />}
+        />
+        <Route path="/formDescuentos" element={<FormDescuentos />} />
+        <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
+        <Route path="/descuentos" element={<Descuentos />} />
+        <Route path="/actividadesReportes" element={<ActividadesReportes />} />
+        <Route path="*" element={<Home />} />
+        {/* ... y así sucesivamente con el resto de tus rutas */}
+      </Routes>
+    </Layout>
   );
 }
 
