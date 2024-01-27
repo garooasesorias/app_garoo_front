@@ -33,6 +33,8 @@ import Descuentos from "./pages/Descuentos";
 import FormDescuentos from "./pages/Descuentos/components/Form";
 import { NotificacionesProvider } from "./context/NotificacionesContext";
 import Login from "./pages/Login";
+import Administradores from "./pages/Administradores";
+import Form from "./pages/Administradores/components/Form";
 
 function App() {
   return (
@@ -108,6 +110,9 @@ function LayoutWithSidebar() {
         <Route path="/formDescuentos/:id" element={<FormDescuentos />} />
         <Route path="/descuentos" element={<Descuentos />} />
         <Route path="/actividadesReportes" element={<ActividadesReportes />} />
+        <Route path="/administradores" element={<Administradores />} />
+        <Route path="/formAdministradores" element={<Form />} />
+        <Route path="/formAdministradores/:id" element={<Form />} />
         <Route path="*" element={<Home />} />
         {/* ... y así sucesivamente con el resto de tus rutas */}
       </Routes>

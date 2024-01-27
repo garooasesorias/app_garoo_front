@@ -10,7 +10,7 @@ import {
   FaChartLine,
 } from "react-icons/fa";
 import { NotificacionesContext } from "../context/NotificacionesContext";
-import { IoPeopleSharp } from "react-icons/io5";
+import { IoPeopleSharp, IoSettingsSharp } from "react-icons/io5";
 import { FaPen } from "react-icons/fa6";
 
 import { BsCircleFill } from "react-icons/bs";
@@ -34,7 +34,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
         >
           <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <ul className="space-y-2">
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <Link to="/clientes">
                     <button
@@ -56,7 +56,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Materias</b>}
@@ -74,7 +74,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Asesores</b>}
@@ -121,7 +121,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Actividades</b>}
@@ -141,7 +141,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Planes</b>}
@@ -159,7 +159,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Cotizaciones</b>}
@@ -200,7 +200,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   {/* Other sub-options for "Actividades" */}
                 </CollapsibleDropdown>
               </li>
-              {isAdmin() && (
+              {!isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Reportes</b>}
@@ -218,7 +218,23 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               )}
             </ul>
             <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
-              <li>
+              {!isAdmin() && (
+                <li>
+                  <CollapsibleDropdown
+                    buttonText={<b>Configuraciones</b>}
+                    icon={
+                      <IoSettingsSharp className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                    }
+                  >
+                    <li className="ml-5">
+                      <NavLink to="/administradores">
+                        Administradores
+                      </NavLink>
+                    </li>
+                  </CollapsibleDropdown>
+                </li>
+              )}
+              {/* <li>
                 <a
                   href="#"
                   className="flex items-center p-2 text-base font-normal text-gray-900 rounded-lg transition duration-75 hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white group"
@@ -277,7 +293,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </svg>
                   <span className="ml-3">Help</span>
                 </a>
-              </li>
+              </li> */}
             </ul>
           </div>
         </aside>
