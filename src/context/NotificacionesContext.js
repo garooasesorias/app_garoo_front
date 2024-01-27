@@ -1,31 +1,33 @@
-// src/context/NotificationesContext.js
+// Context
 import React, { createContext, useState, useEffect, useCallback } from "react";
+import notificacionesService from "../services/notificacionesService";
 
 export const NotificacionesContext = createContext();
 
 export const NotificacionesProvider = ({ children }) => {
   const [notificaciones, setNotificaciones] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Supongamos que esta es tu función para obtener notificaciones de la base de datos
-  const fetchNotificaciones = useCallback(async () => {
+  const fetchNotificacionesDelBackend = useCallback(async () => {
+    setLoading(true);
     try {
-      await google.script.run
-        .withSuccessHandler(setNotificaciones)
-        .getNotificaciones();
+      const data = await notificacionesService.getNotificaciones();
+      console.log(data)
+      setNotificaciones(data); // data ya es un array según la lógica en el servicio
     } catch (error) {
       console.error("Error al cargar las notificaciones:", error);
+      setNotificaciones([]); // Asegúrate de que notificaciones siempre es un array
+    } finally {
+      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchNotificaciones();
-  }, [fetchNotificaciones]);
+    fetchNotificacionesDelBackend();
+  }, [fetchNotificacionesDelBackend]);
 
-  // Proporcionar el array y la función de actualización en el contexto
   return (
-    <NotificacionesContext.Provider
-      value={{ notificaciones, fetchNotificaciones }}
-    >
+    <NotificacionesContext.Provider value={{ notificaciones, fetchNotificaciones: fetchNotificacionesDelBackend, loading }}>
       {children}
     </NotificacionesContext.Provider>
   );
