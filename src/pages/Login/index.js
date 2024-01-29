@@ -2,28 +2,27 @@ import { Tabs, TextInput, Label, Button } from "flowbite-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import adviserService from "../../services/asesorService.js";
+import administradorService from "../../services/administradorService.js"; // Asegúrate de importar el servicio de administradores
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState(""); // Estado para el nombre de usuario del administrador
   const [error, setError] = useState(""); // Para manejar los mensajes de error
   const navigate = useNavigate();
 
-  const handleLogin = async (role) => {
+  const handleLogin = async (role, loginData) => {
     try {
-      const loginData = {
-        email,
-        password,
-      };
+      let response;
+      if (role === "asesor") {
+        response = await adviserService.loginAsesor(loginData);
+      } else if (role === "administrador") {
+        response = await administradorService.loginAdministrador(loginData);
+      }
 
-      const response = await adviserService.loginAsesor(loginData);
-
-      if (  response.ok) {
-        console.log("response ok", response);
+      if (response && response.ok) {
         const data = response;
-        console.log("data.token", data.token);
         localStorage.setItem("token", data.token); // Almacenar el token en localStorage
-        localStorage.setItem("userRole", role); // Almacenar el rol del usuario
         navigate("/"); // Redirigir al dashboard u otra ruta protegida
       } else {
         const errorData = await response.json();
@@ -37,12 +36,12 @@ function Login() {
 
   const handleAsesorLogin = (event) => {
     event.preventDefault();
-    handleLogin("asesor");
+    handleLogin("asesor", { email, password });
   };
 
   const handleAdminLogin = (event) => {
     event.preventDefault();
-    handleLogin("administrador");
+    handleLogin("administrador", { email, password });
   };
 
   // Código del componente sigue aquí...
@@ -100,7 +99,7 @@ function Login() {
                   type="text"
                   placeholder="Ingresa tu usuario"
                   required={true}
-                  onChange={(e) => setUsername(e.target.value)}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="mb-4">

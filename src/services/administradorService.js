@@ -14,7 +14,9 @@ const administradorService = {
   getAdministradorById: async (id) => {
     try {
       // Asegúrate de incluir el ID en la URL
-      const response = await api.get(`/administrador/getAdministradorById/${id}`);
+      const response = await api.get(
+        `/administrador/getAdministradorById/${id}`
+      );
       return response.data;
     } catch (error) {
       console.error("Error al obtener el administrador:", error);
@@ -24,7 +26,10 @@ const administradorService = {
 
   insertAdministrador: async (datosAdministrador) => {
     try {
-      const response = await api.post("/administrador/insertAdministrador", datosAdministrador);
+      const response = await api.post(
+        "/administrador/insertAdministrador",
+        datosAdministrador
+      );
       return response.data; // Respuesta de la API tras insertar el administrador
     } catch (error) {
       console.error("Error al insertar el administrador:", error);
@@ -47,7 +52,9 @@ const administradorService = {
   deleteAdministradorById: async (id) => {
     console.log(id);
     try {
-      const response = await api.delete(`/administrador/deleteAdministradorById/${id}`);
+      const response = await api.delete(
+        `/administrador/deleteAdministradorById/${id}`
+      );
       return response.data; // Respuesta de la API tras insertar el administrador
     } catch (error) {
       console.error("Error al actualizar el administrador:", error);
@@ -56,8 +63,12 @@ const administradorService = {
   },
 
   loginAdministrador: async (data) => {
+    console.log("data parametrer", data);
     try {
-      const response = await api.post(`/administrador/loginAdministrador`, data);
+      const response = await api.post(
+        `/administrador/loginAdministrador`,
+        data
+      );
       return response.data; // Respuesta de la API tras insertar el administrador
     } catch (error) {
       console.error("No se puedo iniciar la sesión", error);
