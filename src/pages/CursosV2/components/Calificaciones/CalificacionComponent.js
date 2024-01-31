@@ -34,7 +34,6 @@ export default function CalificacionComponent({ data }) {
   const fetchData = async () => {
     const resultCalificaciones =
       await calificacionService.getCalificacionesByIdCurso(data._id);
-    console.log("result calificaciones", resultCalificaciones);
     setCalificaciones(resultCalificaciones.data);
 
     const clientes = await clienteService.getClientes();

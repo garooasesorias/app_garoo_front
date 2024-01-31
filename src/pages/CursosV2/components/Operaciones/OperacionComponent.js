@@ -25,7 +25,6 @@ export default function OperacionComponent({ data }) {
         _id: operacion._id,
         actividad: operacion.actividad,
         curso: data._id,
-        nombreActividad: "test",
         nombreActividad:
           data.actividades.find(
             (actividad) => actividad._id === operacion.actividad
@@ -43,7 +42,6 @@ export default function OperacionComponent({ data }) {
       })),
     });
 
-    // await google.script.run.withSuccessHandler(setEstadosAdm).getEstadosAdm();
     const estadosAdm = await estadoAdmService.getEstadosAdm();
     setEstadosAdm(estadosAdm.data);
   };

@@ -4,11 +4,12 @@ import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 import adviserService from "../../../../services/asesorService";
 import asignamientoService from "../../../../services/asignamientoService";
+import authService from "../../../../services/authService"; // Importando authService
 
 export default function AsignamientoComponent({ data }) {
   const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
-    items: data.actividades.map((actividad, index) => ({
+    items: items.map((actividad, index) => ({
       fechaVencimiento: items[index]?.fechaVencimiento
         ? format(parseISO(items[index]?.fechaVencimiento), "yyyy-MM-dd")
         : "",
@@ -20,8 +21,14 @@ export default function AsignamientoComponent({ data }) {
   });
 
   const [asesores, setAsesores] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false); // Estado para almacenar si el usuario es administrador
 
   useEffect(() => {
+    const checkAdmin = async () => {
+      setIsAdmin(await authService.isAdmin()); // Comprobar si el usuario es administrador
+    };
+    checkAdmin();
+
     const fetchData = async () => {
       const asesores = await adviserService.getAdvisors();
       setAsesores(asesores.data);
@@ -59,7 +66,6 @@ export default function AsignamientoComponent({ data }) {
       };
     });
 
-    console.log("data", data);
     await asignamientoService
       .updateAsignamientoById(
         data.asignamiento?._id ? data.asignamiento._id : null,
@@ -70,17 +76,6 @@ export default function AsignamientoComponent({ data }) {
       )
       .then(() => alert("success"))
       .catch(() => alert("error"));
-    // google.script.run
-    //   .withSuccessHandler((response) => {
-    //     alert("Éxito");
-    //   })
-    //   .updateAsignamientoById(
-    //     data.asignamiento._id ? { _id: { $oid: data.asignamiento._id } } : {},
-    //     {
-    //       curso: { $oid: data._id },
-    //       items: itemsToSend,
-    //     }
-    //   );
   };
 
   return (
@@ -108,8 +103,9 @@ export default function AsignamientoComponent({ data }) {
                     type="date"
                     value={item.fechaVencimiento}
                     onChange={(event) =>
-                      handleDateChange(event.target.value, itemIndex)
+                      isAdmin && handleDateChange(event.target.value, itemIndex)
                     }
+                    disabled={!isAdmin}
                     className="datepicker-custom"
                   />
                 </td>
@@ -130,20 +126,23 @@ export default function AsignamientoComponent({ data }) {
                         : null
                     }
                     onChange={(selectedOption) =>
-                      handleAsesorChange(selectedOption, itemIndex)
+                      isAdmin && handleAsesorChange(selectedOption, itemIndex)
                     }
-                    isSearchable={true}
+                    isSearchable={isAdmin}
+                    isDisabled={!isAdmin}
                   />
                 </td>
               </tr>
             ))}
         </tbody>
       </Table>
-      <div className="flex justify-center mt-2">
-        <Button type="submit" color="dark">
-          Actualizar Asignamiento
-        </Button>
-      </div>
+      {isAdmin && (
+        <div className="flex justify-center mt-2">
+          <Button type="submit" color="dark">
+            Actualizar Asignamiento
+          </Button>
+        </div>
+      )}
     </form>
   );
 }
