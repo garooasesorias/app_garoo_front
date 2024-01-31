@@ -41,14 +41,14 @@ function Form() {
     if (id) {
       setLoading(true);
       // Obtiene el asesor por ID
-      const adviserPromise = asesorService
-        .getAdviserById(id)
+      const asesorPromise = asesorService
+        .getAsesorById(id)
         .then((response) => {
-          setAdviser(response.data);
+          setAsesor(response.data);
           setLoading(false);
         })
         .catch((error) => {
-          console.error("Error al obtener el adviser:", error);
+          console.error("Error al obtener el asesor:", error);
           setLoading(false);
         });
 
@@ -67,7 +67,7 @@ function Form() {
       };
 
       // Ejecuta ambas llamadas en paralelo
-      Promise.all([adviserPromise, fetchData()])
+      Promise.all([asesorPromise, fetchData()])
         .then(() => {
           // Todo se completó con éxito
           setLoading(false);
@@ -80,15 +80,15 @@ function Form() {
     }
   }, [id]);
 
-  const setAdviser = (adviser) => {
+  const setAsesor = (asesor) => {
     setFormData({
-      identificacion: adviser.identificacion || "",
-      cargo: adviser.cargo || "",
-      nombre: adviser.nombre || "",
-      avatar: adviser.avatar || "",
-      specialties: adviser.specialties || "",
-      skills: adviser.skills || "",
-      celular: adviser.celular || "",
+      identificacion: asesor.identificacion || "",
+      cargo: asesor.cargo || "",
+      nombre: asesor.nombre || "",
+      avatar: asesor.avatar || "",
+      specialties: asesor.specialties || "",
+      skills: asesor.skills || "",
+      celular: asesor.celular || "",
 
       // ...otros campos
     });
@@ -149,12 +149,12 @@ function Form() {
 
       if (id) {
         // Actualizar asesor existente
-        response = await asesorService.updateAdviserById(id, formData);
+        response = await asesorService.updateAsesorById(id, formData);
         setAction("actualizado");
         // props.setShowToast(true, "asesor actualizado");
       } else {
         // Insertar nuevo asesor
-        response = await asesorService.insertAdviser(formData);
+        response = await asesorService.insertAsesor(formData);
         setAction("creado");
         // props.setShowToast(true, "Asesor creado");
       }

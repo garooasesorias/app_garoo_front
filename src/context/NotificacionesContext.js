@@ -12,7 +12,6 @@ export const NotificacionesProvider = ({ children }) => {
     setLoading(true);
     try {
       const data = await notificacionesService.getNotificaciones();
-      console.log(data)
       setNotificaciones(data); // data ya es un array según la lógica en el servicio
     } catch (error) {
       console.error("Error al cargar las notificaciones:", error);
@@ -27,7 +26,13 @@ export const NotificacionesProvider = ({ children }) => {
   }, [fetchNotificacionesDelBackend]);
 
   return (
-    <NotificacionesContext.Provider value={{ notificaciones, fetchNotificaciones: fetchNotificacionesDelBackend, loading }}>
+    <NotificacionesContext.Provider
+      value={{
+        notificaciones,
+        fetchNotificaciones: fetchNotificacionesDelBackend,
+        loading,
+      }}
+    >
       {children}
     </NotificacionesContext.Provider>
   );

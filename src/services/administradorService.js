@@ -63,9 +63,8 @@ const administradorService = {
   },
 
   loginAdministrador: async (data) => {
-    console.log("data parametrer", data);
     try {
-      const response = await api.post(
+      const response = await api.post(  
         `/administrador/loginAdministrador`,
         data
       );

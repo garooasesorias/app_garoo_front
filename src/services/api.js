@@ -2,7 +2,8 @@ import axios from "axios";
 
 // Crear una instancia de Axios con configuraciones por defecto
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  // baseURL: "http://localhost:3000/api/v1",
+  baseURL: "http://154.41.228.21:3000/api/v1",
 });
 
 // Interceptor para añadir el token de autenticación en cada solicitud
@@ -21,8 +22,5 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-
-
 
 export default api;

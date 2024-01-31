@@ -14,7 +14,7 @@ import { IoPeopleSharp, IoSettingsSharp } from "react-icons/io5";
 import { FaPen } from "react-icons/fa6";
 
 import { BsCircleFill } from "react-icons/bs";
-import { isAdmin } from "../services/authService";
+import authService from "../services/authService";
 // {/* <BsCircleFill style={{ color: "red" }} /> */}
 
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
@@ -32,7 +32,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
         >
           <div className="overflow-y-auto py-5 px-3 h-full bg-white border-r border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <ul className="space-y-2">
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <Link to="/clientes">
                     <button
@@ -54,7 +54,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Materias</b>}
@@ -72,7 +72,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Asesores</b>}
@@ -119,7 +119,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Actividades</b>}
@@ -139,7 +139,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Planes</b>}
@@ -157,7 +157,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Cotizaciones</b>}
@@ -198,7 +198,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   {/* Other sub-options for "Actividades" */}
                 </CollapsibleDropdown>
               </li>
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Reportes</b>}
@@ -216,7 +216,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               )}
             </ul>
             <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
-              {isAdmin() && (
+              {authService.isAdmin() && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Configuraciones</b>}
