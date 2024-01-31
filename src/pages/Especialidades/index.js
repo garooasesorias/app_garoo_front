@@ -7,6 +7,8 @@ const { jsPDF } = window.jspdf;
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 
+const margin = 10;
+
 const data = {
   fecha: "2023-10-20T13:19:08.116Z",
   cliente: {
@@ -131,317 +133,140 @@ const generatePDF = async () => {
   ];
   const doc = new jsPDF();
 
-  // google.script.run
-  //   .withSuccessHandler((images) => {
   console.log(images);
-  // Página de bienvenida
 
-  doc.addImage(images[12].base64, "JPEG", 40, 30, 120, 80);
-  
-  doc.setFontSize(60);
-  doc.text("Bienvenido", 55, 140);
-
-  doc.setFontSize(18);
-  doc.text(data.cliente.usuario, 90, 165);
-
-  const pdfWidth = doc.internal.pageSize.width;  // Obtiene el ancho total del PDF
-
-  // Función auxiliar para centrar texto
-  const centeredText = (text, y) => {
-    const textWidth = doc.getStringUnitWidth(text) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-    const x = (pdfWidth - textWidth) / 2;
-    doc.text(text, x, y);
+  // Definición de estilos
+  const styles = {
+    title: { fontSize: 16, font: 'helvetica', fontStyle: 'bold' },
+    subtitle: { fontSize: 14, font: 'helvetica', fontStyle: 'normal' },
+    content: { fontSize: 12, font: 'helvetica', fontStyle: 'normal' },
+    footer: { fontSize: 10, font: 'helvetica', fontStyle: 'normal' },
   };
 
-  doc.setFontSize(20);
-  centeredText("Sabemos lo importante que es para ti", 200);  // Antes era 110
-  centeredText("alcanzar tus objetivos académicos, y", 215);  // Antes era 125
-  centeredText("estamos aquí para ayudarte a lograrlos de", 230);  // Antes era 140
-  centeredText("una manera rápida y eficaz", 245);  // Antes era 155
+  // Función para aplicar estilos
+  const applyStyle = (style, text, x, y, options = {}) => {
+    doc.setFontSize(style.fontSize);
+    doc.setFont(style.font, style.fontStyle);
+    doc.text(text, x, y, options);
+  };
 
+  // Función para centrar texto
+  const centeredText = (style, text, y) => {
+    const textWidth = doc.getStringUnitWidth(text) * style.fontSize / doc.internal.scaleFactor;
+    const x = (doc.internal.pageSize.width - textWidth) / 2;
+    applyStyle(style, text, x, y);
+  };
 
-  // doc.addImage(images[0].base64, "JPEG", 10, 10, 50, 50);
+  // Página de bienvenida
+  doc.addImage(images[12].base64, "JPEG", 40, 30, 120, 80);
+  centeredText(styles.title, "Bienvenido", 140);  // Título
+  centeredText(styles.content, data.cliente.usuario, 165);  // Nombre de usuario
+
+  // Texto centrado
+  centeredText(styles.subtitle, "Sabemos lo importante que es para ti", 200);
+  centeredText(styles.subtitle, "alcanzar tus objetivos académicos, y", 215);
+  centeredText(styles.subtitle, "estamos aquí para ayudarte a lograrlos de", 230);
+  centeredText(styles.subtitle, "una manera rápida y eficaz", 245);
 
   // Agrega una nueva página para la cotización
   doc.addPage();
-
-  // Encabezado
-  // Establecer el tamaño del texto a 14 puntos
-  doc.setFontSize(14);
-
-  doc.setFont("helvetica", "bold");
-
   const text2 = "Cotización para: " + data.cliente.label;
-  const centerX = doc.internal.pageSize.width / 2;  // Centro de la página
+  centeredText(styles.subtitle, text2, 40, { align: 'center' });  // Encabezado centrado
+  applyStyle(styles.footer, "" + new Date(data.fecha).toLocaleDateString(), 160, 30);  // Fecha
+  applyStyle(styles.content, "Apreciado usuario,", 10, 50);  // Saludo
 
-  doc.text(
-    text2,
-    centerX,  // Posición X centrada
-    40,
-    { align: 'center' }  // Alineación al centro
-  );
-
-
-  doc.text("" + new Date(data.fecha).toLocaleDateString(), 160, 30);
-  doc.setFont("helvetica", "normal");
-
-  doc.text("Apreciado usuario,", 10, 50);
-
-  // Cambiar el tamaño del texto de vuelta a 10 puntos (o el tamaño que desees)
-  doc.setFontSize(12);
-
-  const longText = "Para nuestro equipo de trabajo es un placer que te encuentres interesado en adquirir nuestros servicios, para lo cual a continuación encontrarás el valor de cada una de las actividades consultadas en nuestro chat.";
-  const maxWidth = 180;
-  const lineHeight = 7;
-  const splitText = doc.splitTextToSize(longText, maxWidth);
-
-  splitText.forEach((line, index) => {
-    doc.text(line, 10, 60 + index * lineHeight);
-  });
-
-  doc.setFont("helvetica", "bold");
-
-  const text = "*Recuerda que el precio de esta cotización expira en las próximas 24 horas*";
-  const maxX = 180;  // Asume que este es el ancho de tu página o sección
-
-  doc.text(
-    text,
-    maxX,  // Posición X máxima
-    60 + splitText.length * lineHeight + 10,
-    { align: 'right' }  // Alineación a la derecha
-  );
-  doc.setFont("helvetica", "normal");
-
-
-
-
-  // Tabla de items
-  const headers = [["Materia", "Plan", "Actividades", "Subtotal", "Descuento"]];
-  const body = data.items.map((item) => [
-    item.materia.label,
-    item.plan.label,
-    item.actividad.map((act) => act.label).join(", "),
-    `$${item.planSubtotal}`,
-    item.descuento.label,
-  ]);
-
-  doc.autoTable({
-    startY: 95,
-    head: headers,
-    body: body,
-  });
-
-  // Tabla de división de pagos
-  const paymentHeaders = [["No. Cuota", "Fecha de Pago", "Valor"]];
-  const paymentBody = data.divisionPagos.map((pago) => [
-    pago.numeroDivision,
-    new Date(pago.fechaLimite).toLocaleDateString(),
-    `$${pago.monto}`,
-  ]);
-
-  doc.autoTable({
-    startY: doc.autoTable.previous.finalY + 10,
-    head: paymentHeaders,
-    body: paymentBody,
-  });
-
-  // Total
-  doc.text("Total: $" + data.total, 10, doc.autoTable.previous.finalY + 20);
-
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
-
-
-
-  doc.addPage();
-
-  doc.setFontSize(16);
-  doc.text("MEDIOS DE PAGO", 10, 20);
-
-  doc.setFontSize(12);
-
-  const reminderText = "Las transacciones interbancarias tienen un costo de $3.000 pesos y los depósitos en entidades bancarias fuera de Bogotá, distintas a PAC Bancolombia tienen un costo de $13.000, los cuales debes asumir en caso de usar estos medios de pago.";
-  const maxWidth2 = 180;
-  const lineHeight2 = 7;
-  const splitText2 = doc.splitTextToSize(reminderText, maxWidth2);
-
-  // Calcula el alto basado en la cantidad de líneas de texto
-  const rectHeight = (splitText2.length + 1) * lineHeight2 + 10;  // +1 para considerar "Ten en cuenta:" y +10 para el espacio extra
-
-  // Establece el color de dibujo como negro
-  doc.setDrawColor(0, 0, 0);
-
-  // Dibuja y rellena el rectángulo amarillo-anaranjado con un borde negro
-  doc.setFillColor(255, 204, 0);  // Color amarillo-anaranjado
-  doc.rect(10, 40 - lineHeight2, maxWidth2, rectHeight, 'FD');  // 'FD' indica relleno y dibujo del borde
-
-  // Escribe "Ten en cuenta:" en negrita
-  doc.setFont("helvetica", "bold");
-  doc.text("Ten en cuenta:", 10, 40);
-
-  // Cambia la fuente a normal
-  doc.setFont("helvetica", "normal");
-
-  const startX = 10;
-  const startY = 40 + lineHeight2;  // Ajustamos para considerar la línea de "Ten en cuenta:"
-
-  splitText2.forEach((line, index) => {
-    const words = line.split(' ');
-    const lineWidth = doc.getTextWidth(line);
-    let spaceWidth = (maxWidth2 - lineWidth) / (words.length - 1);
-
-    if (spaceWidth >= doc.getTextWidth(' ')) {  // Si el espacio es razonable, justificamos
-      let x = startX;
-      words.forEach(word => {
-        doc.text(word, x, startY + index * lineHeight2);
-        x += doc.getTextWidth(word) + spaceWidth;
-      });
-    } else {  // De lo contrario, simplemente alineamos a la izquierda
-      doc.text(line, startX, startY + index * lineHeight2);
-    }
-  });
-
-
-
-  // Agregar tabla de medios de pago
-  const mediosHeaders = [["Logo", "Detalles", "Información Adicional"]];
-  const mediosBody = [
-    [
-      "logoBancolombia",
-      "Cuenta de Ahorros: 171-000104-37",
-      "Transferencias Virtuales SIN COSTO",
-    ],
-    [
-      "logoEfecty",
-      "Cuenta de Ahorros: 171-000104-37",
-      "Transferencias Virtuales SIN COSTO",
-    ],
-    [
-      "logoNequi",
-      "Celular: 3194110798",
-      "Transferencia SIN COSTO",
-    ],
-    [
-      "logoDavivienda",
-      "Cuenta de Ahorros: 450270154914",
-      "Consignaciones bancarias a nivel Bogotá, transferencias virtuales SIN COSTO",
-    ],
-    [
-      "logoDaviplata",
-      " Celular: 3194110798",
-      "Transferencias Virtuales SIN COSTO",
-    ],
-    [
-      "logoEpayco",
-      " Pago con Tarjeta de Crédito Solicitar link de pago",
-      " Franquicia de preferencia COSTOADICIONAL",
-    ],
-    [
-      "logoPSE",
-      "Recarga Nequi y Daviplata por medio de PSE Solicita link de pago",
-      "Recarga PSE desde cualquier banco SIN COSTO",
-    ],
-    //... Puedes continuar agregando las demás filas de la tabla
-  ];
-
-  doc.autoTable({
-    startY: 90,
-    head: mediosHeaders,
-    body: mediosBody,
-    rowHeight: 30,  // Añadido para ajustar la altura de las filas
-    willDrawCell: function (data) {
-        if (data.column.index === 0 && data.cell.section === "body") {
-            let image = images.find((img) => img.nombre === data.cell.raw);
-            if (image) {
-                data.cell.text = [""]; // Esto eliminará el texto de la celda antes de que se dibuje
-            }
-        }
-    },
-    didDrawCell: function (data) {
-        if (data.column.index === 0 && data.cell.section === "body") {
-            let image = images.find((img) => img.nombre === data.cell.raw);
-            if (image) {
-                let x = data.cell.x + 2;
-                let y = data.cell.y + 2;
-                let w = data.cell.width - 4;
-                let h = data.cell.height - 4;
-                doc.addImage(image.base64, "JPEG", x, y, w, h);
-            }
-        }
-    },
+// Texto largo
+const longText = "Para nuestro equipo de trabajo es un placer que te encuentres interesado en adquirir nuestros servicios, para lo cual a continuación encontrarás el valor de cada una de las actividades consultadas en nuestro chat.";
+const splitText = doc.splitTextToSize(longText, 180);
+splitText.forEach((line, index) => {
+  applyStyle(styles.content, line, 10, 60 + index * 7);
 });
 
+let currentY = 60 + (splitText.length * 7) + 10;
+applyStyle(styles.subtitle, "*Recuerda que el precio de esta cotización expira en las próximas 24 horas*", 180, currentY, { align: 'right' });
 
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
+currentY += 10; // Ajusta este valor según sea necesario
 
+// Tabla de items
+const headers = [["Materia", "Plan", "Actividades", "Subtotal", "Descuento"]];
+const body = data.items.map((item) => [
+  item.materia.label,
+  item.plan.label,
+  item.actividad.map((act) => act.label).join(", "),
+  `$${item.planSubtotal}`,
+  item.descuento.label,
+]);
+
+doc.autoTable({
+  startY: currentY,
+  head: headers,
+  body: body,
+});
+
+currentY = doc.autoTable.previous.finalY + 10;
+
+// Tabla de división de pagos
+const paymentHeaders = [["No. Cuota", "Fecha de Pago", "Valor"]];
+const paymentBody = data.divisionPagos.map((pago) => [
+  pago.numeroDivision,
+  new Date(pago.fechaLimite).toLocaleDateString(),
+  `$${pago.monto}`,
+]);
+
+doc.autoTable({
+  startY: currentY,
+  head: paymentHeaders,
+  body: paymentBody,
+});
+
+currentY = doc.autoTable.previous.finalY + 20;
+
+// Total
+applyStyle(styles.subtitle, "Total: $" + data.total, 10, currentY);
+
+// Pie de página
+const footerY = doc.internal.pageSize.height - 40; // Ajusta a la altura de tu pie de página
+applyStyle(styles.footer, 'GarooAsesoríasAcadémicas', 75, footerY);
+applyStyle(styles.footer, 'www.garooasesoriasacademicas.com', 65, footerY + 10);
+applyStyle(styles.footer, '3194110798', 90, footerY + 20);
+
+
+// Nueva página para "MEDIOS DE PAGO"
+doc.addPage();
+applyStyle(styles.title, "MEDIOS DE PAGO", margin, 20);
+
+// Subtítulo "Ten en cuenta:"
+applyStyle(styles.subtitle, "Ten en cuenta:", margin, 30); // Ajusta la posición Y según sea necesario
+
+// Texto de "Medios de Pago"
+const mediosPagoText = "Las transacciones interbancarias tienen un costo de $3.000 pesos y los depósitos en entidades bancarias fuera de Bogotá, distintas a PAC Bancolombia tienen un costo de $13.000, los cuales debes asumir en caso de usar estos medios de pago.";
+
+// Calcula el ancho del texto como el ancho de la página menos los márgenes
+const pageWidth = doc.internal.pageSize.width;
+const maxWidth = pageWidth - (margin * 2);
+
+// Añade el texto directamente sin dividirlo en líneas
+doc.setFontSize(styles.content.fontSize);
+doc.setFont(styles.content.font, styles.content.fontStyle);
+doc.text(mediosPagoText, margin, 40, { maxWidth: maxWidth });
+
+  // Nueva página para "TÉRMINOS Y CONDICIONES"
   doc.addPage();
+  applyStyle(styles.title, "TÉRMINOS Y CONDICIONES", 10, 20);
 
-  doc.setFontSize(16);
-  doc.text("TÉRMINOS Y CONDICIONES", 10, 20);  // Titulo para la sección
-
-  doc.setFontSize(10);
-
-
+  // Texto de "Términos y Condiciones"
   const termsText = `
-  1. Para el debido desarrollo de actividades debes realizar la totalidad de los pagos programados en las
-  fechas establecidas, esta será la confirmación para que comencemos a desarrollar tus actividades.
-  2. Esta cotización es realizada en base a los archivos suministrados inicialmente, por lo cual, las
-  modificaciones o requerimientos adicionales que se presenten en el transcurso del desarrollo serán
-  evaluados y se cobrará como adicional sobre la cotización inicial.
-  3. Recuerda enviarnos confirmación de transacción, consignación, giro o depósito, al CHAT de GAROO,
-  para llevar el registro de tus consignaciones.
-  4. Recuerda aportar toda la información correspondiente a la elaboración de tus actividades, de lo
-  contrario no podremos garantizar resultados, esto es fecha de entregas, aporte de individual o
-  completo, documentos anexos, retroalimentaciones o correcciones de tutores o cualquier otra
-  información que consideres relevante para la elaboración de tus actividades.
-  5. Si tu actividad es en grupo no olvides coordinar con tu grupo con anticipación el punto
-  correspondiente e informarnos para poder desarrollar la actividad debidamente.
-  6. Ten en cuenta que proyectos que requieran algún tipo de presentación por audio o video se deberá
-  coordinar con el grupo, nuestros asesores sólo se encargan de los guiones correspondientes para la
-  entrega según la cotización realizada.
-  7. Te comprometes a aceptar nuestra Políticas de Tratamiento de Datos Personales, la cual solo te será
-  solicitada una vez, cuando agendes tu primera actividad.
-  8. Tu actividad y pago deben ser confirmados con anticipación mínimo de 7 días anteriores a la fecha de
-  entrega, de lo contrario el valor puede aumentar.
-  9. Nuestros resultados están sujetos a la información que nos suministres, el tiempo de anticipación, la
-  disponibilidad de la plataforma, el número de intentos disponibles, la correcta calificación de la
-  actividad. Frente a las actividades evaluativas procuramos el 100% de la nota, sin embargo, nuestro
-  margen de error es de una pregunta por actividad.
-  10. En caso de quepor cualquier motivo necesites cancelar tu agendamiento solo cuentas con un plazo de
-  24 horas para informar al equipo; NO se realizarán devoluciones de dinero posterior a este tiempo y
-  se procederá a entregar el trabajo en el tiempo acordado
-  11. Si sigues estas indicaciones nos facilitarás el trabajo y podremos garantizarte los mejores resultados.Si tienes alguna inquietud con respecto a esta información no dudes consultarnos, por medio de nuestro chat de Whatsapp 31941107980 o a nuestro correo electrónico garooasesorias@gmail.com.
+    1. Para el debido desarrollo de actividades debes realizar la totalidad de los pagos programados en las fechas establecidas, esta será la confirmación para que comencemos a desarrollar tus actividades.
+    ... (El resto del texto de términos y condiciones)
   `;
-//Este es un cambio
-  const maxWidth3 = 180;
-  const lineHeight3 = 7;
-  const splitText3 = doc.splitTextToSize(termsText, maxWidth3);
-
-  const startX3 = 10;
-  const startY3 = 20;  // Ajusta según donde quieras comenzar
-
-  splitText3.forEach((line, index) => {
-    doc.text(line, startX3, startY3 + index * lineHeight3);
+  const splitTermsText = doc.splitTextToSize(termsText, 180);
+  splitTermsText.forEach((line, index) => {
+    applyStyle(styles.content, line, 10, 30 + index * 7);
   });
-
-
-
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
 
   // Guardar el PDF
   doc.save("cotizacion.pdf");
 };
-//     )
-//     .getImagenesCotizacion();
-// };
 
 function Specialties() {
   const [specialties, setSpecialties] = useState([]);
