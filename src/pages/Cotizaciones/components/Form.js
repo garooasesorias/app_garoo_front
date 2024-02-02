@@ -553,7 +553,8 @@ function CotizacionForm() {
           </Button>
         )}
 
-        {formData.fecha && <PdfButton data={formData} />}
+        {/* {formData.fecha && <PdfButton data={formData} />} */}
+        <PdfButton />
 
         {isEstadoGenerada && (
           <Button color="light">Enviar Cotización al Cliente</Button>
