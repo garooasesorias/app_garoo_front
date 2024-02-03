@@ -48,6 +48,19 @@ const asignamientoService = {
     }
   },
 
+  insertAsignamiento: async (datosOperacion) => {
+    try {
+      const response = await api.post(
+        "/asignamiento/insertAsignamientos",
+        datosOperacion
+      );
+      return response.data; // Respuesta de la API tras insertar el operacion
+    } catch (error) {
+      console.error("Error al insertar el operaciones:", error);
+      throw error;
+    }
+  },
+
   updateAsignamientoById: async (id, data) => {
     try {
       const response = await api.put("/asignamiento/updateAsignamientoById", {
