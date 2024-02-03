@@ -7,21 +7,48 @@ import asignamientoService from "../../../../services/asignamientoService";
 import authService from "../../../../services/authService"; // Importando authService
 
 export default function AsignamientoComponent({ data }) {
-  const items = data.asignamiento?.items || [];
+  // console.log("data", data);
+  // const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
-    items: items.map((actividad, index) => ({
-      fechaVencimiento: items[index]?.fechaVencimiento
-        ? format(parseISO(items[index]?.fechaVencimiento), "yyyy-MM-dd")
-        : "",
-      actividad: items[index]?.actividad || actividad._id,
-      asesor: {
-        _id: items[index]?.asesor || null,
-      },
-    })),
+    items: [],
+    // items: items.map((actividad, index) => ({
+    //   fechaVencimiento: items[index]?.fechaVencimiento
+    //     ? format(parseISO(items[index]?.fechaVencimiento), "yyyy-MM-dd")
+    //     : "",
+    //   actividad: items[index]?.actividad || actividad._id,
+    //   asesor: {
+    //     _id: items[index]?.asesor || null,
+    //   },
+    // })),
   });
 
   const [asesores, setAsesores] = useState([]);
   const [isAdmin, setIsAdmin] = useState(false); // Estado para almacenar si el usuario es administrador
+
+  const fetchData = async () => {
+    const asesores = await adviserService.getAdvisors();
+    setAsesores(asesores.data);
+
+    // const asignamientos =
+    asignamientoService
+      .getAsignamientoesByIdCurso(data._id)
+      .then((response) => {
+        // console.log("asignamientos", response.data);
+        setFormData({
+          items: response.data.map((asignamiento) => ({
+            id: asignamiento._id,
+            fechaVencimiento: asignamiento?.fechaVencimiento
+              ? format(parseISO(asignamiento.fechaVencimiento), "yyyy-MM-dd")
+              : "",
+            actividad: asignamiento.actividad._id,
+            nombreActividad: asignamiento.actividad.nombre,
+            asesor: {
+              _id: asignamiento.asesor || null,
+            },
+          })),
+        });
+      });
+  };
 
   useEffect(() => {
     const checkAdmin = async () => {
@@ -29,30 +56,32 @@ export default function AsignamientoComponent({ data }) {
     };
     checkAdmin();
 
-    const fetchData = async () => {
-      const asesores = await adviserService.getAdvisors();
-      setAsesores(asesores.data);
-    };
     fetchData();
   }, []);
 
-  const handleDateChange = (date, itemIndex) => {
-    setFormData((prevFormData) => {
-      const newItems = [...prevFormData.items];
-      newItems[itemIndex].fechaVencimiento = date;
-      return { ...prevFormData, items: newItems };
-    });
+  const handleDateChange = (date, id) => {
+    // setFormData((prevFormData) => {
+    //   const newItems = [...prevFormData.items];
+    //   newItems[itemIndex].fechaVencimiento = date;
+    //   return { ...prevFormData, items: newItems };
+    // });
+    asignamientoService.updateAsignamientoById(id, { fechaVencimiento: date });
+    fetchData();
   };
 
-  const handleAsesorChange = (selectedOption, itemIndex) => {
-    setFormData((prevFormData) => {
-      const newItems = [...prevFormData.items];
-      const asesorObj = asesores.find(
-        (asesor) => asesor._id === selectedOption.value
-      );
-      newItems[itemIndex].asesor = asesorObj;
-      return { ...prevFormData, items: newItems };
+  const handleAsesorChange = (selectedOption, id) => {
+    // setFormData((prevFormData) => {
+    //   const newItems = [...prevFormData.items];
+    //   const asesorObj = asesores.find(
+    //     (asesor) => asesor._id === selectedOption.value
+    //   );
+    //   newItems[itemIndex].asesor = asesorObj;
+    //   return { ...prevFormData, items: newItems };
+    // });
+    asignamientoService.updateAsignamientoById(id, {
+      asesor: selectedOption.value,
     });
+    fetchData();
   };
 
   const handleSubmit = async (e) => {
@@ -95,15 +124,13 @@ export default function AsignamientoComponent({ data }) {
           {formData.items &&
             formData.items.map((item, itemIndex) => (
               <tr key={item.actividad}>
-                <td className="px-4 py-2">
-                  {data.actividades[itemIndex].nombre}
-                </td>
+                <td className="px-4 py-2">{item.nombreActividad}</td>
                 <td className="px-4 py-2">
                   <input
                     type="date"
                     value={item.fechaVencimiento}
                     onChange={(event) =>
-                      isAdmin && handleDateChange(event.target.value, itemIndex)
+                      isAdmin && handleDateChange(event.target.value, item.id)
                     }
                     disabled={!isAdmin}
                     className="datepicker-custom"
@@ -111,10 +138,13 @@ export default function AsignamientoComponent({ data }) {
                 </td>
                 <td className="px-4 py-2">
                   <Select
-                    options={asesores.map((asesor) => ({
-                      value: asesor._id,
-                      label: asesor.nombre,
-                    }))}
+                    options={[
+                      { value: null, label: "Sin asignar" },
+                      ...asesores.map((asesor) => ({
+                        value: asesor._id,
+                        label: asesor.nombre,
+                      })),
+                    ]}
                     value={
                       asesores.find((asesor) => asesor._id === item.asesor._id)
                         ? {
@@ -126,7 +156,7 @@ export default function AsignamientoComponent({ data }) {
                         : null
                     }
                     onChange={(selectedOption) =>
-                      isAdmin && handleAsesorChange(selectedOption, itemIndex)
+                      isAdmin && handleAsesorChange(selectedOption, item.id)
                     }
                     isSearchable={isAdmin}
                     isDisabled={!isAdmin}
@@ -136,13 +166,13 @@ export default function AsignamientoComponent({ data }) {
             ))}
         </tbody>
       </Table>
-      {isAdmin && (
+      {/* {isAdmin && (
         <div className="flex justify-center mt-2">
           <Button type="submit" color="dark">
             Actualizar Asignamiento
           </Button>
         </div>
-      )}
+      )} */}
     </form>
   );
 }

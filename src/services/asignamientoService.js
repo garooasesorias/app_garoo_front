@@ -25,7 +25,7 @@ const asignamientoService = {
     try {
       // Asegúrate de incluir el ID en la URL
       const response = await api.post(
-        `/asignamiento/getAsignamientoesByIdCurso`,
+        `/asignamiento/getAsignamientosByIdCurso`,
         { id }
       );
       return response.data;
