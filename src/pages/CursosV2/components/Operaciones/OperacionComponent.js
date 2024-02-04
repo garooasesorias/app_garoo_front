@@ -6,8 +6,13 @@ import { IoMdAttach } from "react-icons/io";
 import operacionService from "../../../../services/operacionService";
 import estadoAdmService from "../../../../services/estadoAdmService";
 import Loader from "../../../../components/Loader";
+import { utcToZonedTime } from "date-fns-tz";
 
-export default function OperacionComponent({ data }) {
+export default function OperacionComponent({
+  data,
+  refreshOperaciones,
+  setRefreshOperaciones,
+}) {
   const [loading, setLoading] = useState(false);
   const [estadosAdm, setEstadosAdm] = useState([]);
   const [openModal, setOpenModal] = useState(false);
@@ -20,15 +25,24 @@ export default function OperacionComponent({ data }) {
       data._id
     );
 
+    console.log("operaciones:", operaciones);
+
     setFormData({
       items: operaciones?.data.map((operacion) => ({
         _id: operacion._id,
         actividad: operacion.actividad,
         curso: data._id,
-        nombreActividad:
-          data.actividades.find(
-            (actividad) => actividad._id === operacion.actividad
-          )?.nombre || "",
+        nombreActividad: operacion.asignamiento.actividad.nombre,
+        nombreAsesor: operacion.asignamiento?.asesor.nombre || "Sin asignar",
+        fechaVencimiento: operacion.asignamiento?.fechaVencimiento
+          ? format(
+              utcToZonedTime(
+                parseISO(operacion.asignamiento.fechaVencimiento),
+                "UTC"
+              ),
+              "yyyy-MM-dd"
+            )
+          : "no establecido",
         grupo: operacion.grupo || "",
         tutor: operacion.tutor || "",
         archivosURL: operacion.archivosURL || "",
@@ -47,7 +61,11 @@ export default function OperacionComponent({ data }) {
   };
   useEffect(() => {
     fetchData();
-  }, []);
+    if (refreshOperaciones) {
+      fetchData();
+      setRefreshOperaciones(false); // Restablece el flag
+    }
+  }, [refreshOperaciones]);
 
   const handleEstadoChange = (selectedOption, itemIndex) => {
     setCurrentItem((prevCurrentItem) => {
@@ -79,11 +97,6 @@ export default function OperacionComponent({ data }) {
       ? currentItem.estado._id
       : null;
 
-    // google.script.run
-    //   .withSuccessHandler((response) => {
-    //     fetchData();
-    //   })
-    //   .updateOperacionById({ _id: objectToSend._id }, objectToSend);
     setLoading(true);
     const updateResponse = await operacionService.updateOperacionById(
       objectToSend._id,
@@ -122,6 +135,7 @@ export default function OperacionComponent({ data }) {
         <thead>
           <tr>
             <th className="px-4 py-2">Nombre Actividad</th>
+            <th className="px-4 py-2">Detalle Actividad</th>
             <th className="px-4 py-2">Grupo</th>
             <th className="px-4 py-2">Tutor</th>
             <th className="px-4 py-2">Archivos</th>
@@ -138,6 +152,11 @@ export default function OperacionComponent({ data }) {
             formData.items.map((item, itemIndex) => (
               <tr key={item.actividad}>
                 <td className="px-4 py-2">{item.nombreActividad}</td>
+                <td className="px-4 py-2" style={{ whiteSpace: "nowrap" }}>
+                  Vence: {item.fechaVencimiento}
+                  <br />
+                  Asesor: <strong>{item.nombreAsesor}</strong>
+                </td>
                 <td className="px-4 py-2">{item.grupo || "Sin Grupo"}</td>
                 <td className="px-4 py-2">{item.tutor || "Sin Tutor"}</td>
                 <td className="px-4 py-2">

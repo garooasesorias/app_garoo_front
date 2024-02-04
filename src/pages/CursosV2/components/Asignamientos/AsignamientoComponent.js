@@ -6,7 +6,10 @@ import adviserService from "../../../../services/asesorService";
 import asignamientoService from "../../../../services/asignamientoService";
 import authService from "../../../../services/authService"; // Importando authService
 
-export default function AsignamientoComponent({ data }) {
+export default function AsignamientoComponent({
+  data,
+  notifyOperacionesUpdate,
+}) {
   // console.log("data", data);
   // const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
@@ -59,17 +62,20 @@ export default function AsignamientoComponent({ data }) {
     fetchData();
   }, []);
 
-  const handleDateChange = (date, id) => {
+  const handleDateChange = async (date, id) => {
     // setFormData((prevFormData) => {
     //   const newItems = [...prevFormData.items];
     //   newItems[itemIndex].fechaVencimiento = date;
     //   return { ...prevFormData, items: newItems };
     // });
-    asignamientoService.updateAsignamientoById(id, { fechaVencimiento: date });
+    await asignamientoService.updateAsignamientoById(id, {
+      fechaVencimiento: date,
+    });
     fetchData();
+    notifyOperacionesUpdate();
   };
 
-  const handleAsesorChange = (selectedOption, id) => {
+  const handleAsesorChange = async (selectedOption, id) => {
     // setFormData((prevFormData) => {
     //   const newItems = [...prevFormData.items];
     //   const asesorObj = asesores.find(
@@ -78,10 +84,11 @@ export default function AsignamientoComponent({ data }) {
     //   newItems[itemIndex].asesor = asesorObj;
     //   return { ...prevFormData, items: newItems };
     // });
-    asignamientoService.updateAsignamientoById(id, {
+    await asignamientoService.updateAsignamientoById(id, {
       asesor: selectedOption.value,
     });
     fetchData();
+    notifyOperacionesUpdate();
   };
 
   const handleSubmit = async (e) => {
