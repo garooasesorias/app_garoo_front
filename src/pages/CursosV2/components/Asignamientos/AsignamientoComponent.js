@@ -5,24 +5,15 @@ import Select from "react-select";
 import adviserService from "../../../../services/asesorService";
 import asignamientoService from "../../../../services/asignamientoService";
 import authService from "../../../../services/authService"; // Importando authService
+import { utcToZonedTime } from "date-fns-tz";
 
 export default function AsignamientoComponent({
   data,
   notifyOperacionesUpdate,
+  notifyCalificacionesUpdate,
 }) {
-  // console.log("data", data);
-  // const items = data.asignamiento?.items || [];
   const [formData, setFormData] = useState({
     items: [],
-    // items: items.map((actividad, index) => ({
-    //   fechaVencimiento: items[index]?.fechaVencimiento
-    //     ? format(parseISO(items[index]?.fechaVencimiento), "yyyy-MM-dd")
-    //     : "",
-    //   actividad: items[index]?.actividad || actividad._id,
-    //   asesor: {
-    //     _id: items[index]?.asesor || null,
-    //   },
-    // })),
   });
 
   const [asesores, setAsesores] = useState([]);
@@ -32,24 +23,31 @@ export default function AsignamientoComponent({
     const asesores = await adviserService.getAdvisors();
     setAsesores(asesores.data);
 
-    // const asignamientos =
     asignamientoService
       .getAsignamientoesByIdCurso(data._id)
       .then((response) => {
-        // console.log("asignamientos", response.data);
+        console.log("asignamientos", response.data);
         setFormData({
           items: response.data.map((asignamiento) => ({
             id: asignamiento._id,
-            fechaVencimiento: asignamiento?.fechaVencimiento
-              ? format(parseISO(asignamiento.fechaVencimiento), "yyyy-MM-dd")
+            fechaVencimiento: asignamiento.fechaVencimiento
+              ? format(
+                  utcToZonedTime(
+                    parseISO(asignamiento.fechaVencimiento),
+                    "UTC"
+                  ),
+                  "yyyy-MM-dd"
+                )
               : "",
             actividad: asignamiento.actividad._id,
             nombreActividad: asignamiento.actividad.nombre,
             asesor: {
-              _id: asignamiento.asesor || null,
+              _id: asignamiento.asesor._id || null,
             },
           })),
         });
+
+        console.log("formData ", formData);
       });
   };
 
@@ -63,32 +61,21 @@ export default function AsignamientoComponent({
   }, []);
 
   const handleDateChange = async (date, id) => {
-    // setFormData((prevFormData) => {
-    //   const newItems = [...prevFormData.items];
-    //   newItems[itemIndex].fechaVencimiento = date;
-    //   return { ...prevFormData, items: newItems };
-    // });
     await asignamientoService.updateAsignamientoById(id, {
       fechaVencimiento: date,
     });
     fetchData();
     notifyOperacionesUpdate();
+    notifyCalificacionesUpdate();
   };
 
   const handleAsesorChange = async (selectedOption, id) => {
-    // setFormData((prevFormData) => {
-    //   const newItems = [...prevFormData.items];
-    //   const asesorObj = asesores.find(
-    //     (asesor) => asesor._id === selectedOption.value
-    //   );
-    //   newItems[itemIndex].asesor = asesorObj;
-    //   return { ...prevFormData, items: newItems };
-    // });
     await asignamientoService.updateAsignamientoById(id, {
       asesor: selectedOption.value,
     });
     fetchData();
     notifyOperacionesUpdate();
+    notifyCalificacionesUpdate();
   };
 
   const handleSubmit = async (e) => {
@@ -173,13 +160,6 @@ export default function AsignamientoComponent({
             ))}
         </tbody>
       </Table>
-      {/* {isAdmin && (
-        <div className="flex justify-center mt-2">
-          <Button type="submit" color="dark">
-            Actualizar Asignamiento
-          </Button>
-        </div>
-      )} */}
     </form>
   );
 }

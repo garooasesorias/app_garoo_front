@@ -4,11 +4,21 @@ import Select from "react-select";
 import calificacionService from "../../../../services/calificacionService";
 import clienteService from "../../../../services/clienteService";
 import Loader from "../../../../components/Loader";
+import asignamientoService from "../../../../services/asignamientoService";
+import { format, parseISO } from "date-fns";
+import { utcToZonedTime } from "date-fns-tz";
 
-export default function CalificacionComponent({ data }) {
-  const [calificaciones, setCalificaciones] = useState([]);
+export default function CalificacionComponent({
+  data,
+  refreshCalificaciones,
+  setRefreshCalificaciones,
+}) {
   const [clientes, setClientes] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    itemsHead: [],
+    itemsBody: [],
+  });
 
   // Componente de Celda Editable
   const EditableCell = ({ value, onValueChange }) => {
@@ -32,9 +42,29 @@ export default function CalificacionComponent({ data }) {
   };
 
   const fetchData = async () => {
-    const resultCalificaciones =
-      await calificacionService.getCalificacionesByIdCurso(data._id);
-    setCalificaciones(resultCalificaciones.data);
+    const asignamientos = (
+      await asignamientoService.getAsignamientoesByIdCurso(data._id)
+    ).data;
+
+    const calificaciones = (
+      await calificacionService.getCalificacionesByIdCurso(data._id)
+    ).data;
+
+    const itemsBody = createArray(asignamientos, calificaciones);
+    setFormData({
+      itemsHead: asignamientos.map((asignamiento) => ({
+        id: asignamiento._id,
+        nombreActividad: asignamiento.actividad.nombre,
+        nombreAsesor: asignamiento.asesor?.nombre || "Sin asignar",
+        fechaVencimiento: asignamiento.fechaVencimiento
+          ? format(
+              utcToZonedTime(parseISO(asignamiento.fechaVencimiento), "UTC"),
+              "yyyy-MM-dd"
+            )
+          : "no establecido",
+      })),
+      itemsBody,
+    });
 
     const clientes = await clienteService.getClientes();
     setClientes(clientes.data);
@@ -42,69 +72,42 @@ export default function CalificacionComponent({ data }) {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    console.log("refreshCalificaciones ", refreshCalificaciones);
+    if (refreshCalificaciones) {
+      fetchData();
+      setRefreshCalificaciones(false); // Restablece el flag
+    }
+  }, [refreshCalificaciones]);
 
   const handleEstudianteChange = async (selectedOption) => {
-    const calificaciones = {
+    const calificaciones = formData.itemsHead.map((item) => ({
       estudiante: selectedOption.value,
-      curso: data._id,
-      notas: data.actividades.map((actividad) => ({
-        actividad: actividad._id,
-        puntaje: 0,
-        entrableURL: null,
-      })),
-    };
+      asignamiento: item.id,
+      puntaje: 0,
+      entregableURL: null,
+    }));
 
     setLoading(true);
-    const resultInsertion = await calificacionService.insertCalificacion(
+    const resultInsertion = await calificacionService.insertCalificaciones(
       calificaciones
     );
 
-    console.log(resultInsertion);
     fetchData();
     setLoading(false);
-
-    // await google.script.run
-    //   .withSuccessHandler((response) => {
-    //     console.log("Calificaciones insertadas", response);
-    //     fetchData();
-    //   })
-    //   .insertCalificaciones(calificaciones);
   };
 
   // Función para manejar el cambio en las calificaciones
-  const handleNotaChange = async (calificacionId, actividadId, newValue) => {
+  const handleNotaChange = async (calificacionId, newValue) => {
     setLoading(true);
-    console.log(calificacionId, actividadId, newValue);
     const resultUpdate = await calificacionService.updatePuntaje(
       {
         _id: calificacionId,
-        "notas.actividad": actividadId,
       },
       newValue
     );
 
-    console.log(resultUpdate);
     fetchData();
     setLoading(false);
-
-    // Actualizar el estado con el nuevo valor
-    // setCalificaciones(
-    //   calificaciones.map((calificacion) => {
-    //     if (calificacion._id === calificacionId) {
-    //       return {
-    //         ...calificacion,
-    //         notas: calificacion.notas.map((nota) => {
-    //           if (nota.actividad === actividadId) {
-    //             return { ...nota, puntaje: newValue };
-    //           }
-    //           return nota;
-    //         }),
-    //       };
-    //     }
-    //     return calificacion;
-    //   })
-    // );
   };
 
   return (
@@ -113,39 +116,34 @@ export default function CalificacionComponent({ data }) {
       <Table striped={true}>
         <Table.Head>
           <Table.HeadCell>Nombre Estudiante</Table.HeadCell>
-          {data.actividades.map((actividad) => (
-            <Table.HeadCell key={actividad._id}>
-              {actividad.nombre}
+          {formData.itemsHead.map((item) => (
+            <Table.HeadCell key={item.id}>
+              {item.nombreActividad} <br />
+              {item.fechaVencimiento} <br />
+              {item.nombreAsesor} <br />
             </Table.HeadCell>
           ))}
         </Table.Head>
         <Table.Body>
-          {calificaciones &&
-            calificaciones.map((calificacion) => (
-              <Table.Row key={calificacion._id}>
+          {formData.itemsBody.length > 0 &&
+            formData.itemsBody.map((studentData) => (
+              <Table.Row key={studentData.studentDetails.idEstudiante}>
                 <Table.Cell>
-                  {
-                    clientes.find(
-                      (cliente) => cliente._id === calificacion.estudiante
-                    )?.nombre
-                  }
+                  {studentData.studentDetails.nombreEstudiante}
                 </Table.Cell>
-                {calificacion.notas.map((nota) => (
-                  <Table.Cell key={calificacion._id + nota.actividad}>
+                {studentData.scores.map((score) => (
+                  <Table.Cell key={score.idCalificacion}>
                     <EditableCell
-                      value={nota.puntaje}
+                      value={score.puntaje}
                       onValueChange={(newValue) =>
-                        handleNotaChange(
-                          calificacion._id,
-                          nota.actividad,
-                          newValue
-                        )
+                        handleNotaChange(score.idCalificacion, newValue)
                       }
                     />
                   </Table.Cell>
                 ))}
               </Table.Row>
             ))}
+
           <Table.Row>
             <Table.Cell>
               <Select
@@ -165,3 +163,78 @@ export default function CalificacionComponent({ data }) {
     </>
   );
 }
+
+function createArray(assignments, scores) {
+  // Create a map of assignments to keep the order
+  const assignmentOrder = {};
+  assignments.forEach((assignment, index) => {
+    assignmentOrder[assignment._id] = index;
+  });
+
+  // Create a map to hold students and their scores as objects
+  const studentsScores = {};
+  scores.forEach((score) => {
+    const studentId = score.estudiante._id;
+    if (!studentsScores[studentId]) {
+      studentsScores[studentId] = {
+        studentDetails: {
+          idEstudiante: studentId,
+          nombreEstudiante: score.estudiante.nombre,
+        },
+        scores: new Array(assignments.length).fill(null).map(() => ({})),
+      };
+    }
+    // Find the assignment order index and add the score object
+    const orderIndex = assignmentOrder[score.asignamiento];
+    studentsScores[studentId].scores[orderIndex] = {
+      idAsignamiento: score.asignamiento,
+      idCalificacion: score._id,
+      puntaje: score.puntaje,
+    };
+  });
+
+  // Convert the map to the final array structure
+  const finalArray = Object.values(studentsScores).map((studentScores) => {
+    return {
+      studentDetails: studentScores.studentDetails,
+      scores: studentScores.scores,
+    };
+  });
+
+  return finalArray;
+}
+
+const array = [
+  [
+    {
+      idEstudiante: "655cbc8bc158ce073cb420d0",
+      nombreEstudiante: "estudiante.nombre",
+    },
+    {
+      idAsignamiento: "65bdeed12c99c13b9df58e17",
+      idCalificacion: "65c0fa23c621dfac20aafcef",
+      puntaje: "calificaion.puntaje",
+    },
+    {
+      idAsignamiento: "65bdeed12c99c13b9df58e16",
+      idCalificacion: "65c0fa23c621dfac20aafcf0",
+      puntaje: "calificaion.puntaje",
+    },
+  ],
+  [
+    {
+      idEstudiante: "65c0e9c9169c8c36ca58427d",
+      nombreEstudiante: "estudiante.nombre",
+    },
+    {
+      idAsignamiento: "65bdeed12c99c13b9df58e17",
+      idCalificacion: "65c0fa46c621dfac20aafd0a",
+      puntaje: "calificaion.puntaje",
+    },
+    {
+      idAsignamiento: "65bdeed12c99c13b9df58e16",
+      idCalificacion: "65c0fa46c621dfac20aafd0b",
+      puntaje: "calificaion.puntaje",
+    },
+  ],
+];

@@ -35,6 +35,19 @@ const calificacionService = {
     }
   },
 
+  insertCalificaciones: async (datosCalificaciones) => {
+    try {
+      const response = await api.post(
+        "/calificacion/insertCalificaciones",
+        datosCalificaciones
+      );
+      return response.data; // Respuesta de la API tras insertar el operacion
+    } catch (error) {
+      console.error("Error al insertar el operaciones:", error);
+      throw error;
+    }
+  },
+
   insertCalificacion: async (datosCalificacion) => {
     try {
       const response = await api.post(

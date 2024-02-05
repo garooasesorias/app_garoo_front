@@ -25,15 +25,13 @@ export default function OperacionComponent({
       data._id
     );
 
-    console.log("operaciones:", operaciones);
-
     setFormData({
       items: operaciones?.data.map((operacion) => ({
         _id: operacion._id,
         actividad: operacion.actividad,
         curso: data._id,
         nombreActividad: operacion.asignamiento.actividad.nombre,
-        nombreAsesor: operacion.asignamiento?.asesor.nombre || "Sin asignar",
+        nombreAsesor: operacion.asignamiento?.asesor?.nombre || "Sin asignar",
         fechaVencimiento: operacion.asignamiento?.fechaVencimiento
           ? format(
               utcToZonedTime(
