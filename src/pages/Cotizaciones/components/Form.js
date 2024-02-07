@@ -40,6 +40,7 @@ function CotizacionForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Carga inicial de datos requeridos como clientes, materias, etc.
         const clientesRes = await clienteService.getClientes();
         setClientes(clientesRes.data);
 
@@ -57,19 +58,31 @@ function CotizacionForm() {
           }))
         );
 
-        const estadosCotizacionesRes =
-          await estadoCotizacionService.getEstadosCotizacion();
+        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
         setEstadosCotizaciones(estadosCotizacionesRes.data);
 
         const descuentosRes = await descuentoService.getDescuentos();
         setDescuentos(descuentosRes.data);
 
+        // Si estamos editando una cotización existente (id presente), obtenemos sus datos
         if (id) {
           const cotizacionRes = await cotizacionService.getCotizacionById(id);
+          console.log('Cotización cargada de la base de datos:', cotizacionRes.data);
+
           const cotizacionData = cotizacionRes.data;
 
-          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
-          const itemsConActividades = cotizacionData.items.map((item) => {
+          // Función para obtener el subtotal por plan
+          const obtenerSubtotalPorPlan = (planId) => {
+            const plan = planesRes.data.find(p => p._id === planId);
+            return plan ? plan.precio : 'N/A'; // Asegúrate de que `plan.precio` es el precio del plan
+          };
+
+          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente,
+          // además de asignar el subtotal adecuado
+          const itemsConActividadesYSubtotal = cotizacionData.items.map((item) => {
+            // Calcula el subtotal para el ítem actual
+            const subtotal = obtenerSubtotalPorPlan(item.plan);
+
             const actividadesOptions = actividadesRes.data.map((act) => ({
               label: act.nombre,
               value: act._id,
@@ -77,17 +90,17 @@ function CotizacionForm() {
 
             return {
               ...item,
+              planSubtotal: subtotal, // Agrega el subtotal al item
               actividades: item.actividades.map(
-                (actId) =>
-                  actividadesOptions.find((act) => act.value === actId._id) ||
-                  null
+                (actId) => actividadesOptions.find((act) => act.value === actId._id) || null
               ),
             };
           });
 
+          // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
-            items: itemsConActividades,
+            items: itemsConActividadesYSubtotal,
           });
         }
       } catch (error) {
@@ -97,6 +110,7 @@ function CotizacionForm() {
 
     fetchData();
   }, [id]); // Dependencia: id
+
 
   const calculateRowTotal = (row) => {
     let totalRow = 0;
@@ -142,6 +156,7 @@ function CotizacionForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Datos del formulario:', formData);
 
     // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
@@ -198,9 +213,9 @@ function CotizacionForm() {
         console.log("insertedId", insertedId);
         const actividades = item.actividades
           ? item.actividades.map((act) => ({
-              actividad: act.value,
-              curso: insertedId,
-            }))
+            actividad: act.value,
+            curso: insertedId,
+          }))
           : [];
         console.log("actividades", actividades);
         if (actividades.length > 0) {
