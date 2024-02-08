@@ -60,8 +60,11 @@ function CotizacionForm() {
         );
 
         const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
-        setEstadosCotizaciones(estadosCotizacionesRes.data);
-
+        const estadosCotizacionesMapeados = estadosCotizacionesRes.data.map(estado => ({
+          label: estado.nombre,
+          value: estado._id
+        }));
+        setEstadosCotizaciones(estadosCotizacionesMapeados);
         const descuentosRes = await descuentoService.getDescuentos();
         setDescuentos(descuentosRes.data);
 
@@ -101,10 +104,22 @@ function CotizacionForm() {
             };
           });
 
+          const estadoSeleccionado = estadosCotizacionesMapeados.find(e => e.value === cotizacionData.estado);
+
+          const divisionesConFechas = cotizacionData.divisionPagos.map(division => {
+            return {
+              ...division,
+              // Transforma la fecha ISO a formato 'aaaa-mm-dd' para el input de fecha
+              fechaLimite: new Date(division.fechaLimite).toISOString().split('T')[0],
+            };
+          });
+
           // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
+            estado: estadoSeleccionado,
             items: itemsConActividadesYSubtotal,
+            divisionPagos: divisionesConFechas,
           });
         }
       } catch (error) {
@@ -115,48 +130,6 @@ function CotizacionForm() {
     fetchData();
   }, [id]); // Dependencia: id
 
-
-  // const calculateRowTotal = (row) => {
-  //   let totalRow = 0;
-  //   if (row.plan) {
-  //     const plan = planes.find((plan) => plan._id === row.plan.value);
-  //     totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
-  //   }
-
-  //   if (row.descuento) {
-  //     const descuentoAplicable = descuentos.find(
-  //       (descuento) => descuento._id === row.descuento.value
-  //     );
-  //     if (descuentoAplicable) {
-  //       totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
-  //     }
-  //   }
-
-  //   return totalRow;
-  // };
-
-  // const calculateRowSubtotal = (row) => {
-  //   let subtotal = 0;
-  //   if (row.plan) {
-  //     const plan = planes.find((p) => p._id === row.plan.value);
-  //     subtotal += plan ? Number(plan.precio) : 0;
-  //   }
-  //   // Aquí puedes agregar más lógica si hay otros elementos que contribuyen al subtotal
-  //   return subtotal;
-  // };
-
-  // // Calcula el total sin descuentos
-  // const calculateTotal = () => {
-  //   return formData.items.reduce((accum, item) => {
-  //     return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
-  //   }, 0);
-  // };
-
-  // const calculateTotalConDescuento = () => {
-  //   return formData.items.reduce((accum, item) => {
-  //     return accum + calculateRowTotal(item); // Asume que calculateRowTotal devuelve el total de la fila con descuento aplicado
-  //   }, 0);
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -501,7 +474,7 @@ function CotizacionForm() {
         </Table>
 
         <div className="text-center">
-        <p>Total: {formData.total} COP</p>
+          <p>Total: {formData.total} COP</p>
           {formData.items.some((fila) => fila.descuento) && (
             <p>Total con Descuento: {formData.subtotal} COP</p>
           )}
@@ -511,15 +484,13 @@ function CotizacionForm() {
           <div className="mb-4">
             <label>Estado de Cotización:</label>
             <Select
-              options={estadosCotizaciones.map((estado) => ({
-                label: estado.nombre,
-                value: estado._id,
-              }))}
-              value={formData.estado}
+              options={estadosCotizaciones}
+              value={estadosCotizaciones.find(estado => estado.value === formData.estado?.value)}
               onChange={handleEstadoChange}
             />
           </div>
         )}
+
 
         <Button color="success" onClick={addRow}>
           Agregar Fila +
@@ -550,7 +521,7 @@ function CotizacionForm() {
                 <td>
                   <input
                     type="date"
-                    value={division.fechaLimite}
+                    value={division.fechaLimite} // Asegúrate de que esto se establece correctamente
                     onChange={(e) => {
                       setFormData((prevData) => {
                         const updatedDivisiones = [...prevData.divisionPagos];
