@@ -100,9 +100,12 @@ function CotizacionForm() {
             };
           });
 
+          const estadoSeleccionado = estadosCotizaciones.find(e => e._id === cotizacionData.estado);
+
           // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
+            estado: estadoSeleccionado ? { label: estadoSeleccionado.nombre, value: estadoSeleccionado._id } : null,
             items: itemsConActividadesYSubtotal,
           });
         }
@@ -114,48 +117,6 @@ function CotizacionForm() {
     fetchData();
   }, [id]); // Dependencia: id
 
-
-  // const calculateRowTotal = (row) => {
-  //   let totalRow = 0;
-  //   if (row.plan) {
-  //     const plan = planes.find((plan) => plan._id === row.plan.value);
-  //     totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
-  //   }
-
-  //   if (row.descuento) {
-  //     const descuentoAplicable = descuentos.find(
-  //       (descuento) => descuento._id === row.descuento.value
-  //     );
-  //     if (descuentoAplicable) {
-  //       totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
-  //     }
-  //   }
-
-  //   return totalRow;
-  // };
-
-  // const calculateRowSubtotal = (row) => {
-  //   let subtotal = 0;
-  //   if (row.plan) {
-  //     const plan = planes.find((p) => p._id === row.plan.value);
-  //     subtotal += plan ? Number(plan.precio) : 0;
-  //   }
-  //   // Aquí puedes agregar más lógica si hay otros elementos que contribuyen al subtotal
-  //   return subtotal;
-  // };
-
-  // // Calcula el total sin descuentos
-  // const calculateTotal = () => {
-  //   return formData.items.reduce((accum, item) => {
-  //     return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
-  //   }, 0);
-  // };
-
-  // const calculateTotalConDescuento = () => {
-  //   return formData.items.reduce((accum, item) => {
-  //     return accum + calculateRowTotal(item); // Asume que calculateRowTotal devuelve el total de la fila con descuento aplicado
-  //   }, 0);
-  // };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
