@@ -80,7 +80,6 @@ function CotizacionForm() {
           // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente,
           // además de asignar el subtotal adecuado
           const itemsConActividadesYSubtotal = cotizacionData.items.map((item) => {
-            // Calcula el subtotal para el ítem actual
             const subtotal = obtenerSubtotalPorPlan(item.plan);
 
             const actividadesOptions = actividadesRes.data.map((act) => ({
@@ -88,12 +87,16 @@ function CotizacionForm() {
               value: act._id,
             }));
 
+            const descuentoAplicado = descuentosRes.data.find(d => d._id === item.descuento);
+
             return {
               ...item,
               planSubtotal: subtotal, // Agrega el subtotal al item
               actividades: item.actividades.map(
                 (actId) => actividadesOptions.find((act) => act.value === actId._id) || null
               ),
+              // Agrega el descuento al item
+              descuento: descuentoAplicado ? { label: `${descuentoAplicado.descripcion} (${descuentoAplicado.porcentaje}%)`, value: descuentoAplicado._id } : null,
             };
           });
 
