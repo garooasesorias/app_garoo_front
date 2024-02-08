@@ -1,68 +1,31 @@
-import React, { useState, useEffect } from "react";
-import especialidadService from "../../services/especialidadService.js";
-import { Table, Card, Button, Modal } from "flowbite-react";
-import { Link } from "react-router-dom";
-import Loader from '../../components/Loader.js';
-const { jsPDF } = window.jspdf;
-import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
-import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+import clienteService from '../services/clienteService';
+import planesService from '../services/planesService';
+import descuentosService from '../services/descuentosService';
+import materiasService from '../services/materiasService';
 
-const margin = 10;
+// Función de ayuda para obtener la etiqueta de un ítem dado
+async function getItemLabel(service, itemId, labelName) {
+  try {
+    const response = await service(itemId);
+    return response.data?.[labelName] || 'N/A';
+  } catch (error) {
+    console.error(`Error al obtener datos de ${labelName}:`, error);
+    return 'N/A';
+  }
+}
 
-const data = {
-  fecha: "2023-10-20T13:19:08.116Z",
-  cliente: {
-    label: "Julian Benavides",
-    value: "652f453e66c327116457d1fc",
-    usuario: "saldarriaga",
-  },
-  items: [
-    {
-      materia: {
-        label: "Calculo II",
-        value: "64dc206ede10c0d9a0f360a6",
-      },
-      plan: {
-        label: "Plan 3 ",
-        value: "64dd1f111a3f8bb16e59b644",
-      },
-      planSubtotal: "400",
-      descuento: {
-        label: "Black Friday (10%)",
-        value: "653066cfef5533b5c5966212",
-      },
-      actividad: [
-        {
-          label: "Quiz 2",
-          value: "64dabe480add76a0a305a734",
-        },
-        {
-          label: "Parcial 1",
-          value: "64dac5867f3ef1926f2b73a3",
-        },
-      ],
-    },
-  ],
-  divisionPagos: [
-    {
-      numeroDivision: 1,
-      monto: "180.00",
-      fechaLimite: "2023-10-20",
-    },
-    {
-      numeroDivision: 2,
-      monto: "180.00",
-      fechaLimite: "2023-10-27",
-    },
-  ],
-  total: 360,
-  estado: {
-    label: "Generada",
-    value: "64e600985fef1743de870cbc",
-  },
-};
+// Función de ayuda para calcular el total de la fila
+function calculateRowTotal(row, descuentoPorcentaje) {
+  let total = parseFloat(row.planSubtotal) || 0;
+  if (descuentoPorcentaje) {
+    total -= total * (descuentoPorcentaje / 100);
+  }
+  return total;
+}
 
-const generatePDF = async () => {
+const generatePDF = async (formData) => {
   const images = [
     {
       base64:
@@ -145,24 +108,22 @@ const generatePDF = async () => {
   ];
   const doc = new jsPDF();
 
-  console.log(images);
+  const clienteNombre = await getItemLabel(clienteService.getClienteById, formData.cliente, 'nombre');
 
-  // Definición de estilos
   const styles = {
-    title: { fontSize: 16, font: 'helvetica', fontStyle: 'bold' },
+    title: { fontSize: 18, font: 'helvetica', fontStyle: 'bold' },
     subtitle: { fontSize: 14, font: 'helvetica', fontStyle: 'normal' },
     content: { fontSize: 12, font: 'helvetica', fontStyle: 'normal' },
     footer: { fontSize: 10, font: 'helvetica', fontStyle: 'normal' },
   };
 
-  // Función para aplicar estilos
+  // Funciones de ayuda para aplicar estilos y centrar texto
   const applyStyle = (style, text, x, y, options = {}) => {
     doc.setFontSize(style.fontSize);
     doc.setFont(style.font, style.fontStyle);
     doc.text(text, x, y, options);
   };
 
-  // Función para centrar texto
   const centeredText = (style, text, y) => {
     const textWidth = doc.getStringUnitWidth(text) * style.fontSize / doc.internal.scaleFactor;
     const x = (doc.internal.pageSize.width - textWidth) / 2;
@@ -171,21 +132,21 @@ const generatePDF = async () => {
 
   // Página de bienvenida
   doc.addImage(images[12].base64, "JPEG", 40, 30, 120, 80);
-  centeredText(styles.title, "Bienvenido", 140);  // Título
-  centeredText(styles.content, data.cliente.usuario, 165);  // Nombre de usuario
+  centeredText(styles.title, "Bienvenido", 140);
+  centeredText(styles.content, `Cliente: ${clienteNombre}`, 165);
+  // doc.text(`Cliente: ${clienteNombre}`, 10, 50);
 
-  // Texto centrado
   centeredText(styles.subtitle, "Sabemos lo importante que es para ti", 200);
   centeredText(styles.subtitle, "alcanzar tus objetivos académicos, y", 215);
   centeredText(styles.subtitle, "estamos aquí para ayudarte a lograrlos de", 230);
   centeredText(styles.subtitle, "una manera rápida y eficaz", 245);
-  doc.addImage(images[13].base64, "JPEG", 75, 260, 60, 20);
 
-  // Agrega una nueva página para la cotización
+  // Página con el contenido del formulario
   doc.addPage();
-  const text2 = "Cotización para: " + data.cliente.label;
+
+  const text2 = "Cotización para: " + clienteNombre;
   centeredText(styles.subtitle, text2, 40, { align: 'center' });  // Encabezado centrado
-  applyStyle(styles.footer, "" + new Date(data.fecha).toLocaleDateString(), 160, 30);  // Fecha
+  applyStyle(styles.footer, "" + new Date(formData.fecha).toLocaleDateString(), 160, 30);  // Fecha
   applyStyle(styles.content, "Apreciado usuario,", 10, 50);  // Saludo
 
   // Texto largo
@@ -200,78 +161,82 @@ const generatePDF = async () => {
 
   currentY += 10; // Ajusta este valor según sea necesario
 
-  // Tabla de items
-  const headers = [["Materia", "Plan", "Actividades", "Subtotal", "Descuento"]];
-  const body = data.items.map((item) => [
-    item.materia.label,
-    item.plan.label,
-    item.actividad.map((act) => act.label).join(", "),
-    `$${item.planSubtotal}`,
-    item.descuento.label,
-  ]);
+  // Procesar cada item (desde el primer bloque de código)
+  const items = await Promise.all(formData.items.map(async (item) => {
+    const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
+    const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
+    const descuentoLabel = await getItemLabel(descuentosService.getDescuentoById, item.descuento, 'descripcion');
+    const descuentoPorcentaje = parseFloat(item.descuento?.porcentaje) || 0;
+    const actividadesLabel = (item.actividades || []).map(act => act.label).join(", ") || 'N/A';
 
+    return [
+      materialLabel,
+      planLabel,
+      actividadesLabel,
+      `$${item.planSubtotal || 0}`,
+      descuentoLabel,
+      `$${calculateRowTotal(item, descuentoPorcentaje)}`,
+    ];
+  }));
+
+  // Añadir la tabla de items al PDF (ajustado desde el segundo bloque de código)
   doc.autoTable({
     startY: currentY,
-    head: headers,
-    body: body,
+    head: [['Materia', 'Plan', 'Actividades', 'Subtotal', 'Descuento', 'Total']],
+    body: items,
   });
 
-  currentY = doc.autoTable.previous.finalY + 10;
+  // Calcular dónde empieza la próxima tabla, después de la anterior
+  let startY = doc.autoTable.previous.finalY + 10;
 
-  // Tabla de división de pagos
-  const paymentHeaders = [["No. Cuota", "Fecha de Pago", "Valor"]];
-  const paymentBody = data.divisionPagos.map((pago) => [
-    pago.numeroDivision,
-    new Date(pago.fechaLimite).toLocaleDateString(),
-    `$${pago.monto}`,
-  ]);
+  // Datos estáticos para la tabla de cuotas
+  const cuotas = [
+    ["1", "19/10/2023", "$180.00"],
+    ["2", "26/10/2023", "$180.00"]
+  ];
 
+  // Añadir la tabla de cuotas al PDF
   doc.autoTable({
-    startY: currentY,
-    head: paymentHeaders,
-    body: paymentBody,
+    head: [['No. Cuota', 'Fecha de Pago', 'Valor']],
+    body: cuotas,
+    startY: startY
   });
 
-  currentY = doc.autoTable.previous.finalY + 20;
+  // Calcular dónde colocar el total
+  startY = doc.autoTable.previous.finalY + 10;
 
-  // Total
-  applyStyle(styles.subtitle, "Total: $" + data.total, 10, currentY);
+  // Añadir el total
+  doc.text(`Total: $${formData.total || 0}`, 10, startY);
 
-  // Pie de página
-  const footerY = doc.internal.pageSize.height - 40; // Ajusta a la altura de tu pie de página
-  applyStyle(styles.footer, 'GarooAsesoríasAcadémicas', 75, footerY);
-  applyStyle(styles.footer, 'www.garooasesoriasacademicas.com', 65, footerY + 10);
-  applyStyle(styles.footer, '3194110798', 90, footerY + 20);
-  doc.addImage(images[14].base64, "JPEG", 78, 270, 10, 10);
+  doc.setFontSize(12);
+  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
+  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
+  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
+  doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
 
-
-  // Nueva página para "MEDIOS DE PAGO"
+  // Añadir una nueva página para "MEDIOS DE PAGO"
   doc.addPage();
+
+  const margin = 10; // Asegúrate de que esta variable está definida con el valor que necesitas
+
   applyStyle(styles.title, "MEDIOS DE PAGO", margin, 20);
 
-  // Texto de "Medios de Pago"
   const mediosPagoText = "Las transacciones interbancarias tienen un costo de $3.000 pesos y los depósitos en entidades bancarias fuera de Bogotá, distintas a PAC Bancolombia tienen un costo de $13.000, los cuales debes asumir en caso de usar estos medios de pago.";
 
-  // Calcula el ancho del texto como el ancho de la página menos los márgenes
   const pageWidth = doc.internal.pageSize.width;
   const maxWidth = pageWidth - (margin * 2);
 
-  // Calcula la altura del texto del subtítulo y del cuerpo principal
-  const subtitleHeight = doc.getTextDimensions("Ten en cuenta:", { maxWidth: maxWidth }).h;
-  const bodyTextHeight = doc.getTextDimensions(mediosPagoText, { maxWidth: maxWidth }).h;
-
   // Añade un rectángulo amarillo
-  const rectHeight = subtitleHeight + bodyTextHeight + 10; // Ajusta el 10 según sea necesario para el padding
-  const startY = 30; // La posición Y donde comienza el rectángulo, ajusta según sea necesario
+  const startYRect = 30; // La posición Y donde comienza el rectángulo, ajusta según sea necesario
+  const rectHeight = 30; // Ajusta esto según sea necesario para el contenido
   doc.setFillColor(255, 255, 0); // Color amarillo
-  doc.rect(margin, startY, maxWidth, rectHeight, 'F');
+  doc.rect(margin, startYRect, maxWidth, rectHeight, 'F');
 
-  // Añade el texto del subtítulo y de "Medios de Pago" después de dibujar el rectángulo
-  applyStyle(styles.subtitle, "Ten en cuenta:", margin, startY + 5); // Ajusta el 5 según sea necesario para el padding dentro del rectángulo
+  // Añade el texto dentro del rectángulo amarillo
+  applyStyle(styles.subtitle, "Ten en cuenta:", margin, startYRect + 10);
   doc.setFontSize(styles.content.fontSize);
   doc.setFont(styles.content.font, styles.content.fontStyle);
-  // Asegúrate de ajustar la posición Y del cuerpo del texto para que quede dentro del rectángulo
-  doc.text(mediosPagoText, margin, startY + subtitleHeight + 10, { maxWidth: maxWidth });
+  doc.text(mediosPagoText, margin, startYRect + 20, { maxWidth: maxWidth });
 
   // Agregar tabla de medios de pago
   const mediosHeaders = [["Logo", "Detalles", "Información Adicional"]];
@@ -313,11 +278,12 @@ const generatePDF = async () => {
     ],
     //... Puedes continuar agregando las demás filas de la tabla
   ];
+  const startYTabla = startYRect + rectHeight + 10; // Ajusta esto según sea necesario
   doc.autoTable({
-    startY: 90,
+    startY: startYTabla,
     head: mediosHeaders,
     body: mediosBody,
-    rowHeight: 30,  // Añadido para ajustar la altura de las filas
+    rowHeight: 30,
     willDrawCell: function (data) {
       if (data.column.index === 0 && data.cell.section === "body") {
         let image = images.find((img) => img.nombre === data.cell.raw);
@@ -339,12 +305,13 @@ const generatePDF = async () => {
       }
     },
   });
+
+  // Ajusta las coordenadas para el texto y la imagen al final de la página
   doc.setFontSize(12);
   doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
   doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
   doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
   doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
-
 
   // Nueva página para "TÉRMINOS Y CONDICIONES"
   doc.addPage();
@@ -400,140 +367,9 @@ const generatePDF = async () => {
   doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
   doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
 
+
   // Guardar el PDF
   doc.save("cotizacion.pdf");
 };
 
-function Specialties() {
-  const [specialties, setSpecialties] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [openModal, setOpenModal] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [selectedSpecialtyId, setSelectedSpecialtyId] = useState(null);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const specialtiesObtenidos = await especialidadService.getSpecialties();
-
-        setSpecialties(specialtiesObtenidos.data);
-        setLoading(false);
-      } catch (error) {
-        console.log("Error al cargar Specialities:", error);
-      }
-
-    };
-
-    fetchData();
-  }, []);
-
-
-  const handleDeleteClick = () => {
-    if (selectedSpecialtyId) {
-      setDeleting(true);
-      especialidadService.deleteSpecialtyById(selectedSpecialtyId).then((response) => {
-        console.log(response);
-        setSpecialties((prevSpecialties) =>
-          prevSpecialties.filter((specialty) => specialty._id !== selectedSpecialtyId)
-        );
-        setDeleting(false);
-        setOpenModal(false);
-        setSelectedSpecialtyId(null); // Limpia el ID almacenado
-      });
-    }
-  };
-
-  const passEspecialidadId = (specialtyId) => {
-    // Tomamos el Id del cliente que viene del botón borrar
-    setSelectedSpecialtyId(specialtyId);
-
-    // Abre el modal
-    setOpenModal(true);
-  };
-  // Llamar a la función
-  generatePDF();
-
-  return (
-    <>
-      <h1 className="PagesTitles">Especialidades</h1>
-      <Link to="/formEspecialidades">
-        <Button className="shadow mb-5 ms-auto mr-5" color="success">
-          Crear Especialidades +
-        </Button>
-      </Link>
-      <Table>
-        <Table.Head>
-          {/* <Table.HeadCell>Id</Table.HeadCell> */}
-          <Table.HeadCell>Nombre de Especialidad</Table.HeadCell>
-          {/*<Table.HeadCell>Tipo</Table.HeadCell>*/}
-          <Table.HeadCell>
-            <span className="sr-only">Edit</span>
-          </Table.HeadCell>
-        </Table.Head>
-        <Table.Body className="divide-y">
-          {specialties &&
-            specialties.map((Specialty) => (
-              <Table.Row
-                key={Specialty._id}
-                className="bg-white dark:border-gray-700 dark:bg-gray-800"
-              >
-                <Table.Cell>{Specialty.nombre}</Table.Cell>
-                {/*<Table.Cell>{materia.tipoNombre}</Table.Cell>*/}
-                <Table.Cell>
-                  <Link
-                    to={`/formEspecialidades/${Specialty._id}`}
-                    className="font-medium text-cyan-600 hover:underline dark:text-cyan-500"
-                  >
-                    Edit
-                  </Link>
-                </Table.Cell>
-                <TableCell>
-                  <button
-                    onClick={() => passEspecialidadId(Specialty._id)}
-                    className="font-medium text-red-600 hover:underline dark:text-red-500"
-                  >
-                    Borrar
-                  </button>
-                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
-                    <Modal.Header />
-                    <Modal.Body>
-                      <div className="text-center">
-                        {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
-                          <div className="LoaderContainerDelete"><Loader /></div>
-                        ) : (
-                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-                        )}
-                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                          {deleting
-                            ? "Eliminando..."
-                            : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
-                        </h3>
-                        <div className="flex justify-center gap-4">
-                          <Button
-                            color="failure"
-                            onClick={() => handleDeleteClick(Specialty._id)}
-                            disabled={deleting} // Deshabilita el botón durante la eliminación
-                          >
-                            {deleting ? "Eliminando..." : "Sí, eliminar"}
-                          </Button>
-                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
-                            No, cancelar
-                          </Button>
-                        </div>
-                      </div>
-                    </Modal.Body>
-                  </Modal>
-                </TableCell>
-              </Table.Row>
-            ))}
-        </Table.Body>
-      </Table>
-      <div className="LoaderContainer">
-        {loading ? <Loader /> : null}
-      </div>
-
-    </>
-  );
-}
-
-export default Specialties;
+export default generatePDF;
