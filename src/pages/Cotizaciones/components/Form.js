@@ -59,8 +59,11 @@ function CotizacionForm() {
         );
 
         const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
-        setEstadosCotizaciones(estadosCotizacionesRes.data);
-
+        const estadosCotizacionesMapeados = estadosCotizacionesRes.data.map(estado => ({
+          label: estado.nombre,
+          value: estado._id
+        }));
+        setEstadosCotizaciones(estadosCotizacionesMapeados);
         const descuentosRes = await descuentoService.getDescuentos();
         setDescuentos(descuentosRes.data);
 
@@ -100,12 +103,12 @@ function CotizacionForm() {
             };
           });
 
-          const estadoSeleccionado = estadosCotizaciones.find(e => e._id === cotizacionData.estado);
+          const estadoSeleccionado = estadosCotizacionesMapeados.find(e => e.value === cotizacionData.estado);
 
           // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
-            estado: estadoSeleccionado ? { label: estadoSeleccionado.nombre, value: estadoSeleccionado._id } : null,
+            estado: estadoSeleccionado,
             items: itemsConActividadesYSubtotal,
           });
         }
@@ -459,7 +462,7 @@ function CotizacionForm() {
         </Table>
 
         <div className="text-center">
-        <p>Total: {formData.total} COP</p>
+          <p>Total: {formData.total} COP</p>
           {formData.items.some((fila) => fila.descuento) && (
             <p>Total con Descuento: {formData.subtotal} COP</p>
           )}
@@ -469,15 +472,13 @@ function CotizacionForm() {
           <div className="mb-4">
             <label>Estado de Cotización:</label>
             <Select
-              options={estadosCotizaciones.map((estado) => ({
-                label: estado.nombre,
-                value: estado._id,
-              }))}
-              value={formData.estado}
+              options={estadosCotizaciones}
+              value={estadosCotizaciones.find(estado => estado.value === formData.estado?.value)}
               onChange={handleEstadoChange}
             />
           </div>
         )}
+
 
         <Button color="success" onClick={addRow}>
           Agregar Fila +
