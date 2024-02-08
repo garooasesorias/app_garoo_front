@@ -105,11 +105,20 @@ function CotizacionForm() {
 
           const estadoSeleccionado = estadosCotizacionesMapeados.find(e => e.value === cotizacionData.estado);
 
+          const divisionesConFechas = cotizacionData.divisionPagos.map(division => {
+            return {
+              ...division,
+              // Transforma la fecha ISO a formato 'aaaa-mm-dd' para el input de fecha
+              fechaLimite: new Date(division.fechaLimite).toISOString().split('T')[0],
+            };
+          });
+
           // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
             estado: estadoSeleccionado,
             items: itemsConActividadesYSubtotal,
+            divisionPagos: divisionesConFechas,
           });
         }
       } catch (error) {
@@ -509,7 +518,7 @@ function CotizacionForm() {
                 <td>
                   <input
                     type="date"
-                    value={division.fechaLimite}
+                    value={division.fechaLimite} // Asegúrate de que esto se establece correctamente
                     onChange={(e) => {
                       setFormData((prevData) => {
                         const updatedDivisiones = [...prevData.divisionPagos];
