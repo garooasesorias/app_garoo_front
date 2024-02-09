@@ -22,15 +22,20 @@ const clienteService = {
     }
   },
 
-  insertCliente: async (datosCliente) => {
-    try {
-      const response = await api.post("/cliente/insertCliente", datosCliente);
-      return response.data; // Respuesta de la API tras insertar el cliente
-    } catch (error) {
-      console.error("Error al insertar el cliente:", error);
-      throw error;
+insertCliente: async (datosCliente) => {
+  try {
+    const response = await api.post("/cliente/insertCliente", datosCliente);
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.status === 409) {
+      // Error específico para clientes duplicados
+      throw new Error(error.response.data.message);
+    } else {
+      // Otros errores
+      throw new Error("Error al crear el cliente");
     }
-  },
+  }
+},
 
   updateClienteById: async (id, data) => {
     try {
