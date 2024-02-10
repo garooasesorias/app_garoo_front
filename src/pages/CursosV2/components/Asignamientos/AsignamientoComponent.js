@@ -4,48 +4,78 @@ import { Button, Table } from "flowbite-react";
 import Select from "react-select";
 import adviserService from "../../../../services/asesorService";
 import asignamientoService from "../../../../services/asignamientoService";
+import authService from "../../../../services/authService"; // Importando authService
+import { utcToZonedTime } from "date-fns-tz";
 
-export default function AsignamientoComponent({ data }) {
-  const items = data.asignamiento?.items || [];
+export default function AsignamientoComponent({
+  data,
+  notifyOperacionesUpdate,
+  notifyCalificacionesUpdate,
+}) {
   const [formData, setFormData] = useState({
-    items: data.actividades.map((actividad, index) => ({
-      fechaVencimiento: items[index]?.fechaVencimiento
-        ? format(parseISO(items[index]?.fechaVencimiento), "yyyy-MM-dd")
-        : "",
-      actividad: items[index]?.actividad || actividad._id,
-      asesor: {
-        _id: items[index]?.asesor || null,
-      },
-    })),
+    items: [],
   });
 
   const [asesores, setAsesores] = useState([]);
+  const [isAdmin, setIsAdmin] = useState(false); // Estado para almacenar si el usuario es administrador
+
+  const fetchData = async () => {
+    const asesores = await adviserService.getAdvisors();
+    setAsesores(asesores.data);
+
+    asignamientoService
+      .getAsignamientoesByIdCurso(data._id)
+      .then((response) => {
+        console.log("asignamientos", response.data);
+        setFormData({
+          items: response.data.map((asignamiento) => ({
+            id: asignamiento._id,
+            fechaVencimiento: asignamiento.fechaVencimiento
+              ? format(
+                  utcToZonedTime(
+                    parseISO(asignamiento.fechaVencimiento),
+                    "UTC"
+                  ),
+                  "yyyy-MM-dd"
+                )
+              : "",
+            actividad: asignamiento.actividad._id,
+            nombreActividad: asignamiento.actividad.nombre,
+            asesor: {
+              _id: asignamiento.asesor._id || null,
+            },
+          })),
+        });
+
+        console.log("formData ", formData);
+      });
+  };
 
   useEffect(() => {
-    const fetchData = async () => {
-      const asesores = await adviserService.getAdvisors();
-      setAsesores(asesores.data);
+    const checkAdmin = async () => {
+      setIsAdmin(await authService.isAdmin()); // Comprobar si el usuario es administrador
     };
+    checkAdmin();
+
     fetchData();
   }, []);
 
-  const handleDateChange = (date, itemIndex) => {
-    setFormData((prevFormData) => {
-      const newItems = [...prevFormData.items];
-      newItems[itemIndex].fechaVencimiento = date;
-      return { ...prevFormData, items: newItems };
+  const handleDateChange = async (date, id) => {
+    await asignamientoService.updateAsignamientoById(id, {
+      fechaVencimiento: date,
     });
+    fetchData();
+    notifyOperacionesUpdate();
+    notifyCalificacionesUpdate();
   };
 
-  const handleAsesorChange = (selectedOption, itemIndex) => {
-    setFormData((prevFormData) => {
-      const newItems = [...prevFormData.items];
-      const asesorObj = asesores.find(
-        (asesor) => asesor._id === selectedOption.value
-      );
-      newItems[itemIndex].asesor = asesorObj;
-      return { ...prevFormData, items: newItems };
+  const handleAsesorChange = async (selectedOption, id) => {
+    await asignamientoService.updateAsignamientoById(id, {
+      asesor: selectedOption.value,
     });
+    fetchData();
+    notifyOperacionesUpdate();
+    notifyCalificacionesUpdate();
   };
 
   const handleSubmit = async (e) => {
@@ -59,7 +89,6 @@ export default function AsignamientoComponent({ data }) {
       };
     });
 
-    console.log("data", data);
     await asignamientoService
       .updateAsignamientoById(
         data.asignamiento?._id ? data.asignamiento._id : null,
@@ -70,17 +99,6 @@ export default function AsignamientoComponent({ data }) {
       )
       .then(() => alert("success"))
       .catch(() => alert("error"));
-    // google.script.run
-    //   .withSuccessHandler((response) => {
-    //     alert("Éxito");
-    //   })
-    //   .updateAsignamientoById(
-    //     data.asignamiento._id ? { _id: { $oid: data.asignamiento._id } } : {},
-    //     {
-    //       curso: { $oid: data._id },
-    //       items: itemsToSend,
-    //     }
-    //   );
   };
 
   return (
@@ -100,25 +118,27 @@ export default function AsignamientoComponent({ data }) {
           {formData.items &&
             formData.items.map((item, itemIndex) => (
               <tr key={item.actividad}>
-                <td className="px-4 py-2">
-                  {data.actividades[itemIndex].nombre}
-                </td>
+                <td className="px-4 py-2">{item.nombreActividad}</td>
                 <td className="px-4 py-2">
                   <input
                     type="date"
                     value={item.fechaVencimiento}
                     onChange={(event) =>
-                      handleDateChange(event.target.value, itemIndex)
+                      isAdmin && handleDateChange(event.target.value, item.id)
                     }
+                    disabled={!isAdmin}
                     className="datepicker-custom"
                   />
                 </td>
                 <td className="px-4 py-2">
                   <Select
-                    options={asesores.map((asesor) => ({
-                      value: asesor._id,
-                      label: asesor.nombre,
-                    }))}
+                    options={[
+                      { value: null, label: "Sin asignar" },
+                      ...asesores.map((asesor) => ({
+                        value: asesor._id,
+                        label: asesor.nombre,
+                      })),
+                    ]}
                     value={
                       asesores.find((asesor) => asesor._id === item.asesor._id)
                         ? {
@@ -130,20 +150,16 @@ export default function AsignamientoComponent({ data }) {
                         : null
                     }
                     onChange={(selectedOption) =>
-                      handleAsesorChange(selectedOption, itemIndex)
+                      isAdmin && handleAsesorChange(selectedOption, item.id)
                     }
-                    isSearchable={true}
+                    isSearchable={isAdmin}
+                    isDisabled={!isAdmin}
                   />
                 </td>
               </tr>
             ))}
         </tbody>
       </Table>
-      <div className="flex justify-center mt-2">
-        <Button type="submit" color="dark">
-          Actualizar Asignamiento
-        </Button>
-      </div>
     </form>
   );
 }

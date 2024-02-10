@@ -12,6 +12,16 @@ function Cursos() {
   const [selectedCurso, setSelectedCurso] = useState(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState(""); // Estado para el mensaje de error
+  const [refreshOperaciones, setRefreshOperaciones] = useState(false);
+  const [refreshCalificaciones, setRefreshCalificaciones] = useState(false);
+
+  const notifyOperacionesUpdate = () => {
+    setRefreshOperaciones(true);
+  };
+  const notifyCalificacionesUpdate = () => {
+    console.log("notifyCalificacionesUpdate ");
+    setRefreshCalificaciones(true);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -84,16 +94,22 @@ function Cursos() {
                   <Tabs.Item title="Asignamientos">
                     <AsignamientoComponent
                       data={selectedCurso}
+                      notifyOperacionesUpdate={notifyOperacionesUpdate}
+                      notifyCalificacionesUpdate={notifyCalificacionesUpdate}
                     ></AsignamientoComponent>
                   </Tabs.Item>
                   <Tabs.Item title="Operaciones">
                     <OperacionComponent
                       data={selectedCurso}
+                      refreshOperaciones={refreshOperaciones}
+                      setRefreshOperaciones={setRefreshOperaciones}
                     ></OperacionComponent>
                   </Tabs.Item>
                   <Tabs.Item title="Calificaciones">
                     <CalificacionComponent
                       data={selectedCurso}
+                      refreshCalificaciones={refreshCalificaciones}
+                      setRefreshCalificaciones={setRefreshCalificaciones}
                     ></CalificacionComponent>
                   </Tabs.Item>
                 </Tabs.Group>

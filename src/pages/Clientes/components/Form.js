@@ -62,9 +62,9 @@ function Form() {
       nombre: cliente.nombre || "",
       fechaNacimiento: cliente.fechaNacimiento
         ? format(
-            utcToZonedTime(parseISO(cliente.fechaNacimiento), "UTC"),
-            "yyyy-MM-dd"
-          )
+          utcToZonedTime(parseISO(cliente.fechaNacimiento), "UTC"),
+          "yyyy-MM-dd"
+        )
         : "",
       genero: cliente.genero || "",
       usuario: cliente.usuario || "",
@@ -86,35 +86,32 @@ function Form() {
 
       if (id) {
         // Actualizar cliente existente
-        console.log("intenta actualizar");
-        console.log(formData);
         response = await clienteService.updateClienteById(id, formData);
-        console.log(response);
-        setAction("actualizado");
-        props.setShowToast(true, "Cliente actualizado");
+        setAction("actualizado"); // Esto se mostrará en el Toast si tiene éxito
       } else {
         // Insertar nuevo cliente
-        console.log("intenta crear");
         response = await clienteService.insertCliente(formData);
-        props.setShowToast(true, "Cliente creado");
+        setAction("creado"); // Esto se mostrará en el Toast si tiene éxito
       }
 
-      console.log(response);
+      // Muestra el toast de éxito
+      setShowToast(true);
+    } catch (error) {
+      console.error("Error en la operación:", error);
+
+      // Aquí se define el mensaje de error basado en el error capturado
+      setAction("no pudo ser creado/datos duplicados"); // Cambia este texto según sea necesario
+      setShowToast(true); // Asegúrate de que se muestre el Toast
+    } finally {
       setLoading(false);
+      // Aquí ocultamos el Toast después de un tiempo, independientemente de si fue éxito o error
       setTimeout(() => {
-        props.setShowToast(false);
+        setShowToast(false);
       }, 5000);
 
       if (!id) {
         handleResetForm();
       }
-    } catch (error) {
-      console.error("Error en la operación:", error);
-      setLoading(false);
-      props.setShowToast(true, "Error en la operación");
-      setTimeout(() => {
-        props.setShowToast(false);
-      }, 5000);
     }
   };
 
@@ -310,17 +307,18 @@ function Form() {
       </Button>
 
       <div className="LoaderContainerForm">{loading ? <Loader /> : null}</div>
-      {props.showToast && (
+      {showToast && (
         <Toast style={{ maxWidth: "250px" }} className="Toast">
           <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
             <HiCheck className="h-5 w-5" />
           </div>
           <div className="ml-3 text-sm font-normal">
-            Cliente {action} con éxito
+            Cliente {action} {/* Aquí se usa el estado `action` para mostrar el mensaje */}
           </div>
-          <Toast.Toggle onDismiss={() => props.setShowToast(false)} />
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
+
     </>
   );
 }

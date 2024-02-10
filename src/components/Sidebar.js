@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import CollapsibleDropdown from "./CollapsibleDropdown";
 import {
@@ -19,6 +19,16 @@ import authService from "../services/authService";
 
 function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
   const { notificaciones } = useContext(NotificacionesContext);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const isAdmin = await authService.isAdmin();
+      setIsAdmin(isAdmin);
+    };
+
+    checkAdmin();
+  }, []);
 
   return (
     <>
@@ -54,7 +64,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Materias</b>}
@@ -72,7 +82,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Asesores</b>}
@@ -119,7 +129,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </ul>
                 </li>
               )}
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Actividades</b>}
@@ -157,7 +167,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Cotizaciones</b>}
@@ -198,7 +208,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   {/* Other sub-options for "Actividades" */}
                 </CollapsibleDropdown>
               </li>
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Reportes</b>}
@@ -216,7 +226,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
               )}
             </ul>
             <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
-              {authService.isAdmin() && (
+              {isAdmin && (
                 <li>
                   <CollapsibleDropdown
                     buttonText={<b>Configuraciones</b>}

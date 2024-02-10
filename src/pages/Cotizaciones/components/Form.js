@@ -12,6 +12,7 @@ import estadoCotizacionService from "../../../services/estadoCotizacionService";
 import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
 import cursoService from "../../../services/cursoService";
 import operacionService from "../../../services/operacionService";
+import asignamientoService from "../../../services/asignamientoService";
 // Otros componentes o servicios que puedas necesitar
 
 function CotizacionForm() {
@@ -40,6 +41,7 @@ function CotizacionForm() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Carga inicial de datos requeridos como clientes, materias, etc.
         const clientesRes = await clienteService.getClientes();
         setClientes(clientesRes.data);
 
@@ -57,37 +59,67 @@ function CotizacionForm() {
           }))
         );
 
-        const estadosCotizacionesRes =
-          await estadoCotizacionService.getEstadosCotizacion();
-        setEstadosCotizaciones(estadosCotizacionesRes.data);
-
+        const estadosCotizacionesRes = await estadoCotizacionService.getEstadosCotizacion();
+        const estadosCotizacionesMapeados = estadosCotizacionesRes.data.map(estado => ({
+          label: estado.nombre,
+          value: estado._id
+        }));
+        setEstadosCotizaciones(estadosCotizacionesMapeados);
         const descuentosRes = await descuentoService.getDescuentos();
         setDescuentos(descuentosRes.data);
 
+        // Si estamos editando una cotización existente (id presente), obtenemos sus datos
         if (id) {
           const cotizacionRes = await cotizacionService.getCotizacionById(id);
+          console.log('Cotización cargada de la base de datos:', cotizacionRes.data);
+
           const cotizacionData = cotizacionRes.data;
 
-          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
-          const itemsConActividades = cotizacionData.items.map((item) => {
+          // Función para obtener el subtotal por plan
+          const obtenerSubtotalPorPlan = (planId) => {
+            const plan = planesRes.data.find(p => p._id === planId);
+            return plan ? plan.precio : 'N/A'; // Asegúrate de que `plan.precio` es el precio del plan
+          };
+
+          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente,
+          // además de asignar el subtotal adecuado
+          const itemsConActividadesYSubtotal = cotizacionData.items.map((item) => {
+            const subtotal = obtenerSubtotalPorPlan(item.plan);
+
             const actividadesOptions = actividadesRes.data.map((act) => ({
               label: act.nombre,
               value: act._id,
             }));
 
+            const descuentoAplicado = descuentosRes.data.find(d => d._id === item.descuento);
+
             return {
               ...item,
+              planSubtotal: subtotal, // Agrega el subtotal al item
               actividades: item.actividades.map(
-                (actId) =>
-                  actividadesOptions.find((act) => act.value === actId._id) ||
-                  null
+                (actId) => actividadesOptions.find((act) => act.value === actId._id) || null
               ),
+              // Agrega el descuento al item
+              descuento: descuentoAplicado ? { label: `${descuentoAplicado.descripcion} (${descuentoAplicado.porcentaje}%)`, value: descuentoAplicado._id } : null,
             };
           });
 
+          const estadoSeleccionado = estadosCotizacionesMapeados.find(e => e.value === cotizacionData.estado);
+
+          const divisionesConFechas = cotizacionData.divisionPagos.map(division => {
+            return {
+              ...division,
+              // Transforma la fecha ISO a formato 'aaaa-mm-dd' para el input de fecha
+              fechaLimite: new Date(division.fechaLimite).toISOString().split('T')[0],
+            };
+          });
+
+          // Actualiza el estado formData con los nuevos items que incluyen subtotales
           setFormData({
             ...cotizacionData,
-            items: itemsConActividades,
+            estado: estadoSeleccionado,
+            items: itemsConActividadesYSubtotal,
+            divisionPagos: divisionesConFechas,
           });
         }
       } catch (error) {
@@ -98,50 +130,10 @@ function CotizacionForm() {
     fetchData();
   }, [id]); // Dependencia: id
 
-  const calculateRowTotal = (row) => {
-    let totalRow = 0;
-    if (row.plan) {
-      const plan = planes.find((plan) => plan._id === row.plan.value);
-      totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
-    }
-
-    if (row.descuento) {
-      const descuentoAplicable = descuentos.find(
-        (descuento) => descuento._id === row.descuento.value
-      );
-      if (descuentoAplicable) {
-        totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
-      }
-    }
-
-    return totalRow;
-  };
-
-  const calculateRowSubtotal = (row) => {
-    let subtotal = 0;
-    if (row.plan) {
-      const plan = planes.find((p) => p._id === row.plan.value);
-      subtotal += plan ? Number(plan.precio) : 0;
-    }
-    // Aquí puedes agregar más lógica si hay otros elementos que contribuyen al subtotal
-    return subtotal;
-  };
-
-  // Calcula el total sin descuentos
-  const calculateTotal = () => {
-    return formData.items.reduce((accum, item) => {
-      return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
-    }, 0);
-  };
-
-  const calculateTotalConDescuento = () => {
-    return formData.items.reduce((accum, item) => {
-      return accum + calculateRowTotal(item); // Asume que calculateRowTotal devuelve el total de la fila con descuento aplicado
-    }, 0);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Datos del formulario:', formData);
 
     // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
@@ -195,20 +187,22 @@ function CotizacionForm() {
         const response = await cursoService.insertCurso(formattedFormData);
         const insertedId = response.data._id;
 
-        console.log("insertedId", insertedId);
         const actividades = item.actividades
           ? item.actividades.map((act) => ({
-              actividad: act.value,
-              curso: insertedId,
-            }))
+            actividad: act.value,
+            curso: insertedId,
+          }))
           : [];
-        console.log("actividades", actividades);
         if (actividades.length > 0) {
           console.log(actividades);
-          const operacionesResponse = await operacionService.insertOperaciones(
-            actividades
-          );
-          console.log("operacionesResponse", operacionesResponse);
+
+          const asignamientosResponse =
+            await asignamientoService.insertAsignamiento(actividades);
+
+          // const operacionesResponse = await operacionService.insertOperaciones(
+          //   actividades
+          // );
+          // console.log("operacionesResponse", operacionesResponse);
         }
       } catch (error) {
         console.error("Error al insertar curso y operaciones:", error);
@@ -468,7 +462,7 @@ function CotizacionForm() {
                     }
                   />
                 </td>
-                <td>{calculateRowTotal(fila)} COP</td>
+                <td>{formData.total} COP</td>
                 <td>
                   <Button color="danger" onClick={() => removeRow(index)}>
                     Eliminar
@@ -480,9 +474,9 @@ function CotizacionForm() {
         </Table>
 
         <div className="text-center">
-          <p>Total: {calculateTotal()} COP</p>
+          <p>Total: {formData.total} COP</p>
           {formData.items.some((fila) => fila.descuento) && (
-            <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
+            <p>Total con Descuento: {formData.subtotal} COP</p>
           )}
         </div>
 
@@ -490,15 +484,13 @@ function CotizacionForm() {
           <div className="mb-4">
             <label>Estado de Cotización:</label>
             <Select
-              options={estadosCotizaciones.map((estado) => ({
-                label: estado.nombre,
-                value: estado._id,
-              }))}
-              value={formData.estado}
+              options={estadosCotizaciones}
+              value={estadosCotizaciones.find(estado => estado.value === formData.estado?.value)}
               onChange={handleEstadoChange}
             />
           </div>
         )}
+
 
         <Button color="success" onClick={addRow}>
           Agregar Fila +
@@ -529,7 +521,7 @@ function CotizacionForm() {
                 <td>
                   <input
                     type="date"
-                    value={division.fechaLimite}
+                    value={division.fechaLimite} // Asegúrate de que esto se establece correctamente
                     onChange={(e) => {
                       setFormData((prevData) => {
                         const updatedDivisiones = [...prevData.divisionPagos];
@@ -553,7 +545,8 @@ function CotizacionForm() {
           </Button>
         )}
 
-        {formData.fecha && <PdfButton data={formData} />}
+        {/* {formData.fecha && <PdfButton data={formData} />} */}
+        <PdfButton data={formData} />
 
         {isEstadoGenerada && (
           <Button color="light">Enviar Cotización al Cliente</Button>

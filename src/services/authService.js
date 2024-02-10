@@ -6,19 +6,6 @@ export const getDecodedToken = () => {
   return token ? jwtDecode(token) : null;
 };
 
-// export const isAdmin = () => {
-//   const decodedToken = getDecodedToken();
-//   return decodedToken?.role === "administrador";
-// };
-
-// export const isAuthenticated = () => {
-//   const token = localStorage.getItem("token");
-//   // Aquí simplemente verifica si el token existe y es un string no vacío
-//   return !!token; // Esto devolverá true si hay un token, false si no
-// };
-
-// services/authService.js
-
 const authService = {
   validateToken: async () => {
     try {
@@ -30,16 +17,10 @@ const authService = {
     }
   },
 
-  isAdmin: async () => {
+  isAdmin: () => {
     const decodedToken = getDecodedToken();
-    return decodedToken?.role === "administrador";
+    return decodedToken.role === "administrador";
   },
-
-  // export const isAdmin = () => {
-  //   const decodedToken = getDecodedToken();
-  //   return decodedToken?.role === "administrador";
-  // };
-  // ... puedes incluir aquí otros métodos relacionados con la autenticación ...
 };
 
 export default authService;

@@ -25,7 +25,7 @@ const asignamientoService = {
     try {
       // Asegúrate de incluir el ID en la URL
       const response = await api.post(
-        `/asignamiento/getAsignamientoesByIdCurso`,
+        `/asignamiento/getAsignamientosByIdCurso`,
         { id }
       );
       return response.data;
@@ -44,6 +44,19 @@ const asignamientoService = {
       return response.data; // Respuesta de la API tras insertar el asignamiento
     } catch (error) {
       console.error("Error al insertar el asignamiento:", error);
+      throw error;
+    }
+  },
+
+  insertAsignamiento: async (datosOperacion) => {
+    try {
+      const response = await api.post(
+        "/asignamiento/insertAsignamientos",
+        datosOperacion
+      );
+      return response.data; // Respuesta de la API tras insertar el operacion
+    } catch (error) {
+      console.error("Error al insertar el operaciones:", error);
       throw error;
     }
   },
