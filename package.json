@@ -1,10 +1,6 @@
 {
   "name": "webappgaroo",
-<<<<<<< HEAD
   "version": "1.0.2",
-=======
-  "version": "1.0.1",
->>>>>>> 97d28c6bd5ffbafe59d74405015d21c3db0a7ba9
   "description": "",
   "scripts": {
     "start": "react-scripts start",
