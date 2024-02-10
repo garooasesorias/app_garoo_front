@@ -21,42 +21,66 @@ export default function OperacionComponent({
   const [formData, setFormData] = useState({});
 
   const fetchData = async () => {
-    const operaciones = await operacionService.getOperacionesByIdCurso(
-      data._id
-    );
+    setLoading(true);
+    try {
+      // Intenta cargar las operaciones
+      let operacionesData = [];
+      try {
+        const operacionesResponse =
+          await operacionService.getOperacionesByIdCurso(data._id);
+        operacionesData = operacionesResponse.data;
+      } catch (error) {
+        console.warn("No se pudieron cargar las operaciones: ", error.message);
+        // Manejo específico del error de operaciones aquí
+      }
 
-    setFormData({
-      items: operaciones?.data.map((operacion) => ({
-        _id: operacion._id,
-        actividad: operacion.actividad,
-        curso: data._id,
-        nombreActividad: operacion.asignamiento.actividad.nombre,
-        nombreAsesor: operacion.asignamiento?.asesor?.nombre || "Sin asignar",
-        fechaVencimiento: operacion.asignamiento?.fechaVencimiento
-          ? format(
-              utcToZonedTime(
-                parseISO(operacion.asignamiento.fechaVencimiento),
-                "UTC"
-              ),
-              "yyyy-MM-dd"
-            )
-          : "no establecido",
-        grupo: operacion.grupo || "",
-        tutor: operacion.tutor || "",
-        archivosURL: operacion.archivosURL || "",
-        comentarios: operacion.comentarios || "",
-        estado: {
-          _id: operacion.estado || "",
-        },
-        formaEnvio: operacion.formaEnvio || "",
-        actividadURL: operacion.actividadURL || "",
-        priorizacion: operacion.priorizacion || "",
-      })),
-    });
+      // Procesar operaciones para actualizar el estado, incluso si está vacío
+      setFormData({
+        items: operacionesData.map((operacion) => ({
+          _id: operacion._id,
+          actividad: operacion.actividad,
+          curso: data._id,
+          nombreActividad: operacion.asignamiento.actividad.nombre,
+          nombreAsesor: operacion.asignamiento?.asesor?.nombre || "Sin asignar",
+          fechaVencimiento: operacion.asignamiento?.fechaVencimiento
+            ? format(
+                utcToZonedTime(
+                  parseISO(operacion.asignamiento.fechaVencimiento),
+                  "UTC"
+                ),
+                "yyyy-MM-dd"
+              )
+            : "no establecido",
+          grupo: operacion.grupo || "",
+          tutor: operacion.tutor || "",
+          archivosURL: operacion.archivosURL || "",
+          comentarios: operacion.comentarios || "",
+          estado: operacion.estado || "",
+          formaEnvio: operacion.formaEnvio || "",
+          actividadURL: operacion.actividadURL || "",
+          priorizacion: operacion.priorizacion || "",
+        })),
+      });
 
-    const estadosAdm = await estadoAdmService.getEstadosAdm();
-    setEstadosAdm(estadosAdm.data);
+      // Cargar estados administrativos independientemente del éxito de operaciones
+      try {
+        const estadosAdmResponse = await estadoAdmService.getEstadosAdm();
+        setEstadosAdm(estadosAdmResponse.data);
+      } catch (error) {
+        console.error(
+          "Error al cargar estados administrativos: ",
+          error.message
+        );
+        // Manejo específico del error de estados administrativos aquí
+      }
+    } catch (error) {
+      // Manejo de otros errores no esperados
+      console.error("Error no manejado: ", error.message);
+    } finally {
+      setLoading(false);
+    }
   };
+
   useEffect(() => {
     fetchData();
     if (refreshOperaciones) {

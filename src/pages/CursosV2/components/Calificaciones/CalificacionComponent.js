@@ -41,38 +41,63 @@ export default function CalificacionComponent({
     );
   };
 
+  // Agregar manejo de errores en fetchData
   const fetchData = async () => {
-    const asignamientos = (
-      await asignamientoService.getAsignamientoesByIdCurso(data._id)
-    ).data;
+    try {
+      setLoading(true); // Iniciar loading antes de la petición
 
-    const calificaciones = (
-      await calificacionService.getCalificacionesByIdCurso(data._id)
-    ).data;
+      const asignamientosResponse =
+        await asignamientoService.getAsignamientosByIdCurso(data._id);
+      const asignamientos = asignamientosResponse.data;
 
-    const itemsBody = createArray(asignamientos, calificaciones);
-    setFormData({
-      itemsHead: asignamientos.map((asignamiento) => ({
-        id: asignamiento._id,
-        nombreActividad: asignamiento.actividad.nombre,
-        nombreAsesor: asignamiento.asesor?.nombre || "Sin asignar",
-        fechaVencimiento: asignamiento.fechaVencimiento
-          ? format(
-              utcToZonedTime(parseISO(asignamiento.fechaVencimiento), "UTC"),
-              "yyyy-MM-dd"
-            )
-          : "no establecido",
-      })),
-      itemsBody,
-    });
+      // Intentar cargar calificaciones, pero continuar normalmente si falla
+      let calificaciones = [];
+      try {
+        const calificacionesResponse =
+          await calificacionService.getCalificacionesByIdCurso(data._id);
+        calificaciones = calificacionesResponse.data;
+      } catch (error) {
+        console.warn(
+          "Error al cargar calificaciones, continuando con otros datos: ",
+          error.message
+        );
+        // Aquí se maneja el error pero no se interrumpe el flujo normal
+      }
 
-    const clientes = await clienteService.getClientes();
-    setClientes(clientes.data);
+      const itemsBody = createArray(asignamientos, calificaciones);
+      setFormData({
+        itemsHead: asignamientos.map((asignamiento) => ({
+          id: asignamiento._id,
+          nombreActividad: asignamiento.actividad.nombre,
+          nombreAsesor: asignamiento.asesor?.nombre || "Sin asignar",
+          fechaVencimiento: asignamiento.fechaVencimiento
+            ? format(
+                utcToZonedTime(parseISO(asignamiento.fechaVencimiento), "UTC"),
+                "yyyy-MM-dd"
+              )
+            : "no establecido",
+        })),
+        itemsBody,
+      });
+
+      // Separar la carga de clientes para manejar sus errores de forma independiente
+      try {
+        const clientesResponse = await clienteService.getClientes();
+        setClientes(clientesResponse.data);
+      } catch (error) {
+        console.error("Error al cargar los clientes: ", error.message);
+        // Manejar el error de carga de clientes aquí, si es necesario
+      }
+    } catch (error) {
+      console.error("Error al cargar los datos generales: ", error.message);
+      // Manejar otros errores inesperados aquí
+    } finally {
+      setLoading(false); // Finalizar loading después de la petición
+    }
   };
 
   useEffect(() => {
     fetchData();
-    console.log("refreshCalificaciones ", refreshCalificaciones);
     if (refreshCalificaciones) {
       fetchData();
       setRefreshCalificaciones(false); // Restablece el flag
@@ -88,26 +113,40 @@ export default function CalificacionComponent({
     }));
 
     setLoading(true);
-    const resultInsertion = await calificacionService.insertCalificaciones(
-      calificaciones
-    );
-
-    fetchData();
-    setLoading(false);
+    try {
+      // Intenta insertar las calificaciones
+      const resultInsertion = await calificacionService.insertCalificaciones(
+        calificaciones
+      );
+      console.log("Inserción exitosa:", resultInsertion);
+      // Puedes agregar más lógica aquí si necesitas procesar resultInsertion
+    } catch (error) {
+      // Manejo de errores durante la inserción de calificaciones
+      console.error("Error al insertar calificaciones:", error.message);
+      // Aquí puedes mostrar un mensaje de error al usuario, si es necesario
+    } finally {
+      // fetchData se llama independientemente de si la inserción fue exitosa o no
+      fetchData().finally(() => {
+        setLoading(false);
+      });
+    }
   };
 
   // Función para manejar el cambio en las calificaciones
   const handleNotaChange = async (calificacionId, newValue) => {
-    setLoading(true);
-    const resultUpdate = await calificacionService.updatePuntaje(
-      {
-        _id: calificacionId,
-      },
-      newValue
-    );
-
-    fetchData();
-    setLoading(false);
+    try {
+      setLoading(true);
+      await calificacionService.updatePuntaje(
+        { _id: calificacionId },
+        newValue
+      );
+      fetchData(); // Recargar datos después de la actualización
+    } catch (error) {
+      console.error("Error al actualizar la calificación: ", error.message);
+      // Manejar el error en la UI aquí
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -203,38 +242,3 @@ function createArray(assignments, scores) {
 
   return finalArray;
 }
-
-const array = [
-  [
-    {
-      idEstudiante: "655cbc8bc158ce073cb420d0",
-      nombreEstudiante: "estudiante.nombre",
-    },
-    {
-      idAsignamiento: "65bdeed12c99c13b9df58e17",
-      idCalificacion: "65c0fa23c621dfac20aafcef",
-      puntaje: "calificaion.puntaje",
-    },
-    {
-      idAsignamiento: "65bdeed12c99c13b9df58e16",
-      idCalificacion: "65c0fa23c621dfac20aafcf0",
-      puntaje: "calificaion.puntaje",
-    },
-  ],
-  [
-    {
-      idEstudiante: "65c0e9c9169c8c36ca58427d",
-      nombreEstudiante: "estudiante.nombre",
-    },
-    {
-      idAsignamiento: "65bdeed12c99c13b9df58e17",
-      idCalificacion: "65c0fa46c621dfac20aafd0a",
-      puntaje: "calificaion.puntaje",
-    },
-    {
-      idAsignamiento: "65bdeed12c99c13b9df58e16",
-      idCalificacion: "65c0fa46c621dfac20aafd0b",
-      puntaje: "calificaion.puntaje",
-    },
-  ],
-];

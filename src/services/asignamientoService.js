@@ -1,7 +1,7 @@
 import api from "./api";
 
 const asignamientoService = {
-  getAsignamientoes: async () => {
+  getAsignamientos: async () => {
     try {
       const response = await api.get("/asignamiento/getAsignamientos");
       return response.data;
@@ -21,7 +21,7 @@ const asignamientoService = {
       throw error;
     }
   },
-  getAsignamientoesByIdCurso: async (id) => {
+  getAsignamientosByIdCurso: async (id) => {
     try {
       // Asegúrate de incluir el ID en la URL
       const response = await api.post(

@@ -24,9 +24,8 @@ export default function AsignamientoComponent({
     setAsesores(asesores.data);
 
     asignamientoService
-      .getAsignamientoesByIdCurso(data._id)
+      .getAsignamientosByIdCurso(data._id)
       .then((response) => {
-        console.log("asignamientos", response.data);
         setFormData({
           items: response.data.map((asignamiento) => ({
             id: asignamiento._id,
@@ -42,12 +41,10 @@ export default function AsignamientoComponent({
             actividad: asignamiento.actividad._id,
             nombreActividad: asignamiento.actividad.nombre,
             asesor: {
-              _id: asignamiento.asesor._id || null,
+              _id: asignamiento.asesor?._id || null,
             },
           })),
         });
-
-        console.log("formData ", formData);
       });
   };
 

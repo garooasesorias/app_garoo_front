@@ -1,6 +1,7 @@
+import pkg from "../../package.json";
+const { version } = pkg;
+
 function Footer() {
-    return <>
-   <h1></h1>
-        </>
+  return <p className="text-end me-2">Versión: {version} </p>;
 }
-export default Footer
+export default Footer;
