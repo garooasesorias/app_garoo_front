@@ -18,3 +18,5 @@ tmp
 .clasp.json
 
 apps-script/index.html
+
+src/services/api.js
