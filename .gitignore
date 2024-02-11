@@ -18,3 +18,4 @@ tmp
 .clasp.json
 
 apps-script/index.html
+src/env.json

@@ -1,9 +1,8 @@
 import axios from "axios";
-
+import env from "../env.json";
 // Crear una instancia de Axios con configuraciones por defecto
 const api = axios.create({
-  // baseURL: "http://localhost:4200/api/v1",
-  baseURL: "http://154.41.228.21:3000/api/v1",
+  baseURL: env.baseURL,
 });
 
 // Interceptor para añadir el token de autenticación en cada solicitud
