@@ -11,8 +11,8 @@ import { ToggleSwitch } from "flowbite-react";
 
 function Form() {
   const formRef = useRef();
-  //const [selectedFile, setSelectedFile] = useState(null);
-  const [formData, setFormData] = useState({
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [formDataState, setFormDataState] = useState({
     //avatar: "",
     identificacion: "",
     nombre: "",
@@ -81,7 +81,7 @@ function Form() {
   }, [id]);
 
   const setAsesor = (asesor) => {
-    setFormData({
+    setFormDataState({
       identificacion: asesor.identificacion || "",
       cargo: asesor.cargo || "",
       nombre: asesor.nombre || "",
@@ -95,48 +95,30 @@ function Form() {
   };
 
   function guardarArchivo(e) {
-    var file = e.target.files[0]; // El archivo seleccionado
-    //setSelectedFile(file ? file.name : null);
-    var reader = new FileReader(); // Para convertir a Base64
-    reader.readAsDataURL(e.target.files[0]); // Inicia la conversión...
-
-    reader.onload = function (e) {
-      // Una vez terminada la conversión...
-      var rawLog = reader.result.split(",")[1]; // Extrae solo los datos del archivo
-      var dataSend = {
-        dataReq: { data: rawLog, name: file.name, type: file.type },
-        //fname: "uploadFilesToGoogleDrive",
-      };
-
-      const apiUrl =
-        "http://localhost:3000/api/asesor/uploadFilesToGoogleDrive"; // Ajusta la URL según tu configuración
-
-      axios
-        .post(apiUrl, dataSend)
-        .then((response) => {
-          const fileId = response.data.id;
-          const baseUrl = "https://drive.google.com/uc?export=view&id=";
-          const nuevaUrl = baseUrl + fileId;
-
-          console.log("Nueva URL formateada:", nuevaUrl);
-
-          setFormData((prevData) => ({
-            ...prevData,
-            avatar: nuevaUrl,
-          }));
-        })
-        .uploadFilesToGoogleDrive(
-          dataSend.dataReq.data,
-          dataSend.dataReq.name,
-          dataSend.dataReq.type
-        );
-    };
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+    } else {
+      setSelectedFile(null);
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError(null); // Resetear el mensaje de error
+
+    const formData = new FormData();
+
+    // Agregar todos los datos del formulario al objeto FormData
+    Object.keys(formDataState).forEach((key) => {
+      formData.append(key, formDataState[key]);
+    });
+
+    // Agregar el archivo, si existe
+    if (selectedFile) {
+      formData.append("photoProfile", selectedFile);
+    }
 
     // Validar si la contraseña es necesaria y está presente
     if (!isTempPwd && !formData.email) {
@@ -206,7 +188,7 @@ function Form() {
   };
 
   const handleResetForm = () => {
-    setFormData({
+    setFormDataState({
       identificacion: "",
       cargo: "",
       correo: "",
@@ -220,14 +202,14 @@ function Form() {
   };
   const handleIdentificacionChange = (e) => {
     const newIdentificacion = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       identificacion: newIdentificacion,
     }));
   };
   const handleNombreChange = (e) => {
     const newName = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       nombre: newName,
     }));
@@ -235,7 +217,7 @@ function Form() {
 
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       email: newEmail,
     }));
@@ -243,21 +225,21 @@ function Form() {
 
   const handlePasswordChange = (e) => {
     const newPassword = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       password: newPassword,
     }));
   };
   const handleCargoChange = (e) => {
     const newCargo = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       cargo: newCargo,
     }));
   };
   const handleCelularChange = (e) => {
     const newCelular = e.target.value;
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       celular: newCelular,
     }));
@@ -272,7 +254,7 @@ function Form() {
 
     console.log("Selected Skills IDs:", selectedSkillsIds);
 
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       skills: selectedSkillsIds,
     }));
@@ -285,7 +267,7 @@ function Form() {
 
     console.log("Selected specialties ids", selectedSpecialtiesIds);
 
-    setFormData((prevData) => ({
+    setFormDataState((prevData) => ({
       ...prevData,
       specialties: selectedSpecialtiesIds,
     }));
@@ -314,7 +296,7 @@ function Form() {
             onChange={(e) => guardarArchivo(e)}
             // required
           />
-          <input type="hidden" name="avatar" value={formData.avatar} />
+          <input type="hidden" name="avatar" value={formDataState.avatar} />
           {/* <p >Archivo seleccionado: {selectedFile || 'Ningún archivo seleccionado'}</p>*/}
         </div>
         <div className="max-w-md">
@@ -325,7 +307,7 @@ function Form() {
             addon="ID"
             id="identificacion"
             name="identificacion"
-            value={formData.identificacion}
+            value={formDataState.identificacion}
             onChange={handleIdentificacionChange}
             required
           />
@@ -338,7 +320,7 @@ function Form() {
             addon="Nombre"
             id="nombre"
             name="nombre"
-            value={formData.nombre}
+            value={formDataState.nombre}
             onChange={handleNombreChange}
             required
           />
@@ -352,7 +334,7 @@ function Form() {
             id="email"
             name="email"
             placeholder="Ingresa tu correo electrónico"
-            value={formData.email}
+            value={formDataState.email}
             onChange={handleEmailChange}
             required
           />
@@ -366,19 +348,19 @@ function Form() {
             id="password"
             name="password"
             placeholder="Ingresa tu contraseña"
-            value={formData.password}
+            value={formDataState.password}
             onChange={handlePasswordChange}
             disabled={!isTempPwd} // Deshabilitar basado en isTempPwd
-            required={!formData.isTempPwd} // El campo es requerido si `isTempPwd` es false
+            required={!formDataState.isTempPwd} // El campo es requerido si `isTempPwd` es false
           />
           <ToggleSwitch
             className="mt-2"
-            checked={formData.isTempPwd}
+            checked={formDataState.isTempPwd}
             label="Contraseña Temporal"
             onChange={(isChecked) => {
               // Aquí se asume que 'isChecked' es un booleano directamente, no un evento
               setIsTempPwd(isChecked); // Actualiza el estado local
-              setFormData((prevFormData) => ({
+              setFormDataState((prevFormData) => ({
                 ...prevFormData,
                 isTempPwd: isChecked,
               }));
@@ -393,7 +375,7 @@ function Form() {
             addon="Cargo"
             id="cargo"
             name="cargo"
-            value={formData.cargo}
+            value={formDataState.cargo}
             onChange={handleCargoChange}
             required
           />
@@ -406,7 +388,7 @@ function Form() {
             addon="#"
             id="celular"
             name="celular"
-            value={formData.celular}
+            value={formDataState.celular}
             onChange={handleCelularChange}
             required
           />
@@ -423,7 +405,7 @@ function Form() {
               value: skill._id,
             }))}
             isMulti
-            value={(Array.isArray(formData.skills) ? formData.skills : []).map(
+            value={(Array.isArray(formDataState.skills) ? formDataState.skills : []).map(
               (selectedSkillId) => ({
                 label:
                   skills.find((skill) => skill._id === selectedSkillId)
@@ -446,8 +428,8 @@ function Form() {
               value: specialty._id,
             }))}
             isMulti
-            value={(Array.isArray(formData.specialties)
-              ? formData.specialties
+            value={(Array.isArray(formDataState.specialties)
+              ? formDataState.specialties
               : []
             ).map((selectedSpecialtyId) => ({
               label:
