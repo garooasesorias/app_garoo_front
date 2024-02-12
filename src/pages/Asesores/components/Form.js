@@ -82,20 +82,22 @@ function Form() {
 
   const setAsesor = (asesor) => {
     setFormDataState({
+      id: asesor._id,
       identificacion: asesor.identificacion || "",
       cargo: asesor.cargo || "",
       nombre: asesor.nombre || "",
+      email: asesor.email || "",
       avatar: asesor.avatar || "",
       specialties: asesor.specialties || "",
       skills: asesor.skills || "",
       celular: asesor.celular || "",
-
       // ...otros campos
     });
   };
 
   function guardarArchivo(e) {
     const file = e.target.files[0];
+    console.log("file guardar archivo ", file);
     if (file) {
       setSelectedFile(file);
     } else {
@@ -116,21 +118,15 @@ function Form() {
     });
 
     // Agregar el archivo, si existe
+    console.log("selectedFile insertAsesor", selectedFile);
     if (selectedFile) {
+      console.log("appending file insertAsesor");
       formData.append("photoFile", selectedFile);
-    }
-
-    // Validar si la contraseña es necesaria y está presente
-    if (!isTempPwd && !formData.email) {
-      setError("Por favor, ingresa una contraseña.");
-      return; // No continuar con el envío si la validación falla
     }
 
     try {
       let response;
-
       if (id) {
-        // Actualizar asesor existente
         response = await asesorService.updateAsesorById(id, formData);
         setAction("actualizado");
         // props.setShowToast(true, "asesor actualizado");
@@ -165,13 +161,6 @@ function Form() {
     } finally {
       setLoading(false); // Desactivar la señal de carga independientemente del resultado
     }
-    // } catch (error) {
-    //   setLoading(false);
-    //   props.setShowToast(true, "Error en la operación");
-    //   setTimeout(() => {
-    //     props.setShowToast(false);
-    //   }, 5000);
-    // }
   };
 
   const showToastWithTimeout = (message, duration = 5000) => {
@@ -189,6 +178,7 @@ function Form() {
 
   const handleResetForm = () => {
     setFormDataState({
+      id: "",
       identificacion: "",
       cargo: "",
       correo: "",
@@ -245,14 +235,10 @@ function Form() {
     }));
   };
   const handleSkillsChange = (selectedOptions) => {
-    console.log("Selected Skills:", selectedOptions);
-
     // Mapear los objetos seleccionados a sus IDs
     const selectedSkillsIds = selectedOptions.map(
       (selectedOption) => selectedOption.value
     );
-
-    console.log("Selected Skills IDs:", selectedSkillsIds);
 
     setFormDataState((prevData) => ({
       ...prevData,
@@ -264,8 +250,6 @@ function Form() {
     const selectedSpecialtiesIds = selectedOptionsSpecialties.map(
       (selectedOptionsSpecialties) => selectedOptionsSpecialties.value
     );
-
-    console.log("Selected specialties ids", selectedSpecialtiesIds);
 
     setFormDataState((prevData) => ({
       ...prevData,
@@ -449,8 +433,7 @@ function Form() {
           // value={formData.avatar}
           // onChange={(e) => guardarArchivo(e)}
         >
-          {" "}
-          Submit
+          {id ? "Actualizar Asesor" : "Insertar Asesor"}
         </Button>
       </form>
       <Button

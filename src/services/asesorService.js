@@ -23,9 +23,14 @@ const asesorService = {
   },
 
   insertAsesor: async (datosAsesor) => {
+    console.log("datos Asesor: ", datosAsesor);
+    const config = { headers: { "Content-Type": '"multipart/form-data"' } };
     try {
-      console.log("datosAsesor insertAsesor", datosAsesor);
-      const response = await api.post("/asesor/insertAsesor", datosAsesor);
+      const response = await api.post(
+        "/asesor/insertAsesor",
+        datosAsesor,
+        config
+      );
       return response.data; // Respuesta de la API tras insertar el asesor
     } catch (error) {
       console.error("Error al insertar el asesor:", error);
@@ -35,10 +40,7 @@ const asesorService = {
 
   updateAsesorById: async (id, data) => {
     try {
-      const response = await api.put("/asesor/updateAsesorById", {
-        id,
-        data,
-      });
+      const response = await api.put("/asesor/updateAsesorById", data);
       return response.data; // Respuesta de la API tras insertar el asesor
     } catch (error) {
       console.error("Error al actualizar el asesor:", error);
@@ -46,7 +48,6 @@ const asesorService = {
     }
   },
   deleteAsesorById: async (id) => {
-    console.log(id);
     try {
       const response = await api.delete(`/asesor/deleteAsesorById/${id}`);
       return response.data; // Respuesta de la API tras insertar el asesor

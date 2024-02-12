@@ -41,9 +41,6 @@ function Form() {
           const date = parseISO(response.data.fechaNacimiento);
           const zonedDate = utcToZonedTime(date, "UTC");
           const formattedDate = format(zonedDate, "yyyy-MM-dd");
-
-          console.log(response.data.fechaNacimiento); // 2025-02-01T00:00:00.000Z
-          console.log(formattedDate); // 2025-02-01
           setCliente(response.data);
           setLoading(false);
         })

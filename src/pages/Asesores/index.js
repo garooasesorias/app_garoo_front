@@ -46,8 +46,7 @@ function Advisors() {
   const handleDeleteClick = () => {
     if (selectedAdviserId) {
       setDeleting(true);
-      asesorService.deleteAdviserById(selectedAdviserId).then((response) => {
-        console.log(response);
+      asesorService.deleteAsesorById(selectedAdviserId).then((response) => {
         setAsesores((prevAsesores) =>
           prevAsesores.filter((asesor) => asesor._id !== selectedAdviserId)
         );
@@ -168,18 +167,6 @@ function Advisors() {
               <span className="text-sm text-gray-500 dark:text-gray-400">
                 {asesor.celular}
               </span>
-
-              {/* <div className="mt-2 flex space-x-2">
-                <Button
-                  color="gray"
-                  className="rounded-lg px-3 py-1 text-sm bg-cyan-700 hover:bg-cyan-800"
-                >
-                  {asesor.projects} PROYECTOS
-                </Button>
-                <Button className="rounded-lg border border-gray-300 text-sm text-gray-900 hover:bg-gray-100">
-                  {asesor.status}
-                </Button>
-              </div>*/}
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
