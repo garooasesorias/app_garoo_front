@@ -8,6 +8,7 @@ import { useParams } from "react-router-dom";
 import { HiCheck } from "react-icons/hi";
 import Loader from "../../../components/Loader.js";
 import { ToggleSwitch } from "flowbite-react";
+import RatingComponent from "../components/RatingComponent.js";
 
 function Form() {
   const formRef = useRef();
@@ -21,7 +22,7 @@ function Form() {
     isTempPwd: false,
     cargo: "",
     celular: "",
-    skills: "",
+    skills: [],
     specialties: "",
   });
   const [error, setError] = useState(null);
@@ -234,13 +235,14 @@ function Form() {
   };
   const handleSkillsChange = (selectedOptions) => {
     // Mapear los objetos seleccionados a sus IDs
-    const selectedSkillsIds = selectedOptions.map(
-      (selectedOption) => selectedOption.value
-    );
+    const selectedSkills = selectedOptions.map((selectedOption) => ({
+      _id: selectedOption.value,
+      rating: 0,
+    }));
 
     setFormDataState((prevData) => ({
       ...prevData,
-      skills: selectedSkillsIds,
+      skills: selectedSkills,
     }));
   };
 
@@ -252,6 +254,15 @@ function Form() {
     setFormDataState((prevData) => ({
       ...prevData,
       specialties: selectedSpecialtiesIds,
+    }));
+  };
+
+  const handleRatingChange = (skillId, newRating) => {
+    setFormDataState((prevData) => ({
+      ...prevData,
+      skills: prevData.skills.map((skill) =>
+        skill._id === skillId ? { ...skill, rating: newRating } : skill
+      ),
     }));
   };
 
@@ -390,14 +401,28 @@ function Form() {
             value={(Array.isArray(formDataState.skills)
               ? formDataState.skills
               : []
-            ).map((selectedSkillId) => ({
+            ).map((selectedSkill) => ({
               label:
-                skills.find((skill) => skill._id === selectedSkillId)?.nombre ||
-                "",
-              value: selectedSkillId,
+                skills.find((skill) => skill._id === selectedSkill._id)
+                  ?.nombre || "",
+              value: selectedSkill._id,
             }))}
             onChange={handleSkillsChange}
           />
+        </div>
+        <div className="max-w-md flex flex-col gap-y-3">
+          {formDataState.skills.map((skill) => (
+            <div key={skill._id} className="flex items-center gap-2">
+              <div className="text-sm font-medium">
+                {skill.name || "Habilidad sin nombre"}
+              </div>
+              <RatingComponent
+                skillId={skill._id}
+                rating={skill.rating}
+                onRatingChange={handleRatingChange}
+              />
+            </div>
+          ))}
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
@@ -425,12 +450,7 @@ function Form() {
           />
         </div>
 
-        <Button
-          type="submit"
-          color="dark"
-          // value={formData.avatar}
-          // onChange={(e) => guardarArchivo(e)}
-        >
+        <Button type="submit" color="dark">
           {id ? "Actualizar Asesor" : "Insertar Asesor"}
         </Button>
       </form>
