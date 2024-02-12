@@ -118,7 +118,6 @@ function Form() {
     });
 
     // Agregar el archivo, si existe
-    console.log("selectedFile insertAsesor", selectedFile);
     if (selectedFile) {
       console.log("appending file insertAsesor");
       formData.append("photoFile", selectedFile);
