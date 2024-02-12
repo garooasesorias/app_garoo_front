@@ -6,6 +6,8 @@ import { useParams } from "react-router-dom"; // Asegúrate de tener react-route
 import Loader from "../../../components/Loader.js";
 import { parseISO, format } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
+import { HiX } from "react-icons/hi";
+
 
 function Form() {
   const formRef = useRef();
@@ -94,26 +96,28 @@ function Form() {
         setAction("creado"); // Esto se mostrará en el Toast si tiene éxito
       }
 
-      // Muestra el toast de éxito
+      // Muestra el toast de éxito y establece un temporizador para ocultarlo
       setShowToast(true);
-    } catch (error) {
-      console.error("Error en la operación:", error);
-
-      // Aquí se define el mensaje de error basado en el error capturado
-      setAction("no pudo ser creado/datos duplicados"); // Cambia este texto según sea necesario
-      setShowToast(true); // Asegúrate de que se muestre el Toast
-    } finally {
-      setLoading(false);
-      // Aquí ocultamos el Toast después de un tiempo, independientemente de si fue éxito o error
       setTimeout(() => {
         setShowToast(false);
       }, 5000);
 
+    } catch (error) {
+      console.error("Error en la operación:", error);
+
+      // Define el mensaje de error y muestra el Toast, pero no establezcas un temporizador para ocultarlo
+      setAction("no pudo ser creado/datos duplicados");
+      setShowToast(true);
+      // No uses setTimeout aquí, para que el Toast se quede visible hasta que el usuario decida cerrarlo
+    } finally {
+      setLoading(false);
       if (!id) {
         handleResetForm();
       }
     }
   };
+
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -309,8 +313,16 @@ function Form() {
       <div className="LoaderContainerForm">{loading ? <Loader /> : null}</div>
       {showToast && (
         <Toast style={{ maxWidth: "250px" }} className="Toast">
-          <div className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100 text-cyan-500 dark:bg-cyan-800 dark:text-cyan-200">
-            <HiCheck className="h-5 w-5" />
+          <div className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${action === "creado" || action === "actualizado"
+              ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
+              : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
+            }`}>
+            {action === "creado" || action === "actualizado" ? (
+              <HiCheck className="h-5 w-5" />
+            ) : (
+              // Asegúrate de importar HiX o el ícono que elijas para representar errores
+              <HiX className="h-5 w-5" />
+            )}
           </div>
           <div className="ml-3 text-sm font-normal">
             Cliente {action} {/* Aquí se usa el estado `action` para mostrar el mensaje */}
@@ -318,6 +330,7 @@ function Form() {
           <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
+
 
     </>
   );
