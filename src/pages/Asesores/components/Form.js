@@ -109,7 +109,7 @@ function Form() {
     e.preventDefault();
     setLoading(true);
     setError(null); // Resetear el mensaje de error
-
+    console.log("formDataState updateAsesor", formDataState);
     const formData = new FormData();
 
     // Agregar todos los datos del formulario al objeto FormData
@@ -119,7 +119,6 @@ function Form() {
 
     // Agregar el archivo, si existe
     if (selectedFile) {
-      console.log("appending file insertAsesor");
       formData.append("photoFile", selectedFile);
     }
 
