@@ -117,7 +117,7 @@ function Form() {
 
     // Agregar el archivo, si existe
     if (selectedFile) {
-      formData.append("photoProfile", selectedFile);
+      formData.append("photoFile", selectedFile);
     }
 
     // Validar si la contraseña es necesaria y está presente
@@ -405,14 +405,15 @@ function Form() {
               value: skill._id,
             }))}
             isMulti
-            value={(Array.isArray(formDataState.skills) ? formDataState.skills : []).map(
-              (selectedSkillId) => ({
-                label:
-                  skills.find((skill) => skill._id === selectedSkillId)
-                    ?.nombre || "",
-                value: selectedSkillId,
-              })
-            )}
+            value={(Array.isArray(formDataState.skills)
+              ? formDataState.skills
+              : []
+            ).map((selectedSkillId) => ({
+              label:
+                skills.find((skill) => skill._id === selectedSkillId)?.nombre ||
+                "",
+              value: selectedSkillId,
+            }))}
             onChange={handleSkillsChange}
           />
         </div>

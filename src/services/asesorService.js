@@ -24,13 +24,8 @@ const asesorService = {
 
   insertAsesor: async (datosAsesor) => {
     try {
-      const config = { headers: { "Content-Type": '"multipart/form-data"' } };
-
-      const response = await api.post(
-        "/asesor/insertAsesor",
-        datosAsesor,
-        config
-      );
+      console.log("datosAsesor insertAsesor", datosAsesor);
+      const response = await api.post("/asesor/insertAsesor", datosAsesor);
       return response.data; // Respuesta de la API tras insertar el asesor
     } catch (error) {
       console.error("Error al insertar el asesor:", error);
