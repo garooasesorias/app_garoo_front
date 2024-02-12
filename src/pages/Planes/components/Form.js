@@ -134,8 +134,8 @@ function Form() {
     window.history.back();
   };
 
-  console.log('Actividades Options:', actividadesOptions);
-  console.log('Form Data:', formData);
+  // console.log('Actividades Options:', actividadesOptions);
+  // console.log('Form Data:', formData);
 
   return (
     <>
