@@ -5,6 +5,7 @@ import Loader from '../../components/Loader.js';
 import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js";
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import planesService from '../../services/planesService'; // Asegúrate de importar tu servicio de planes
+import actividadesService from "../../services/actividadesService.js";
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,17 +19,37 @@ function Planes() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await planesService.getPlanes(); // Utiliza el servicio de planes para obtener los datos
-        setPlanes(response.data);
-        setLoading(false);
+        // Primero obtén todos los planes
+        const planesResponse = await planesService.getPlanes();
+        const planesData = planesResponse.data;
+
+        // Luego obtén los detalles de todas las actividades
+        const actividadesResponse = await actividadesService.getActividades();
+        const actividadesData = actividadesResponse.data;
+
+        // Crea un mapa de ID de actividad a detalles de actividad para un acceso rápido
+        const actividadesMap = actividadesData.reduce((map, actividad) => {
+          map[actividad._id] = actividad;
+          return map;
+        }, {});
+
+        // Ahora actualiza los planes para incluir los nombres de las actividades
+        const planesConNombresDeActividades = planesData.map(plan => ({
+          ...plan,
+          actividades_relacionadas: plan.actividades.map(id => actividadesMap[id]).filter(Boolean) // Filtra los undefined o null
+        }));
+
+        setPlanes(planesConNombresDeActividades);
       } catch (error) {
-        console.error("Error al obtener los planes:", error);
+        console.error("Error al obtener los planes o actividades:", error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
 
   const handleSearch = (event) => {
     setSearchQuery(event.target.value);
@@ -60,18 +81,18 @@ function Planes() {
       }
     }
   };
-  
-    const passPlantId = (planId) => {
-      // Tomamos el Id del cliente que viene del botón borrar
-      setSelectedPlanId(planId);
-    
-      // Abre el modal
-      setOpenModal(true);
-    };
+
+  const passPlantId = (planId) => {
+    // Tomamos el Id del cliente que viene del botón borrar
+    setSelectedPlanId(planId);
+
+    // Abre el modal
+    setOpenModal(true);
+  };
 
   return (
     <>
-    <h1 className="PagesTitles">Planes</h1>
+      <h1 className="PagesTitles">Planes</h1>
       {/* Toolbar */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-4 items-center">
@@ -99,45 +120,49 @@ function Planes() {
             style={{ maxWidth: "400px" }}
           >
             <Link to={`/formPlanes/${plan._id}`}>
-              <Button className="shadow mb-2 ms-auto" color="success">
+              <Button
+                className="bg-transparent text-blue-600 hover:text-blue-700 shadow mb-2 ms-auto border border-transparent hover:border-blue-600"
+                color="none" // Esto establece el color del botón como ninguno, eliminando el color por defecto
+              >
                 Editar
               </Button>
             </Link>
             <Button
-                    onClick={() => passPlantId(plan._id)}
-                    className=" text-red-600 hover:underline shadow mb-2 ms-auto" color="success"
-                  >
-                    Borrar
-                  </Button>
-                  <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
-                    <Modal.Header />
-                    <Modal.Body>
-                      <div className="text-center">
-                        {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
-                          <div className="LoaderContainerDelete"><Loader /></div>
-                        ) : (
-                          <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
-                        )}
-                        <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
-                          {deleting
-                            ? "Eliminando..."
-                            : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
-                        </h3>
-                        <div className="flex justify-center gap-4">
-                          <Button
-                            color="failure"
-                            onClick={() => handleDeleteClick(plan._id)}
-                            disabled={deleting} // Deshabilita el botón durante la eliminación
-                          >
-                            {deleting ? "Eliminando..." : "Sí, eliminar"}
-                          </Button>
-                          <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
-                            No, cancelar
-                          </Button>
-                        </div>
-                      </div>
-                    </Modal.Body>
-                  </Modal>
+              onClick={() => passPlantId(plan._id)}
+              className="bg-transparent text-red-600 hover:text-red-700 shadow mb-2 ms-auto border border-transparent hover:border-red-600"
+              color="none"
+            >
+              Borrar
+            </Button>
+            <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
+              <Modal.Header />
+              <Modal.Body>
+                <div className="text-center">
+                  {deleting ? ( // Mostrar el loader si se está ejecutando la eliminación
+                    <div className="LoaderContainerDelete"><Loader /></div>
+                  ) : (
+                    <HiOutlineExclamationCircle className="mx-auto mb-4 h-14 w-14 text-gray-400 dark:text-gray-200" />
+                  )}
+                  <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+                    {deleting
+                      ? "Eliminando..."
+                      : "¿Estás seguro de que deseas eliminar este elemento de forma permanente?"}
+                  </h3>
+                  <div className="flex justify-center gap-4">
+                    <Button
+                      color="failure"
+                      onClick={() => handleDeleteClick(plan._id)}
+                      disabled={deleting} // Deshabilita el botón durante la eliminación
+                    >
+                      {deleting ? "Eliminando..." : "Sí, eliminar"}
+                    </Button>
+                    <Button color="gray" onClick={() => setOpenModal(false)} disabled={deleting}>
+                      No, cancelar
+                    </Button>
+                  </div>
+                </div>
+              </Modal.Body>
+            </Modal>
 
             <div className="flex flex-col items-center pb-4">
               <h5 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">
@@ -157,15 +182,14 @@ function Planes() {
               </div>
               {collapsedIndex === index && (
                 <div className="grid gap-2">
-                  {plan.actividades_relacionadas.map(
-                    (actividad, actividadIndex) => (
-                      <div
-                        key={actividadIndex}
-                        className="text-sm text-gray-500"
-                      >
+                  {plan.actividades_relacionadas && plan.actividades_relacionadas.length > 0 ? (
+                    plan.actividades_relacionadas.map((actividad, actividadIndex) => (
+                      <div key={actividad._id || actividadIndex} className="text-sm text-gray-500">
                         {actividad.nombre}
                       </div>
-                    )
+                    ))
+                  ) : (
+                    <div className="text-sm text-gray-500">No hay actividades disponibles.</div>
                   )}
                 </div>
               )}
@@ -174,8 +198,8 @@ function Planes() {
         ))}
       </div>
       <div className="LoaderContainer">
-            {loading ? <Loader /> : null}
-            </div>
+        {loading ? <Loader /> : null}
+      </div>
     </>
   );
 }

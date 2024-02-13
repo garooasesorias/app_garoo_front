@@ -29,7 +29,7 @@ function Form() {
           value: a._id
         }));
         setActividadesOptions(actividadesData);
-  
+
         // Si no hay un 'id', significa que estamos creando un nuevo plan, no editando uno existente.
         if (!id) {
           setFormData(prevFormData => ({
@@ -37,20 +37,24 @@ function Form() {
             actividades: [] // Asegurarse de que se inicializa como un array vacío para la creación
           }));
         }
-  
+
         return actividadesData; // Devuelve esto para usarlo en el siguiente paso
       } catch (error) {
         console.error("Error fetching actividades:", error);
       }
     };
-  
+
     const fetchPlanData = async (actividadesData) => {
       if (id) {
         try {
           const planResponse = await planesService.getPlanById(id);
           const selectedActividades = planResponse.data.actividades.map(a => {
-            return actividadesData.find(option => option.value === a) || a;
-          }).filter(a => a); // Filtrar elementos falsy
+            const matchedOption = actividadesData.find(option => option.value === a._id);
+            return {
+              label: matchedOption ? matchedOption.label : a.nombre,
+              value: a._id
+            };
+          });
           setFormData({
             nombre: planResponse.data.nombre || "",
             precio: planResponse.data.precio || "",
@@ -61,7 +65,7 @@ function Form() {
         }
       }
     };
-  
+
     // Llama a fetchActividades y luego a fetchPlanData con los resultados.
     fetchActividades().then(actividadesData => {
       if (id) {
@@ -69,20 +73,20 @@ function Form() {
       }
     }).finally(() => setLoading(false));
   }, [id]);
-    
-      
+
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-  
+
     // Crear un objeto con los datos a enviar
     const dataToSend = {
       nombre: formData.nombre,
       precio: formData.precio,
       actividades: formData.actividades.map(a => a.value), // Solo envía los IDs
     };
-  
+
     try {
       let response;
       if (id) {
@@ -107,7 +111,7 @@ function Form() {
       setLoading(false);
     }
   };
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -122,7 +126,7 @@ function Form() {
       actividades: selectedOptions || [],
     }));
   };
-  
+
   // Asegúrate de implementar la lógica correcta para renderizar las opciones de actividades
   // y enlazarlas correctamente con el estado del formulario.
 
@@ -130,6 +134,8 @@ function Form() {
     window.history.back();
   };
 
+  // console.log('Actividades Options:', actividadesOptions);
+  // console.log('Form Data:', formData);
 
   return (
     <>
@@ -148,11 +154,9 @@ function Form() {
           />
         </div>
         <div className="max-w-md">
-          <div className="mb-2 block">
-            <Label htmlFor="precio" value="precio" />
-          </div>
+          <Label htmlFor="precio" value="Precio" />
           <TextInput
-            addon="@"
+            addon="$"
             id="precio"
             name="precio"
             placeholder="300"
@@ -166,15 +170,15 @@ function Form() {
             <Label htmlFor="celular" value="Actividades" />
           </div>
           <Select
-  id="actividades"
-  name="actividades"
-  options={actividadesOptions}
-  isMulti
-  value={formData.actividades}
-  getOptionLabel={(option) => option.label}
-  getOptionValue={(option) => option.value}
-  onChange={handleActividadesChange}
-/>
+            id="actividades"
+            name="actividades"
+            options={actividadesOptions}
+            isMulti
+            value={formData.actividades}
+            getOptionLabel={(option) => option.label}
+            getOptionValue={(option) => option.value}
+            onChange={handleActividadesChange}
+          />
         </div>
         <Button type="submit" color="dark">
           Submit
