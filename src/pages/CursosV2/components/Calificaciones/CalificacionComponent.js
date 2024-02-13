@@ -102,7 +102,7 @@ export default function CalificacionComponent({
       fetchData();
       setRefreshCalificaciones(false); // Restablece el flag
     }
-  }, [refreshCalificaciones]);
+  }, [refreshCalificaciones, data]);
 
   const handleEstudianteChange = async (selectedOption) => {
     const calificaciones = formData.itemsHead.map((item) => ({

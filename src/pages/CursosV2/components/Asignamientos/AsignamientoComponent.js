@@ -23,29 +23,24 @@ export default function AsignamientoComponent({
     const asesores = await adviserService.getAdvisors();
     setAsesores(asesores.data);
 
-    asignamientoService
-      .getAsignamientosByIdCurso(data._id)
-      .then((response) => {
-        setFormData({
-          items: response.data.map((asignamiento) => ({
-            id: asignamiento._id,
-            fechaVencimiento: asignamiento.fechaVencimiento
-              ? format(
-                  utcToZonedTime(
-                    parseISO(asignamiento.fechaVencimiento),
-                    "UTC"
-                  ),
-                  "yyyy-MM-dd"
-                )
-              : "",
-            actividad: asignamiento.actividad._id,
-            nombreActividad: asignamiento.actividad.nombre,
-            asesor: {
-              _id: asignamiento.asesor?._id || null,
-            },
-          })),
-        });
+    asignamientoService.getAsignamientosByIdCurso(data._id).then((response) => {
+      setFormData({
+        items: response.data.map((asignamiento) => ({
+          id: asignamiento._id,
+          fechaVencimiento: asignamiento.fechaVencimiento
+            ? format(
+                utcToZonedTime(parseISO(asignamiento.fechaVencimiento), "UTC"),
+                "yyyy-MM-dd"
+              )
+            : "",
+          actividad: asignamiento.actividad._id,
+          nombreActividad: asignamiento.actividad.nombre,
+          asesor: {
+            _id: asignamiento.asesor?._id || null,
+          },
+        })),
       });
+    });
   };
 
   useEffect(() => {
@@ -55,7 +50,7 @@ export default function AsignamientoComponent({
     checkAdmin();
 
     fetchData();
-  }, []);
+  }, [data]);
 
   const handleDateChange = async (date, id) => {
     await asignamientoService.updateAsignamientoById(id, {

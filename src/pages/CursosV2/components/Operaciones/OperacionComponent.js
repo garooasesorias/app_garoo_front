@@ -87,7 +87,7 @@ export default function OperacionComponent({
       fetchData();
       setRefreshOperaciones(false); // Restablece el flag
     }
-  }, [refreshOperaciones]);
+  }, [refreshOperaciones, data]);
 
   const handleEstadoChange = (selectedOption, itemIndex) => {
     setCurrentItem((prevCurrentItem) => {
