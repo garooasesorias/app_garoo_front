@@ -33,7 +33,8 @@ const asesorService = {
     }
   },
 
-  updateAsesorById: async (id, data) => {
+  updateAsesorById: async (data) => {
+    console.log("formData in updateAsesorById", data);
     try {
       const response = await api.put("/asesor/updateAsesorById", data);
       return response.data; // Respuesta de la API tras insertar el asesor

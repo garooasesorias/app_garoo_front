@@ -110,13 +110,22 @@ function Form() {
     e.preventDefault();
     setLoading(true);
     setError(null); // Resetear el mensaje de error
-    console.log("formDataState updateAsesor", formDataState);
+
     const formData = new FormData();
 
-    // Agregar todos los datos del formulario al objeto FormData
+    // Agregar los datos del formulario al objeto FormData, excepto 'skills' que necesita ser una cadena JSON
     Object.keys(formDataState).forEach((key) => {
-      formData.append(key, formDataState[key]);
+      if (key !== "skills") {
+        formData.append(key, formDataState[key]);
+      }
     });
+
+    // Manejar 'skills' especialmente si existe
+    if (formDataState.skills) {
+      // Convertir 'skills' a una cadena JSON y añadir al FormData
+      const stringSkills = JSON.stringify(formDataState.skills);
+      formData.append("skills", stringSkills);
+    }
 
     // Agregar el archivo, si existe
     if (selectedFile) {
@@ -125,40 +134,38 @@ function Form() {
 
     try {
       let response;
+      // Lógica para determinar si se debe insertar o actualizar un asesor
       if (id) {
-        response = await asesorService.updateAsesorById(id, formData);
-        setAction("actualizado");
-        // props.setShowToast(true, "asesor actualizado");
+        // Actualizar asesor existente
+        response = await asesorService.updateAsesorById(formData);
       } else {
         // Insertar nuevo asesor
         response = await asesorService.insertAsesor(formData);
-        setAction("creado");
-        // props.setShowToast(true, "Asesor creado");
       }
 
-      // Verificar si la respuesta del servidor es exitosa
+      // Manejo de la respuesta del servidor
       if (!response.ok) {
-        // Si la respuesta tiene un código de estado de error
         const errorData = await response.json();
         throw new Error(
           errorData.message || "Ocurrió un error al realizar la operación"
         );
       }
 
-      setShowToast(true); // Mostrar el mensaje de éxito
-      setLoading(false);
-      setTimeout(() => {
-        setShowToast(false);
-      }, 5000);
+      id ? setAction("actualizado") : setAction("creado");
 
+      // Operaciones post-envío exitoso
+      setShowToast(true);
+      setTimeout(() => setShowToast(false), 5000);
+
+      // Resetear el formulario si es un nuevo asesor
       if (!id) {
         handleResetForm();
       }
     } catch (error) {
       console.error("Error en la operación:", error);
-      showToastWithTimeout("Error en la operación"); // Muestra el toast con el mensaje de error
+      showToastWithTimeout("Error en la operación");
     } finally {
-      setLoading(false); // Desactivar la señal de carga independientemente del resultado
+      setLoading(false);
     }
   };
 
