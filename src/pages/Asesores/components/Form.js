@@ -245,17 +245,29 @@ function Form() {
     }));
   };
   const handleSkillsChange = (selectedOptions) => {
-    // Mapear los objetos seleccionados a sus IDs
-    const selectedSkills = selectedOptions.map((selectedOption) => ({
-      _id: selectedOption.value,
-      rating: 0,
-    }));
-
-    setFormDataState((prevData) => ({
-      ...prevData,
-      skills: selectedSkills,
-    }));
+    setFormDataState((prevData) => {
+      // Crear un mapa de los skills existentes para facilitar la búsqueda por _id
+      const existingSkillsMap = prevData.skills.reduce((acc, skill) => {
+        acc[skill._id] = skill.rating;
+        return acc;
+      }, {});
+  
+      // Mapear las opciones seleccionadas a sus objetos de skills,
+      // preservando los ratings existentes o asignando 0 si son nuevas
+      const selectedSkills = selectedOptions.map((selectedOption) => ({
+        _id: selectedOption.value,
+        // Preservar el rating existente si es posible, de lo contrario asignar 0
+        rating: existingSkillsMap[selectedOption.value] !== undefined ? existingSkillsMap[selectedOption.value] : 0,
+      }));
+  
+      // Actualizar el estado con los skills actualizados, preservando otras propiedades
+      return {
+        ...prevData,
+        skills: selectedSkills,
+      };
+    });
   };
+  
 
   const handleSpecialtiesChange = (selectedOptionsSpecialties) => {
     const selectedSpecialtiesIds = selectedOptionsSpecialties.map(
