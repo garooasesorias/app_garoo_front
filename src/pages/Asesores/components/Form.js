@@ -37,6 +37,20 @@ function Form() {
   const [action, setAction] = useState("creado");
   const { id } = useParams(); // Extrae el id desde la URL
 
+  const fetchData = async () => {
+    try {
+      const skillResponse = await skillService.getSkills();
+      setSkills(skillResponse.data);
+
+      const specialtyResponse = await especialidadService.getSpecialties();
+      setSpecialties(specialtyResponse.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Primero, verifica si hay un ID válido
     if (id) {
@@ -54,19 +68,7 @@ function Form() {
         });
 
       // Luego, obtén las habilidades y especialidades
-      const fetchData = async () => {
-        try {
-          const skillResponse = await skillService.getSkills();
-          setSkills(skillResponse.data);
-
-          const specialtyResponse = await especialidadService.getSpecialties();
-          setSpecialties(specialtyResponse.data);
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setLoading(false);
-        }
-      };
-
+      fetchData();
       // Ejecuta ambas llamadas en paralelo
       Promise.all([asesorPromise, fetchData()])
         .then(() => {
@@ -78,6 +80,9 @@ function Form() {
           setLoading(false);
           // Aquí podrías manejar el error, por ejemplo, mostrando un mensaje al usuario
         });
+    } else {
+      setLoading(true);
+      fetchData();
     }
   }, [id]);
 
@@ -98,7 +103,6 @@ function Form() {
 
   function guardarArchivo(e) {
     const file = e.target.files[0];
-    console.log("file guardar archivo ", file);
     if (file) {
       setSelectedFile(file);
     } else {
@@ -192,7 +196,7 @@ function Form() {
       nombre: "",
       avatar: "",
       specialties: "",
-      skills: "",
+      skills: [],
       celular: "",
     });
   };
@@ -421,7 +425,8 @@ function Form() {
           {formDataState.skills.map((skill) => (
             <div key={skill._id} className="flex items-center gap-2">
               <div className="text-sm font-medium">
-                {skill.name || "Habilidad sin nombre"}
+                {skills.find((skillSource) => skillSource._id === skill._id)
+                  ?.nombre || ""}
               </div>
               <RatingComponent
                 skillId={skill._id}
