@@ -4,6 +4,7 @@ import { Card, Avatar, Table, Button, Progress, Modal } from "flowbite-react";
 import { Link } from "react-router-dom";
 import Loader from "../../components/Loader.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import RatingComponent from "./components/RatingComponent.js";
 
 function Advisors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -13,16 +14,19 @@ function Advisors() {
   const [openModal, setOpenModal] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [selectedAdviserId, setSelectedAdviserId] = useState(null);
+  const [formDataState, setFormDataState] = useState({
+    ratignSkills: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const asesoresObtenidos = await asesorService.getAdvisors();
-        console.log(
-          "asesoresObtenidos useEffect asesorIndex",
-          asesoresObtenidos
-        );
-        setAsesores(asesoresObtenidos.data);
+        const { data: asesorData } = await asesorService.getAdvisors();
+        console.log("asesorData useEffect asesorIndex", asesorData);
+        setAsesores(asesorData);
+        setFormDataState({
+          ratignSkills: asesorData,
+        });
         setLoading(false);
       } catch (error) {
         console.log("Error al cargar Asesores:", error);
@@ -65,6 +69,17 @@ function Advisors() {
 
     // Abre el modal
     setOpenModal(true);
+  };
+
+  const handleRatingSkillChange = (ratingSkillId, newRatingSkill) => {
+    // setFormDataState((prevData) => ({
+    //   ...prevData,
+    //   ratingSkills: prevData.ratingSkills.map((ratingSkill) =>
+    //     ratingSkill.skill._id === ratingSkillId
+    //       ? { ...ratingSkill, rating: newRatingSkill }
+    //       : ratingSkill
+    //   ),
+    // }));
   };
 
   return (
@@ -179,7 +194,7 @@ function Advisors() {
               >
                 Ver Especialidades {">"}
               </div>
-              {collapsedIndex === index && (
+              {/* {collapsedIndex === index && (
                 <div className="grid gap-2">
                   {asesor.specialties_relacionadas &&
                     asesor.specialties_relacionadas.map(
@@ -193,21 +208,27 @@ function Advisors() {
                       )
                     )}
                 </div>
-              )}
+              )} */}
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
               <div className="text-base font-medium dark:text-dark">SKILLS</div>
-              {asesor.skills &&
-                asesor.skills.map((skill, index) => (
-                  <Progress
-                    key={index}
-                    labelText
-                    textLabel={skill.nombre}
-                    size="lg"
-                    color="dark"
-                    progress={skill.progress}
-                  />
+
+              {asesor.ratingSkills &&
+                asesor.ratingSkills.map((ratingSkill, index) => (
+                  <div
+                    key={ratingSkill.skill._id}
+                    className="flex items-center gap-2"
+                  >
+                    <div className="text-sm font-medium">
+                      {ratingSkill.skill.nombre}
+                    </div>
+                    <RatingComponent
+                      ratingSkillId={ratingSkill.skill}
+                      rating={ratingSkill.rating}
+                      onRatingSkillChange={handleRatingSkillChange}
+                    />
+                  </div>
                 ))}
             </div>
           </Card>

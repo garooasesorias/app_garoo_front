@@ -441,15 +441,15 @@ function Form() {
           />
         </div>
         <div className="max-w-md flex flex-col gap-y-3">
-          {formDataState.ratingSkills.map((ratignSkill) => (
-            <div key={ratignSkill.skill} className="flex items-center gap-2">
+          {formDataState.ratingSkills.map((ratingSkill) => (
+            <div key={ratingSkill.skill} className="flex items-center gap-2">
               <div className="text-sm font-medium">
-                {skills.find((skill) => skill._id === ratignSkill.skill)
+                {skills.find((skill) => skill._id === ratingSkill.skill)
                   ?.nombre || ""}
               </div>
               <RatingComponent
-                ratingSkillId={ratignSkill.skill}
-                rating={ratignSkill.rating}
+                ratingSkillId={ratingSkill.skill}
+                rating={ratingSkill.rating}
                 onRatingSkillChange={handleRatingSkillChange}
               />
             </div>
