@@ -6,6 +6,10 @@ import { TableCell } from "flowbite-react/lib/esm/components/Table/TableCell.js"
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import planesService from '../../services/planesService'; // Asegúrate de importar tu servicio de planes
 import actividadesService from "../../services/actividadesService.js";
+import { AiOutlinePlusCircle } from 'react-icons/ai'; // Para el botón Crear
+import { TiEdit } from 'react-icons/ti'; // Para el botón Editar
+import { RiDeleteBin6Line } from 'react-icons/ri'; // Para el botón Borrar
+
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -107,7 +111,7 @@ function Planes() {
         <div className="flex items-center">
           <Link to="/formPlanes" className="">
             <Button className="shadow me-5" color="success">
-              Crear
+            <AiOutlinePlusCircle size={24}/> {/* Ícono para el botón Crear */}
             </Button>
           </Link>
         </div>
@@ -121,14 +125,14 @@ function Planes() {
           >
             <Link to={`/formPlanes/${plan._id}`}>
               <Button className="shadow mb-2 ms-auto" color="success">
-                Editar
+              <TiEdit size={24}/> {/* Ícono para el botón Editar */}
               </Button>
             </Link>
             <Button
               onClick={() => passPlantId(plan._id)}
               className=" text-red-600 hover:underline shadow mb-2 ms-auto" color="success"
             >
-              Borrar
+              <RiDeleteBin6Line size={24}  /> {/* Ícono para el botón Borrar */}
             </Button>
             <Modal show={openModal} size="md" onClose={() => setOpenModal(false)} popup>
               <Modal.Header />
