@@ -1,13 +1,23 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
+
 import asesorService from "../../../services/asesorService.js";
 import skillService from "../../../services/skillService.js";
 import materiaService from "../../../services/materiasService.js";
-import { Button, Label, TextInput, FileInput, Toast } from "flowbite-react";
+
+import {
+  Button,
+  Label,
+  TextInput,
+  FileInput,
+  Toast,
+  ToggleSwitch,
+} from "flowbite-react";
 import Select from "react-select";
-import { useParams } from "react-router-dom";
 import { HiCheck } from "react-icons/hi";
+import { HiX } from "react-icons/hi";
+
 import Loader from "../../../components/Loader.js";
-import { ToggleSwitch } from "flowbite-react";
 import RatingComponent from "../components/RatingComponent.js";
 
 function Form() {
@@ -166,15 +176,21 @@ function Form() {
 
       // Operaciones post-envío exitoso
       setShowToast(true);
-      setTimeout(() => setShowToast(false), 5000);
-
       // Resetear el formulario si es un nuevo asesor
       if (!id) {
         handleResetForm();
       }
     } catch (error) {
-      console.error("Error en la operación:", error);
-      showToastWithTimeout("Error en la operación");
+      const errorMessage =
+        error.response && error.response.data && error.response.data.message
+          ? error.response.data.message
+          : "Hubo un error desconocido. Por favor, intenta de nuevo más tarde.";
+
+      // Establece el mensaje de error
+      setAction(errorMessage);
+
+      // Muestra el toast de error
+      setShowToast(true);
     } finally {
       setLoading(false);
     }
@@ -523,22 +539,27 @@ function Form() {
         </Toast>
       )}
 
-      {showErrorToast && (
-        <Toast>
+      {showToast && (
+        <Toast style={{ maxWidth: "250px" }} className="Toast">
           <div
-            className="inline-flex items-center justify-center w-full max-w-xs p-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800"
-            role="alert"
+            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
+              action === "creado" || action === "actualizado"
+                ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
+                : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
+            }`}
           >
-            <div className="text-sm font-normal">{toastMessage}</div>
-            <button
-              type="button"
-              className="ml-auto -mx-1.5 -my-1.5 bg-white text-gray-400 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex h-8 w-8 dark:bg-gray-800 dark:hover:bg-gray-700"
-              onClick={hideToast}
-            >
-              <span className="sr-only">Cerrar</span>
-              {/* Icono de cierre */}
-            </button>
+            {action === "creado" || action === "actualizado" ? (
+              <HiCheck className="h-5 w-5" />
+            ) : (
+              // Asegúrate de importar HiX o el ícono que elijas para representar errores
+              <HiX className="h-5 w-5" />
+            )}
           </div>
+          <div className="ml-3 text-sm font-normal">
+            Cliente {action}{" "}
+            {/* Aquí se usa el estado `action` para mostrar el mensaje */}
+          </div>
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
         </Toast>
       )}
     </>

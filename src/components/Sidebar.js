@@ -112,14 +112,14 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                         Skills
                       </NavLink>
                     </li>
-                    <li className="ml-2">
+                    {/* <li className="ml-2">
                       <NavLink
                         to="/especialidades"
                         className="flex-1 ml-3 text-left whitespace-nowrap"
                       >
                         Especialidades
                       </NavLink>
-                    </li>
+                    </li> */}
                   </CollapsibleDropdown>
 
                   <ul id="dropdown-pages" className="hidden py-2 space-y-2">

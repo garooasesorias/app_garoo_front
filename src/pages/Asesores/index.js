@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import Loader from "../../components/Loader.js";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
 import RatingComponent from "./components/RatingComponent.js";
+import defaultAvatar from "../../images/default_avatar.webp";
 
 function Advisors() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,10 +169,9 @@ function Advisors() {
               <Avatar
                 alt={`${asesor.nombre} image`}
                 className="mb-2 rounded-full shadow-lg"
-                height="auto" // Cambio de "64" a "auto" para mantener proporciones
-                img={`${asesor.photoLink}`}
-                width="100%" // Cambio de "64" a "100%" para ajustar al contenedor
-                status="online"
+                img={`${asesor.photoLink || defaultAvatar}`}
+                size={"xl"}
+                status="offline"
               />
               <h5 className="mb-1 text-lg font-medium text-gray-900 dark:text-white">
                 {asesor.nombre}
