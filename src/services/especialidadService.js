@@ -1,7 +1,7 @@
 import api from "./api";
 
 const SpecialtyService = {
-  getSpecialties: async () => {
+  getEspecialidades: async () => {
     try {
       const response = await api.get("/especialidad/getSpecialties");
       return response.data;
@@ -10,7 +10,6 @@ const SpecialtyService = {
       throw error;
     }
   },
-  
 
   getSpecialtyById: async (id) => {
     try {
@@ -25,7 +24,10 @@ const SpecialtyService = {
 
   insertSpecialty: async (datosSpecialty) => {
     try {
-      const response = await api.post("/especialidad/insertSpecialty", datosSpecialty);
+      const response = await api.post(
+        "/especialidad/insertSpecialty",
+        datosSpecialty
+      );
       return response.data; // Respuesta de la API tras insertar el cliente
     } catch (error) {
       console.error("Error al insertar el Specialty:", error);
@@ -48,7 +50,9 @@ const SpecialtyService = {
   deleteSpecialtyById: async (id) => {
     console.log(id);
     try {
-      const response = await api.delete(`/especialidad/deleteSpecialtyById/${id}`);
+      const response = await api.delete(
+        `/especialidad/deleteSpecialtyById/${id}`
+      );
       return response.data; // Respuesta de la API tras insertar el cliente
     } catch (error) {
       console.error("Error al actualizar el Especialidad:", error);

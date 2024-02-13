@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import asesorService from "../../../services/asesorService.js";
 import skillService from "../../../services/skillService.js";
-import especialidadService from "../../../services/especialidadService.js";
+import materiaService from "../../../services/materiasService.js";
 import { Button, Label, TextInput, FileInput, Toast } from "flowbite-react";
 import Select from "react-select";
 import { useParams } from "react-router-dom";
@@ -23,12 +23,12 @@ function Form() {
     cargo: "",
     celular: "",
     ratingSkills: [],
-    specialties: "",
+    especialidades: [],
   });
   const [error, setError] = useState(null);
   const [skills, setSkills] = useState([]);
   const [isTempPwd, setIsTempPwd] = useState(false);
-  const [specialties, setSpecialties] = useState([]);
+  const [materias, setMaterias] = useState([]);
   const [showToast, setShowToast] = useState(false);
   const [loading, setLoading] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -42,8 +42,8 @@ function Form() {
       const skillResponse = await skillService.getSkills();
       setSkills(skillResponse.data);
 
-      // const specialtyResponse = await especialidadService.getSpecialties();
-      // setSpecialties(specialtyResponse.data);
+      const materiaResponse = await materiaService.getMaterias();
+      setMaterias(materiaResponse.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -94,7 +94,7 @@ function Form() {
       nombre: asesor.nombre || "",
       email: asesor.email || "",
       avatar: asesor.avatar || "",
-      specialties: asesor.specialties || "",
+      especialidades: asesor.especialidades || "",
       ratingSkills: asesor.ratingSkills || "",
       celular: asesor.celular || "",
       // ...otros campos
@@ -119,7 +119,7 @@ function Form() {
 
     // Agregar los datos del formulario al objeto FormData, excepto 'skills' que necesita ser una cadena JSON
     Object.keys(formDataState).forEach((key) => {
-      if (key !== "ratingSkills") {
+      if (key !== "ratingSkills" && key !== "especialidades") {
         formData.append(key, formDataState[key]);
       }
     });
@@ -129,6 +129,13 @@ function Form() {
       // Convertir 'skills' a una cadena JSON y añadir al FormData
       const stringRatingSkills = JSON.stringify(formDataState.ratingSkills);
       formData.append("ratingSkills", stringRatingSkills);
+    }
+
+    // Manejar 'especiliades' especialmente si existe
+    if (formDataState.especialidades) {
+      // Convertir 'skills' a una cadena JSON y añadir al FormData
+      const stringEspecialidades = JSON.stringify(formDataState.especialidades);
+      formData.append("especialidades", stringEspecialidades);
     }
 
     // Agregar el archivo, si existe
@@ -195,7 +202,7 @@ function Form() {
       contrasena: "",
       nombre: "",
       avatar: "",
-      specialties: "",
+      especialidades: [],
       ratingSkills: [],
       celular: "",
     });
@@ -274,16 +281,25 @@ function Form() {
     });
   };
 
-  // const handleSpecialtiesChange = (selectedOptionsSpecialties) => {
-  //   const selectedSpecialtiesIds = selectedOptionsSpecialties.map(
-  //     (selectedOptionsSpecialties) => selectedOptionsSpecialties.value
-  //   );
+  const handleMateriasChange = (selectedOptionsMaterias) => {
+    console.log(
+      "selectedOptionsMaterias handleMateriasChange formAsesor",
+      selectedOptionsMaterias
+    );
+    const selectedEspecialidades = selectedOptionsMaterias.map(
+      (selectedOptionsMaterias) => ({ materia: selectedOptionsMaterias.value })
+    );
 
-  //   setFormDataState((prevData) => ({
-  //     ...prevData,
-  //     specialties: selectedSpecialtiesIds,
-  //   }));
-  // };
+    console.log(
+      "selectedMateriasIds handleMateriasChange formAsesor",
+      selectedEspecialidades
+    );
+
+    setFormDataState((prevData) => ({
+      ...prevData,
+      especialidades: selectedEspecialidades,
+    }));
+  };
 
   const handleRatingSkillChange = (ratingSkillId, newRatingSkill) => {
     setFormDataState((prevData) => ({
@@ -455,31 +471,31 @@ function Form() {
             </div>
           ))}
         </div>
-        {/* <div className="max-w-md">
+        <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="especialidades" value="Especialidades" />
+            <Label htmlFor="materias" value="Especialidades" />
           </div>
           <Select
-            id="especialidades"
-            name="especialidades"
-            options={specialties.map((specialty) => ({
-              label: specialty.nombre,
-              value: specialty._id,
+            id="materias"
+            name="materias"
+            options={materias.map((materia) => ({
+              label: materia.nombre,
+              value: materia._id,
             }))}
             isMulti
-            value={(Array.isArray(formDataState.specialties)
-              ? formDataState.specialties
+            value={(Array.isArray(formDataState.especialidades)
+              ? formDataState.especialidades
               : []
-            ).map((selectedSpecialtyId) => ({
+            ).map((selectedEspecialidad) => ({
               label:
-                specialties.find(
-                  (specialty) => specialty._id === selectedSpecialtyId
+                materias.find(
+                  (materia) => materia._id === selectedEspecialidad.materia
                 )?.nombre || "",
-              value: selectedSpecialtyId,
+              value: selectedEspecialidad.materia,
             }))}
-            onChange={handleSpecialtiesChange}
+            onChange={handleMateriasChange}
           />
-        </div> */}
+        </div>
 
         <Button type="submit" color="dark">
           {id ? "Actualizar Asesor" : "Insertar Asesor"}
