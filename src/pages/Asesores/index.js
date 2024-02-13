@@ -194,21 +194,21 @@ function Advisors() {
               >
                 Ver Especialidades {">"}
               </div>
-              {/* {collapsedIndex === index && (
+              {collapsedIndex === index && (
                 <div className="grid gap-2">
-                  {asesor.specialties_relacionadas &&
-                    asesor.specialties_relacionadas.map(
-                      (specialty, specialtyIndex) => (
+                  {asesor.especialidades &&
+                    asesor.especialidades.map(
+                      (especialidad, especialidadIndex) => (
                         <div
-                          key={specialtyIndex}
+                          key={especialidad.materia._id}
                           className="text-sm text-gray-500"
                         >
-                          {specialty.nombre}
+                          {especialidad.materia.nombre}
                         </div>
                       )
                     )}
                 </div>
-              )} */}
+              )}
             </div>
 
             <div className="flex flex-col gap-2 mt-2">
@@ -220,9 +220,7 @@ function Advisors() {
                     key={ratingSkill.skill._id}
                     className="flex items-center gap-2"
                   >
-                    <div className="text-sm font-medium">
-                      {ratingSkill.skill.nombre}
-                    </div>
+                    <div className="text-sm">{ratingSkill.skill.nombre}</div>
                     <RatingComponent
                       ratingSkillId={ratingSkill.skill}
                       rating={ratingSkill.rating}
