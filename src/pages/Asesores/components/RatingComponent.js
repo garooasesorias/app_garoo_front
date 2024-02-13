@@ -1,9 +1,13 @@
 import { Rating } from "flowbite-react";
 
-export default function RatingComponent({ skillId, rating, onRatingChange }) {
+export default function RatingComponent({
+  ratingSkillId,
+  rating,
+  onRatingSkillChange,
+}) {
   const handleStarClick = (newRating) => {
-    if (onRatingChange) {
-      onRatingChange(skillId, newRating);
+    if (onRatingSkillChange) {
+      onRatingSkillChange(ratingSkillId, newRating);
     }
   };
   // Crea un arreglo de estrellas basado en el rating

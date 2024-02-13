@@ -18,7 +18,10 @@ function Advisors() {
     const fetchData = async () => {
       try {
         const asesoresObtenidos = await asesorService.getAdvisors();
-
+        console.log(
+          "asesoresObtenidos useEffect asesorIndex",
+          asesoresObtenidos
+        );
         setAsesores(asesoresObtenidos.data);
         setLoading(false);
       } catch (error) {

@@ -22,7 +22,7 @@ function Form() {
     isTempPwd: false,
     cargo: "",
     celular: "",
-    skills: [],
+    ratingSkills: [],
     specialties: "",
   });
   const [error, setError] = useState(null);
@@ -42,8 +42,8 @@ function Form() {
       const skillResponse = await skillService.getSkills();
       setSkills(skillResponse.data);
 
-      const specialtyResponse = await especialidadService.getSpecialties();
-      setSpecialties(specialtyResponse.data);
+      // const specialtyResponse = await especialidadService.getSpecialties();
+      // setSpecialties(specialtyResponse.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -95,7 +95,7 @@ function Form() {
       email: asesor.email || "",
       avatar: asesor.avatar || "",
       specialties: asesor.specialties || "",
-      skills: asesor.skills || "",
+      ratingSkills: asesor.ratingSkills || "",
       celular: asesor.celular || "",
       // ...otros campos
     });
@@ -119,16 +119,16 @@ function Form() {
 
     // Agregar los datos del formulario al objeto FormData, excepto 'skills' que necesita ser una cadena JSON
     Object.keys(formDataState).forEach((key) => {
-      if (key !== "skills") {
+      if (key !== "ratingSkills") {
         formData.append(key, formDataState[key]);
       }
     });
 
     // Manejar 'skills' especialmente si existe
-    if (formDataState.skills) {
+    if (formDataState.ratingSkills) {
       // Convertir 'skills' a una cadena JSON y añadir al FormData
-      const stringSkills = JSON.stringify(formDataState.skills);
-      formData.append("skills", stringSkills);
+      const stringRatingSkills = JSON.stringify(formDataState.ratingSkills);
+      formData.append("ratingSkills", stringRatingSkills);
     }
 
     // Agregar el archivo, si existe
@@ -196,7 +196,7 @@ function Form() {
       nombre: "",
       avatar: "",
       specialties: "",
-      skills: [],
+      ratingSkills: [],
       celular: "",
     });
   };
@@ -244,47 +244,54 @@ function Form() {
       celular: newCelular,
     }));
   };
-  const handleSkillsChange = (selectedOptions) => {
+  const handleSkillChange = (selectedOptions) => {
     setFormDataState((prevData) => {
       // Crear un mapa de los skills existentes para facilitar la búsqueda por _id
-      const existingSkillsMap = prevData.skills.reduce((acc, skill) => {
-        acc[skill._id] = skill.rating;
-        return acc;
-      }, {});
-  
+      const existingRatingSkillsMap = prevData.ratingSkills.reduce(
+        (acc, ratingSkill) => {
+          acc[ratingSkill.skill] = ratingSkill.rating;
+          return acc;
+        },
+        {}
+      );
+
       // Mapear las opciones seleccionadas a sus objetos de skills,
       // preservando los ratings existentes o asignando 0 si son nuevas
-      const selectedSkills = selectedOptions.map((selectedOption) => ({
-        _id: selectedOption.value,
+      const selectedRatingSkills = selectedOptions.map((selectedOption) => ({
+        skill: selectedOption.value,
         // Preservar el rating existente si es posible, de lo contrario asignar 0
-        rating: existingSkillsMap[selectedOption.value] !== undefined ? existingSkillsMap[selectedOption.value] : 0,
+        rating:
+          existingRatingSkillsMap[selectedOption.value] !== undefined
+            ? existingRatingSkillsMap[selectedOption.value]
+            : 0,
       }));
-  
+
       // Actualizar el estado con los skills actualizados, preservando otras propiedades
       return {
         ...prevData,
-        skills: selectedSkills,
+        ratingSkills: selectedRatingSkills,
       };
     });
   };
-  
 
-  const handleSpecialtiesChange = (selectedOptionsSpecialties) => {
-    const selectedSpecialtiesIds = selectedOptionsSpecialties.map(
-      (selectedOptionsSpecialties) => selectedOptionsSpecialties.value
-    );
+  // const handleSpecialtiesChange = (selectedOptionsSpecialties) => {
+  //   const selectedSpecialtiesIds = selectedOptionsSpecialties.map(
+  //     (selectedOptionsSpecialties) => selectedOptionsSpecialties.value
+  //   );
 
+  //   setFormDataState((prevData) => ({
+  //     ...prevData,
+  //     specialties: selectedSpecialtiesIds,
+  //   }));
+  // };
+
+  const handleRatingSkillChange = (ratingSkillId, newRatingSkill) => {
     setFormDataState((prevData) => ({
       ...prevData,
-      specialties: selectedSpecialtiesIds,
-    }));
-  };
-
-  const handleRatingChange = (skillId, newRating) => {
-    setFormDataState((prevData) => ({
-      ...prevData,
-      skills: prevData.skills.map((skill) =>
-        skill._id === skillId ? { ...skill, rating: newRating } : skill
+      ratingSkills: prevData.ratingSkills.map((ratingSkill) =>
+        ratingSkill.skill === ratingSkillId
+          ? { ...ratingSkill, rating: newRatingSkill }
+          : ratingSkill
       ),
     }));
   };
@@ -421,34 +428,34 @@ function Form() {
               value: skill._id,
             }))}
             isMulti
-            value={(Array.isArray(formDataState.skills)
-              ? formDataState.skills
+            value={(Array.isArray(formDataState.ratingSkills)
+              ? formDataState.ratingSkills
               : []
-            ).map((selectedSkill) => ({
+            ).map((selectedRatingSkill) => ({
               label:
-                skills.find((skill) => skill._id === selectedSkill._id)
+                skills.find((skill) => skill._id === selectedRatingSkill.skill)
                   ?.nombre || "",
-              value: selectedSkill._id,
+              value: selectedRatingSkill.skill,
             }))}
-            onChange={handleSkillsChange}
+            onChange={handleSkillChange}
           />
         </div>
         <div className="max-w-md flex flex-col gap-y-3">
-          {formDataState.skills.map((skill) => (
-            <div key={skill._id} className="flex items-center gap-2">
+          {formDataState.ratingSkills.map((ratignSkill) => (
+            <div key={ratignSkill.skill} className="flex items-center gap-2">
               <div className="text-sm font-medium">
-                {skills.find((skillSource) => skillSource._id === skill._id)
+                {skills.find((skill) => skill._id === ratignSkill.skill)
                   ?.nombre || ""}
               </div>
               <RatingComponent
-                skillId={skill._id}
-                rating={skill.rating}
-                onRatingChange={handleRatingChange}
+                ratingSkillId={ratignSkill.skill}
+                rating={ratignSkill.rating}
+                onRatingSkillChange={handleRatingSkillChange}
               />
             </div>
           ))}
         </div>
-        <div className="max-w-md">
+        {/* <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="especialidades" value="Especialidades" />
           </div>
@@ -472,7 +479,7 @@ function Form() {
             }))}
             onChange={handleSpecialtiesChange}
           />
-        </div>
+        </div> */}
 
         <Button type="submit" color="dark">
           {id ? "Actualizar Asesor" : "Insertar Asesor"}
