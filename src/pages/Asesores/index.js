@@ -113,15 +113,18 @@ function Advisors() {
             style={{ maxWidth: "600px" }}
           >
             <Link to={`/formAsesores/${asesor._id}`}>
-              <Button className="shadow mb-2 ms-auto" color="success">
+              <Button
+                className="bg-transparent text-blue-600 hover:text-blue-700 shadow mb-2 ms-auto border border-transparent hover:border-blue-600"
+                color="none" // Esto establece el color del botón como ninguno, eliminando el color por defecto
+              >
                 Editar
               </Button>
             </Link>
 
             <Button
               onClick={() => passAdviserId(asesor._id)}
-              className=" text-red-600 hover:underline shadow mb-2 ms-auto"
-              color="success"
+              className="bg-transparent text-red-600 hover:text-red-700 shadow mb-2 ms-auto border border-transparent hover:border-red-600"
+              color="none"
             >
               Borrar
             </Button>

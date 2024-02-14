@@ -1,10 +1,11 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import { FiBell, FiLogOut } from "react-icons/fi";
 import { Dropdown } from "flowbite-react";
 import { NotificacionesContext } from "../context/NotificacionesContext";
+import authService from "../services/authService";
 
 export function Layout({ children }) {
   const navigate = useNavigate();
@@ -12,6 +13,21 @@ export function Layout({ children }) {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [user, setUser] = useState({});
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const user = await authService.getUser(); // Asume authService ya importado
+        setUser(user); // Asume setUser ya definido en este contexto
+      } catch (error) {
+        console.error("Error al obtener el usuario:", error);
+        // Manejar el error, por ejemplo, estableciendo un estado de error
+      }
+    };
+
+    getUser(); // Invocar la función asíncrona
+  }, []); // U
 
   let marginLeftValue = isMinimized ? "100px" : "280px";
 
@@ -36,6 +52,7 @@ export function Layout({ children }) {
           ☰
         </button>
         <div className="flex items-center">
+          <div className="me-3">{user.email}</div>
           <Dropdown
             inline={true}
             label={

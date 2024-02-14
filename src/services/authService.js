@@ -21,6 +21,11 @@ const authService = {
     const decodedToken = getDecodedToken();
     return decodedToken.role === "administrador";
   },
+
+  getUser: () => {
+    const decodedToken = getDecodedToken();
+    return decodedToken;
+  },
 };
 
 export default authService;
