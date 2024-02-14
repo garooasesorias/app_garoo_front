@@ -68,10 +68,13 @@ function Cotizaciones() {
   const handleDeleteClick = () => {
     if (selectedCotizacionId) {
       setDeleting(true);
-      cotizacionService.deleteCotizacionById(selectedCotizacionId)
+      cotizacionService
+        .deleteCotizacionById(selectedCotizacionId)
         .then(() => {
-          setCotizaciones(prevCotizaciones =>
-            prevCotizaciones.filter(cotizacion => cotizacion._id !== selectedCotizacionId)
+          setCotizaciones((prevCotizaciones) =>
+            prevCotizaciones.filter(
+              (cotizacion) => cotizacion._id !== selectedCotizacionId
+            )
           );
           setDeleting(false);
           setOpenModal(false);
@@ -124,7 +127,7 @@ function Cotizaciones() {
           <Table.HeadCell>Total</Table.HeadCell>
           <Table.HeadCell>Estado</Table.HeadCell>
           <Table.HeadCell>
-            <span className="sr-only">Ver Detalles</span>
+            <span className="sr-only">Editar</span>
           </Table.HeadCell>
         </Table.Head>
         <Table.Body className="divide-y">
