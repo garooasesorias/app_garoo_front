@@ -100,12 +100,16 @@ function Form() {
       }, 5000);
 
     } catch (error) {
-      console.error("Error en la operación:", error);
+      console.error("Error completo:", error);
 
-      // Define el mensaje de error y muestra el Toast, pero no establezcas un temporizador para ocultarlo
-      setAction("no pudo ser creado/datos duplicados");
+      const errorMessage = error.response && error.response.data
+        ? error.response.data.message || "Hubo un error desconocido. Por favor, intenta de nuevo más tarde."
+        : error.message || "Hubo un error desconocido. Por favor, intenta de nuevo más tarde.";
+
+      console.log("Mensaje de error a mostrar:", errorMessage);
+
+      setAction(errorMessage);
       setShowToast(true);
-      // No uses setTimeout aquí, para que el Toast se quede visible hasta que el usuario decida cerrarlo
     } finally {
       setLoading(false);
       if (!id) {
@@ -311,8 +315,8 @@ function Form() {
       {showToast && (
         <Toast style={{ maxWidth: "250px" }} className="Toast">
           <div className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${action === "creado" || action === "actualizado"
-              ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
-              : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
+            ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
+            : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
             }`}>
             {action === "creado" || action === "actualizado" ? (
               <HiCheck className="h-5 w-5" />
