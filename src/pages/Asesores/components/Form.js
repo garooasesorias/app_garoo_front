@@ -27,7 +27,10 @@ function Form() {
     //avatar: "",
     identificacion: "",
     nombre: "",
+    codigo: "",
     email: "",
+    hojaDeVidaUrl: "",
+    documentacionLegalUrl: "",
     password: "",
     isTempPwd: false,
     cargo: "",
@@ -238,11 +241,35 @@ function Form() {
     }));
   };
 
+  const handleCodigoChange = (e) => {
+    const newCodigo = e.target.value;
+    setFormDataState((prevData) => ({
+      ...prevData,
+      codigo: newCodigo,
+    }));
+  };
+
   const handleEmailChange = (e) => {
     const newEmail = e.target.value;
     setFormDataState((prevData) => ({
       ...prevData,
       email: newEmail,
+    }));
+  };
+
+  const handleHojaDeVidaUrlChange = (e) => {
+    const newHojaDeVidaUrl = e.target.value;
+    setFormDataState((prevData) => ({
+      ...prevData,
+      hojaDeVidaUrl: newHojaDeVidaUrl,
+    }));
+  };
+
+  const handleDocumentacionLegalUrlChange = (e) => {
+    const newDocumentacionLegalUrl = e.target.value;
+    setFormDataState((prevData) => ({
+      ...prevData,
+      documentacionLegalUrl: newDocumentacionLegalUrl,
     }));
   };
 
@@ -349,7 +376,7 @@ function Form() {
             name="avatar"
             accept="image/*"
             onChange={(e) => guardarArchivo(e)}
-            // required
+          // required
           />
           <input type="hidden" name="avatar" value={formDataState.avatar} />
           {/* <p >Archivo seleccionado: {selectedFile || 'Ningún archivo seleccionado'}</p>*/}
@@ -369,14 +396,28 @@ function Form() {
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
-            <Label htmlFor="nombre" value="Nombre" />
+            <Label htmlFor="nombre" value="Nombres y Apellidos" />
           </div>
           <TextInput
-            addon="Nombre"
+            addon="Nombres y Apellidos"
             id="nombre"
             name="nombre"
             value={formDataState.nombre}
             onChange={handleNombreChange}
+            required
+          />
+        </div>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="codigo" value="Código" />
+          </div>
+          <TextInput
+            addon="Codigo"
+            id="codigo"
+            name="codigo"
+            placeholder="Ingresa el código"
+            value={formDataState.codigo}
+            onChange={handleCodigoChange}
             required
           />
         </div>
@@ -391,6 +432,34 @@ function Form() {
             placeholder="Ingresa tu correo electrónico"
             value={formDataState.email}
             onChange={handleEmailChange}
+            required
+          />
+        </div>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="hojaDeVidaUrl" value="Hoja de Vida URL" />
+          </div>
+          <TextInput
+            type="url" // Especifica que es un campo de tipo URL
+            id="hojaDeVidaUrl"
+            name="hojaDeVidaUrl"
+            placeholder="Ingresa la URL de tu hoja de vida"
+            value={formDataState.hojaDeVidaUrl}
+            onChange={handleHojaDeVidaUrlChange}
+            required
+          />
+        </div>
+        <div className="max-w-md">
+          <div className="mb-2 block">
+            <Label htmlFor="documentacionLegalUrl" value="Documentación Legal URL" />
+          </div>
+          <TextInput
+            type="url" // Especifica que es un campo de tipo URL
+            id="documentacionLegalUrl"
+            name="documentacionLegalUrl"
+            placeholder="Ingresa la URL de tu documentación legal"
+            value={formDataState.documentacionLegalUrl}
+            onChange={handleDocumentacionLegalUrlChange}
             required
           />
         </div>
@@ -542,11 +611,10 @@ function Form() {
       {showToast && (
         <Toast style={{ maxWidth: "250px" }} className="Toast">
           <div
-            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${
-              action === "creado" || action === "actualizado"
-                ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
-                : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
-            }`}
+            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${action === "creado" || action === "actualizado"
+              ? "bg-green-100 text-green-500 dark:bg-green-800 dark:text-green-200"
+              : "bg-red-100 text-red-500 dark:bg-red-800 dark:text-red-200"
+              }`}
           >
             {action === "creado" || action === "actualizado" ? (
               <HiCheck className="h-5 w-5" />
