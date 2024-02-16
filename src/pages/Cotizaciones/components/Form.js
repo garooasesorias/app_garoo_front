@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Label, Table } from "flowbite-react";
+
+import ESTADOS_COTIZACIONES from "../../../constants/CotizacionesStates";
+
+import { useCotizacion } from "../../../context/CotizacionContext";
+
+import { Badge, Button, Label, Table } from "flowbite-react";
 import Select from "react-select";
 import PdfButton from "./PdfButton";
+
 import cotizacionService from "../../../services/cotizacionService"; // Servicio para las operaciones de cotizaciones
 import clienteService from "../../../services/clienteService"; // Servicio para las operaciones de clientes
 import materiaService from "../../../services/materiasService"; // Servicio para las operaciones de materias
@@ -11,12 +17,20 @@ import actividadService from "../../../services/actividadesService"; // Servicio
 import estadoCotizacionService from "../../../services/estadoCotizacionService"; // Servicio para las operaciones de estados de cotizaciones
 import descuentoService from "../../../services/descuentosService"; // Servicio para las operaciones de descuentos
 import cursoService from "../../../services/cursoService";
-import operacionService from "../../../services/operacionService";
 import asignamientoService from "../../../services/asignamientoService";
-// Otros componentes o servicios que puedas necesitar
 
+// Otros componentes o servicios que puedas necesita
 function CotizacionForm() {
   let { id } = useParams();
+  const { getEstadoStrategy, setEstado } = useCotizacion();
+
+  const strategy = getEstadoStrategy();
+  const validationRules = strategy.getFormValidationRules();
+
+  const isFieldRequired = (fieldName) => {
+    return validationRules[fieldName]?.required;
+  };
+
   const [formData, setFormData] = useState({
     fecha: "",
     cliente: null,
@@ -31,73 +45,74 @@ function CotizacionForm() {
   const [planes, setPlanes] = useState([]);
   const [actividades, setActividades] = useState([]);
   const [planActividades, setPlanActividades] = useState([]);
-  const [cotizacion, setCotizacion] = useState([]);
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
   const [descuentos, setDescuentos] = useState([]);
-  const [descuentoSeleccionado, setDescuentoSeleccionado] = useState(null);
   const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
-  const [fechasLimite, setFechasLimite] = useState([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const clientesRes = await clienteService.getClientes();
-        setClientes(clientesRes.data);
-
-        const materiasRes = await materiaService.getMaterias();
-        setMaterias(materiasRes.data);
-
-        const planesRes = await planService.getPlanes();
-        setPlanes(planesRes.data);
-
-        const actividadesRes = await actividadService.getActividades();
-        setActividades(
-          actividadesRes.data.map((act) => ({
-            label: act.nombre,
-            value: act._id,
-          }))
-        );
-
-        const estadosCotizacionesRes =
-          await estadoCotizacionService.getEstadosCotizacion();
-        setEstadosCotizaciones(estadosCotizacionesRes.data);
-
-        const descuentosRes = await descuentoService.getDescuentos();
-        setDescuentos(descuentosRes.data);
-
-        if (id) {
-          const cotizacionRes = await cotizacionService.getCotizacionById(id);
-          const cotizacionData = cotizacionRes.data;
-
-          // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
-          const itemsConActividades = cotizacionData.items.map((item) => {
-            const actividadesOptions = actividadesRes.data.map((act) => ({
-              label: act.nombre,
-              value: act._id,
-            }));
-
-            return {
-              ...item,
-              actividades: item.actividades.map(
-                (actId) =>
-                  actividadesOptions.find((act) => act.value === actId._id) ||
-                  null
-              ),
-            };
-          });
-
-          setFormData({
-            ...cotizacionData,
-            items: itemsConActividades,
-          });
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
     fetchData();
   }, [id]); // Dependencia: id
+
+  const fetchData = async () => {
+    try {
+      const clientesRes = await clienteService.getClientes();
+      setClientes(clientesRes.data);
+
+      const materiasRes = await materiaService.getMaterias();
+      setMaterias(materiasRes.data);
+
+      const planesRes = await planService.getPlanes();
+      setPlanes(planesRes.data);
+
+      const actividadesRes = await actividadService.getActividades();
+      setActividades(
+        actividadesRes.data.map((act) => ({
+          label: act.nombre,
+          value: act._id,
+        }))
+      );
+
+      const estadosCotizacionesRes =
+        await estadoCotizacionService.getEstadosCotizacion();
+      setEstadosCotizaciones(estadosCotizacionesRes.data);
+
+      const descuentosRes = await descuentoService.getDescuentos();
+      setDescuentos(descuentosRes.data);
+
+      if (id) {
+        const cotizacionRes = await cotizacionService.getCotizacionById(id);
+        const cotizacionData = cotizacionRes.data;
+
+        // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
+        const itemsConActividades = cotizacionData.items.map((item) => {
+          const actividadesOptions = actividadesRes.data.map((act) => ({
+            label: act.nombre,
+            value: act._id,
+          }));
+
+          return {
+            ...item,
+            actividades: item.actividades.map(
+              (actId) =>
+                actividadesOptions.find((act) => act.value === actId._id) ||
+                null
+            ),
+          };
+        });
+
+        setFormData({
+          ...cotizacionData,
+          items: itemsConActividades,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const aprobarCotizacion = () => {
+    setEstado(ESTADOS_COTIZACIONES.APROBADO);
+  };
 
   const calculateRowTotal = (row) => {
     let totalRow = 0;
@@ -144,6 +159,11 @@ function CotizacionForm() {
   const handleSubmitCotizacion = async (e) => {
     e.preventDefault();
 
+    if (isFieldRequired("materia") && !(formData.items.length > 0)) {
+      alert("No hay materias");
+      return;
+    }
+
     // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
       materia: item.materia ? item.materia.value : null,
@@ -155,7 +175,7 @@ function CotizacionForm() {
     }));
 
     const formattedFormData = {
-      fecha: formData.fecha,
+      fecha: currentDate,
       cliente: formData.cliente ? formData.cliente.value : null,
       estado: formData.estado ? formData.estado.value : null,
       items: formattedItems,
@@ -170,10 +190,19 @@ function CotizacionForm() {
 
     // Enviamos los datos
     try {
-      const response = await cotizacionService.insertCotizacion(
-        formattedFormData
-      );
-      alert("Cotización creada con éxito.");
+      let response;
+
+      if (id) {
+        response = await cotizacionService.updateCotizacionById(
+          id,
+          formattedFormData
+        );
+        alert("Cotización actualizada con éxito.");
+      } else {
+        response = await cotizacionService.insertCotizacion(formattedFormData);
+        alert("Cotización creada con éxito.");
+      }
+      fetchData();
     } catch (error) {
       console.error("Error al crear la cotización:", error);
       alert("Ocurrió un error al crear la cotización.");
@@ -207,11 +236,6 @@ function CotizacionForm() {
 
           const asignamientosResponse =
             await asignamientoService.insertAsignamiento(actividades);
-
-          // const operacionesResponse = await operacionService.insertOperaciones(
-          //   actividades
-          // );
-          // console.log("operacionesResponse", operacionesResponse);
         }
       } catch (error) {
         console.error("Error al insertar curso y operaciones:", error);
@@ -369,6 +393,12 @@ function CotizacionForm() {
 
   return (
     <>
+      <div className="flex justify-start m-4">
+        <Badge color={strategy.colorBadge}>{strategy.nombre}</Badge>
+      </div>
+      <div>
+        <button onClick={aprobarCotizacion}>Aprobar Cotización</button>
+      </div>
       <form
         className="flex mx-auto flex-col gap-4"
         onSubmit={handleSubmitCotizacion}
@@ -376,6 +406,7 @@ function CotizacionForm() {
         <div className="mb-4">
           <label>Cliente:</label>
           <Select
+            required={isFieldRequired("cliente")}
             options={clientes.map((cliente) => ({
               label: cliente.nombre,
               value: cliente._id,
@@ -406,6 +437,7 @@ function CotizacionForm() {
               <tr key={index}>
                 <td>
                   <Select
+                    required={isFieldRequired("materia")}
                     options={materias.map((materia) => ({
                       label: materia.nombre,
                       value: materia._id,
@@ -423,6 +455,7 @@ function CotizacionForm() {
                 </td>
                 <td>
                   <Select
+                    required={isFieldRequired("planes")}
                     options={planes.map((plan) => ({
                       label: plan.nombre,
                       value: plan._id,
@@ -440,6 +473,7 @@ function CotizacionForm() {
                 </td>
                 <td>
                   <Select
+                    required={isFieldRequired("actividades")}
                     options={
                       fila.plan && fila.plan.value !== "personalizado"
                         ? planActividades
