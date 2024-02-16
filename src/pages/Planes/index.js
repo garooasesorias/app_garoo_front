@@ -9,6 +9,8 @@ import actividadesService from "../../services/actividadesService.js";
 
 function Planes() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchPlanQuery, setSearchPlanQuery] = useState("");
+  const [searchActivityQuery, setSearchActivityQuery] = useState("");
   const [collapsedIndex, setCollapsedIndex] = useState(null);
   const [planes, setPlanes] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,17 +57,30 @@ function Planes() {
     setSearchQuery(event.target.value);
   };
 
+  const handleSearchPlan = (event) => {
+    setSearchPlanQuery(event.target.value);
+  };
+
+  const handleSearchActivity = (event) => {
+    setSearchActivityQuery(event.target.value);
+  };
+
   const handleCollapseToggle = (index) => {
     setCollapsedIndex(collapsedIndex === index ? null : index);
   };
 
-  const filteredPlanes = planes.filter(
-    (plan) => plan.nombre.toLowerCase().includes(searchQuery.toLowerCase())
-    // || Add more filtering based on plan properties
-    // plan.actividades.some((actividad) => actividad.nombre.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const handleDeleteClick = async () => {
+  const filteredPlanes = planes.filter((plan) => {
+    const searchPlanMatch = plan.nombre.toLowerCase().includes(searchPlanQuery.toLowerCase());
+    
+    const searchActivityMatch = searchActivityQuery
+      ? plan.actividades_relacionadas.some((actividad) =>
+          actividad.nombre.toLowerCase().includes(searchActivityQuery.toLowerCase())
+        )
+      : true; // Si no hay búsqueda de actividad, no filtrar por actividades
+  
+    return searchPlanMatch && searchActivityMatch; // Ambos filtros deben ser verdaderos para que el plan aparezca
+  });
+    const handleDeleteClick = async () => {
     if (selectedPlanId) {
       setDeleting(true);
       try {
@@ -100,9 +115,17 @@ function Planes() {
             type="text"
             placeholder="Buscar plan..."
             className="px-4 py-2 border rounded-md"
-            value={searchQuery}
-            onChange={handleSearch}
+            value={searchPlanQuery}
+            onChange={handleSearchPlan}
           />
+          <input
+            type="text"
+            placeholder="Buscar actividad..."
+            className="px-4 py-2 border rounded-md"
+            value={searchActivityQuery}
+            onChange={handleSearchActivity}
+          />
+
         </div>
         <div className="flex items-center">
           <Link to="/formPlanes" className="">
