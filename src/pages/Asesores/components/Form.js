@@ -110,6 +110,9 @@ function Form() {
       especialidades: asesor.especialidades || "",
       ratingSkills: asesor.ratingSkills || "",
       celular: asesor.celular || "",
+      codigo: asesor.codigo || "",  // Asegúrate de tener un campo 'codigo' en tu modelo de Mongoose
+      hojaDeVidaUrl: asesor.hojaDeVidaUrl || "",  // Asegúrate de que 'hojaDeVidaUrl' exista en tu modelo
+      documentacionLegalUrl: asesor.documentacionLegalUrl || "",  // Asegúrate de que 'documentacionLegalUrl' exista
       // ...otros campos
     });
   };
@@ -439,29 +442,45 @@ function Form() {
           <div className="mb-2 block">
             <Label htmlFor="hojaDeVidaUrl" value="Hoja de Vida URL" />
           </div>
-          <TextInput
-            type="url" // Especifica que es un campo de tipo URL
-            id="hojaDeVidaUrl"
-            name="hojaDeVidaUrl"
-            placeholder="Ingresa la URL de tu hoja de vida"
-            value={formDataState.hojaDeVidaUrl}
-            onChange={handleHojaDeVidaUrlChange}
-            required
-          />
+          <div className="flex items-center">
+            <TextInput
+              type="url" // Especifica que es un campo de tipo URL
+              id="hojaDeVidaUrl"
+              name="hojaDeVidaUrl"
+              placeholder="Ingresa la URL de tu hoja de vida"
+              value={formDataState.hojaDeVidaUrl}
+              onChange={handleHojaDeVidaUrlChange}
+              required
+              className="flex-1"
+            />
+            {formDataState.hojaDeVidaUrl && (
+              <a href={formDataState.hojaDeVidaUrl} target="_blank" rel="noopener noreferrer" className="ml-2">
+                Ver aquí
+              </a>
+            )}
+          </div>
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
             <Label htmlFor="documentacionLegalUrl" value="Documentación Legal URL" />
           </div>
-          <TextInput
-            type="url" // Especifica que es un campo de tipo URL
-            id="documentacionLegalUrl"
-            name="documentacionLegalUrl"
-            placeholder="Ingresa la URL de tu documentación legal"
-            value={formDataState.documentacionLegalUrl}
-            onChange={handleDocumentacionLegalUrlChange}
-            required
-          />
+          <div className="flex items-center">
+            <TextInput
+              type="url" // Especifica que es un campo de tipo URL
+              id="documentacionLegalUrl"
+              name="documentacionLegalUrl"
+              placeholder="Ingresa la URL de tu documentación legal"
+              value={formDataState.documentacionLegalUrl}
+              onChange={handleDocumentacionLegalUrlChange}
+              required
+              className="flex-1"
+            />
+            {formDataState.documentacionLegalUrl && (
+              <a href={formDataState.documentacionLegalUrl} target="_blank" rel="noopener noreferrer" className="ml-2">
+                Ver aquí
+              </a>
+            )}
+          </div>
         </div>
         <div className="max-w-md">
           <div className="mb-2 block">
