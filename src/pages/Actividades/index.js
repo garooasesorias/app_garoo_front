@@ -23,48 +23,48 @@ function Actividades() {
 
   useEffect(() => {
     const fetchData = async () => {
-        try {
-            const actividadesResponse = await actividadesService.getActividades();
-            const tipoDataResponse = await tiposActividadesService.getTiposActividad();
-            setLoading(false);
+      try {
+        const actividadesResponse = await actividadesService.getActividades();
+        const tipoDataResponse = await tiposActividadesService.getTiposActividad();
+        setLoading(false);
 
-            console.log("actividadesResponse:", actividadesResponse);
-            console.log("tipoDataResponse:", tipoDataResponse);
+        console.log("actividadesResponse:", actividadesResponse);
+        console.log("tipoDataResponse:", tipoDataResponse);
 
-            const tipoDataArray = tipoDataResponse.data || [];
-            console.log("tipoDataArray:", tipoDataArray);
+        const tipoDataArray = tipoDataResponse.data || [];
+        console.log("tipoDataArray:", tipoDataArray);
 
-            const tipoDataMap = tipoDataArray.reduce((acc, tipo) => {
-                acc[tipo._id] = tipo.nombre;
-                return acc;
-            }, {});
+        const tipoDataMap = tipoDataArray.reduce((acc, tipo) => {
+          acc[tipo._id] = tipo.nombre;
+          return acc;
+        }, {});
 
-            console.log("tipoDataMap:", tipoDataMap);
+        console.log("tipoDataMap:", tipoDataMap);
 
-            const actividadesArray = actividadesResponse.data || [];
-            console.log("actividadesArray:", actividadesArray);
+        const actividadesArray = actividadesResponse.data || [];
+        console.log("actividadesArray:", actividadesArray);
 
-            const actividadesWithTipoNombre = actividadesArray.map(
-                (actividad) => ({
-                    ...actividad,
-                    tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
-                })
-            );
+        const actividadesWithTipoNombre = actividadesArray.map(
+          (actividad) => ({
+            ...actividad,
+            tipoNombre: tipoDataMap[actividad.tipo] || "Unknown Tipo",
+          })
+        );
 
-            console.log("actividadesWithTipoNombre:", actividadesWithTipoNombre);
+        console.log("actividadesWithTipoNombre:", actividadesWithTipoNombre);
 
-            setActividades(actividadesWithTipoNombre);
-        } catch (error) {
-            console.error("Error fetching data:", error);
-        }
+        setActividades(actividadesWithTipoNombre);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
     };
 
     fetchData();
-}, []);
+  }, []);
 
 
 
-  
+
   const renderFilterInput = (label, filterKey) => (
     <div className="flex-1 px-2 mb-4">
       <label className="block text-sm font-medium text-gray-700">{label}</label>
@@ -78,7 +78,7 @@ function Actividades() {
       />
     </div>
   );
-  
+
   const filteredActividades = actividades.filter((actividad) => {
     return (
       (!filters.nombre ||
@@ -88,12 +88,10 @@ function Actividades() {
       (!filters.tipo ||
         actividad.tipoNombre.toLowerCase().includes(filters.tipo.toLowerCase())) &&
       (!filters.precio ||
-        actividad.precio
-          .toLowerCase()
-          .includes(filters.precio.toLowerCase())) 
+        actividad.precio.toString().toLowerCase().includes(filters.precio.toLowerCase()))
     );
   });
-  
+
   const handleDeleteClick = async () => {
     if (selectedActividadId) {
       setDeleting(true);
@@ -110,15 +108,15 @@ function Actividades() {
       }
     }
   };
-  
+
   const passActividadId = (actividadId) => {
     // Tomamos el Id del cliente que viene del botón borrar
     setSelectedActividadId(actividadId);
-  
+
     // Abre el modal
     setOpenModal(true);
   };
-  
+
 
   return (
     <>
@@ -212,8 +210,8 @@ function Actividades() {
         </Table.Body>
       </Table>
       <div className="LoaderContainer">
-            {loading ? <Loader /> : null}
-            </div>
+        {loading ? <Loader /> : null}
+      </div>
     </>
   );
 }
