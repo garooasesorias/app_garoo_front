@@ -17,14 +17,16 @@ const cotizacionService = {
       const response = await api.get(`/cotizacion/getCotizacionById/${id}`);
       return response.data;
     } catch (error) {
-      console.error("Error al obtener el cotizacion:", error);
-      throw error;
+      throw new Error(error);
     }
   },
 
   insertCotizacion: async (datosCotizacion) => {
     try {
-      const response = await api.post("/cotizacion/insertCotizacion", datosCotizacion);
+      const response = await api.post(
+        "/cotizacion/insertCotizacion",
+        datosCotizacion
+      );
       return response.data; // Respuesta de la API tras insertar el cotizacion
     } catch (error) {
       console.error("Error al insertar el cotizacion:", error);
@@ -34,20 +36,21 @@ const cotizacionService = {
 
   updateCotizacionById: async (id, data) => {
     try {
-      const response = await api.put("/cotizacion/updateCotizacionById", {
-        id,
-        data,
-      });
+      const response = await api.put(
+        `/cotizacion/updateCotizacionById/${id}`,
+        data
+      );
       return response.data; // Respuesta de la API tras insertar el cotizacion
     } catch (error) {
-      console.error("Error al actualizar el cotizacion:", error);
       throw error;
     }
   },
+
   deleteCotizacionById: async (id) => {
-    console.log(id);
     try {
-      const response = await api.delete(`/cotizacion/deleteCotizacionById/${id}`);
+      const response = await api.delete(
+        `/cotizacion/deleteCotizacionById/${id}`
+      );
       return response.data; // Respuesta de la API tras insertar el cotizacion
     } catch (error) {
       console.error("Error al actualizar el cotizacion:", error);

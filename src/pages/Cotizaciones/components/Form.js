@@ -22,8 +22,9 @@ import asignamientoService from "../../../services/asignamientoService";
 // Otros componentes o servicios que puedas necesita
 function CotizacionForm() {
   let { id } = useParams();
-  const { getEstadoStrategy, setEstado } = useCotizacion();
+  const { getEstadoStrategy, setEstado, estado } = useCotizacion();
 
+  const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
   const strategy = getEstadoStrategy();
   const validationRules = strategy.getFormValidationRules();
 
@@ -47,7 +48,7 @@ function CotizacionForm() {
   const [planActividades, setPlanActividades] = useState([]);
   const [estadosCotizaciones, setEstadosCotizaciones] = useState([]);
   const [descuentos, setDescuentos] = useState([]);
-  const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
+  const [action, setAction] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -80,12 +81,14 @@ function CotizacionForm() {
       setDescuentos(descuentosRes.data);
 
       if (id) {
-        const cotizacionRes = await cotizacionService.getCotizacionById(id);
-        const cotizacionData = cotizacionRes.data;
+        const { data } = await cotizacionService.getCotizacionById(id);
+        // const cotizacionData = cotizacionRes.data;
+
+        setEstado(data.estado);
 
         // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
-        const itemsConActividades = cotizacionData.items.map((item) => {
-          const actividadesOptions = actividadesRes.data.map((act) => ({
+        const itemsConActividades = data.items.map((item) => {
+          const actividadesOptions = data.map((act) => ({
             label: act.nombre,
             value: act._id,
           }));
@@ -101,7 +104,7 @@ function CotizacionForm() {
         });
 
         setFormData({
-          ...cotizacionData,
+          ...data,
           items: itemsConActividades,
         });
       }
@@ -156,14 +159,7 @@ function CotizacionForm() {
     }, 0);
   };
 
-  const handleSubmitCotizacion = async (e) => {
-    e.preventDefault();
-
-    if (isFieldRequired("materia") && !(formData.items.length > 0)) {
-      alert("No hay materias");
-      return;
-    }
-
+  const formatFormData = () => {
     // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
       materia: item.materia ? item.materia.value : null,
@@ -177,7 +173,7 @@ function CotizacionForm() {
     const formattedFormData = {
       fecha: currentDate,
       cliente: formData.cliente ? formData.cliente.value : null,
-      estado: formData.estado ? formData.estado.value : null,
+      estado,
       items: formattedItems,
       subtotal: calculateTotal(),
       total: calculateTotal(),
@@ -188,24 +184,24 @@ function CotizacionForm() {
       })),
     };
 
-    // Enviamos los datos
-    try {
-      let response;
+    return formattedFormData;
+  };
 
-      if (id) {
-        response = await cotizacionService.updateCotizacionById(
-          id,
-          formattedFormData
-        );
-        alert("Cotización actualizada con éxito.");
-      } else {
-        response = await cotizacionService.insertCotizacion(formattedFormData);
-        alert("Cotización creada con éxito.");
+  // Asegúrate de que handleSubmit maneje la acción pendiente después de la validación
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Previene el envío estándar del formulario
+    const formatedData = formatFormData(formData);
+
+    try {
+      if (action) {
+        // Ejecuta la acción con los datos formateados actuales
+        // Asegúrate de que la función almacenada en `accion` esté preparada para recibir estos datos como argumento
+        await action(formatedData, id);
+        setAction(null); // Limpia la acción después de ejecutarla
+        alert("Éxito");
       }
-      fetchData();
-    } catch (error) {
-      console.error("Error al crear la cotización:", error);
-      alert("Ocurrió un error al crear la cotización.");
+    } catch ({ response: { data } }) {
+      alert(data.message);
     }
   };
 
@@ -232,8 +228,6 @@ function CotizacionForm() {
             }))
           : [];
         if (actividades.length > 0) {
-          console.log(actividades);
-
           const asignamientosResponse =
             await asignamientoService.insertAsignamiento(actividades);
         }
@@ -376,17 +370,6 @@ function CotizacionForm() {
     }));
   };
 
-  // Variables de estado (asegúrate de que los valores son correctos)
-  const isEstadoGenerada =
-    formData.estado?.value === "64e600985fef1743de870cbc";
-  const isEstadoEnviada = formData.estado?.value === "64e5ffdc0bdfb8235d675878";
-  const isEstadoAprobada =
-    formData.estado?.value === "64e6003c9f5475c68f9c8098";
-  const isEstadoRechazada =
-    formData.estado?.value === "64e600235fef1743de86a806";
-  const isEstadoGestionada =
-    formData.estado?.value === "64ea66fb83c29fa14cfa44bf";
-
   const goBack = () => {
     window.history.back();
   };
@@ -399,10 +382,7 @@ function CotizacionForm() {
       <div>
         <button onClick={aprobarCotizacion}>Aprobar Cotización</button>
       </div>
-      <form
-        className="flex mx-auto flex-col gap-4"
-        onSubmit={handleSubmitCotizacion}
-      >
+      <form className="flex mx-auto flex-col gap-4" onSubmit={handleSubmit}>
         <div className="mb-4">
           <label>Cliente:</label>
           <Select
@@ -525,21 +505,6 @@ function CotizacionForm() {
             <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
           )}
         </div>
-
-        {id && (
-          <div className="mb-4">
-            <label>Estado de Cotización:</label>
-            <Select
-              options={estadosCotizaciones.map((estado) => ({
-                label: estado.nombre,
-                value: estado._id,
-              }))}
-              value={formData.estado}
-              onChange={handleEstadoChange}
-            />
-          </div>
-        )}
-
         <Button color="success" onClick={addRow}>
           Agregar Fila +
         </Button>
@@ -587,49 +552,18 @@ function CotizacionForm() {
           </tbody>
         </Table>
 
-        {id ? (
-          <Button type="submit" color="dark">
-            Actualizar Cotizacion
+        {strategy.displayButtons().map((button) => (
+          <Button
+            key={button.id}
+            type="submit"
+            color={button.color}
+            onClick={() => setAction(() => button.action)}
+          >
+            {button.text}
           </Button>
-        ) : (
-          <Button type="submit" color="dark">
-            Crear Cotización
-          </Button>
-        )}
-
-        {formData.fecha && <PdfButton data={formData} />}
-
-        {isEstadoGenerada && (
-          <Button color="light">Enviar Cotización al Cliente</Button>
-        )}
-
-        {isEstadoEnviada && (
-          <>
-            <Button color="light">Reenviar Cotización</Button>
-            <Button color="light">Aprobar Cotización</Button>
-            <Button color="light">Rechazar Cotización</Button>
-          </>
-        )}
-
-        {isEstadoAprobada && (
-          <>
-            <Button color="light">Reenviar Cotización</Button>
-            <Button color="light">Rechazar Cotización</Button>
-            <Button onClick={handleSubmitCurso} color="light">
-              Crear Curso
-            </Button>
-          </>
-        )}
-
-        {isEstadoRechazada && (
-          <>
-            <Button color="light">Reenviar Cotización</Button>
-            <Button color="light">Aprobar Cotización</Button>
-          </>
-        )}
-
-        {isEstadoGestionada && <Button color="light">Ver Cursos</Button>}
+        ))}
       </form>
+
       <Button
         type="button"
         color="dark"
