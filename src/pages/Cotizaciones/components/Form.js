@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 
 import ESTADOS_COTIZACIONES from "../../../constants/CotizacionesStates";
@@ -21,6 +21,7 @@ import asignamientoService from "../../../services/asignamientoService";
 
 // Otros componentes o servicios que puedas necesita
 function CotizacionForm() {
+  const formRef = useRef(null);
   let { id } = useParams();
   const { getEstadoStrategy, setEstado, estado } = useCotizacion();
 
@@ -55,6 +56,8 @@ function CotizacionForm() {
   }, [id]); // Dependencia: id
 
   const fetchData = async () => {
+    setEstado(ESTADOS_COTIZACIONES.INICIAL);
+
     try {
       const clientesRes = await clienteService.getClientes();
       setClientes(clientesRes.data);
@@ -88,7 +91,7 @@ function CotizacionForm() {
 
         // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
         const itemsConActividades = data.items.map((item) => {
-          const actividadesOptions = data.map((act) => ({
+          const actividadesOptions = item.actividades.map((act) => ({
             label: act.nombre,
             value: act._id,
           }));
@@ -111,10 +114,6 @@ function CotizacionForm() {
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
-
-  const aprobarCotizacion = () => {
-    setEstado(ESTADOS_COTIZACIONES.APROBADO);
   };
 
   const calculateRowTotal = (row) => {
@@ -160,6 +159,7 @@ function CotizacionForm() {
   };
 
   const formatFormData = () => {
+    console.log("formData formatFormData CotizacionesComponent", formData);
     // Formateamos los datos con validación
     const formattedItems = formData.items.map((item) => ({
       materia: item.materia ? item.materia.value : null,
@@ -167,7 +167,9 @@ function CotizacionForm() {
       // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
       descuento: item.descuento ? item.descuento.value : null,
       // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
-      actividades: item.actividad ? item.actividad.map((act) => act.value) : [],
+      actividades: item.actividades
+        ? item.actividades.map((act) => act.value)
+        : [],
     }));
 
     const formattedFormData = {
@@ -189,19 +191,19 @@ function CotizacionForm() {
 
   // Asegúrate de que handleSubmit maneje la acción pendiente después de la validación
   const handleSubmit = async (event) => {
-    event.preventDefault(); // Previene el envío estándar del formulario
+    event.preventDefault();
+
     const formatedData = formatFormData(formData);
 
     try {
       if (action) {
         // Ejecuta la acción con los datos formateados actuales
-        // Asegúrate de que la función almacenada en `accion` esté preparada para recibir estos datos como argumento
-        await action(formatedData, id);
-        setAction(null); // Limpia la acción después de ejecutarla
+        const response = await action(formatedData, id);
         alert("Éxito");
+        setEstado(response);
       }
-    } catch ({ response: { data } }) {
-      alert(data.message);
+    } catch (error) {
+      alert(error.message);
     }
   };
 
@@ -379,13 +381,15 @@ function CotizacionForm() {
       <div className="flex justify-start m-4">
         <Badge color={strategy.colorBadge}>{strategy.nombre}</Badge>
       </div>
-      <div>
-        <button onClick={aprobarCotizacion}>Aprobar Cotización</button>
-      </div>
-      <form className="flex mx-auto flex-col gap-4" onSubmit={handleSubmit}>
+      <form
+        className="flex mx-auto flex-col gap-4"
+        ref={formRef}
+        onSubmit={handleSubmit}
+      >
         <div className="mb-4">
           <label>Cliente:</label>
           <Select
+            className="test"
             required={isFieldRequired("cliente")}
             options={clientes.map((cliente) => ({
               label: cliente.nombre,

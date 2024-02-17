@@ -7,12 +7,25 @@ class EstadoCotizacionStrategy {
     this.nombre = "";
   }
 
+  getFormValidationRules() {
+    // Define las validaciones para el estado Borrador
+    return {
+      cliente: { required: true },
+      materia: { required: true },
+      planes: { required: true },
+      actividades: { required: true },
+      // Añade más reglas según sea necesario
+    };
+  }
+
   async submitCotizacion(formData, id) {
     if (!formData.items || formData.items.length === 0) {
       throw new Error("Debes seleccionar al menos una actividad");
     }
     try {
+      formData.estado = ESTADOS_COTIZACIONES.GENERADO;
       await this.submit(formData, id); // Usa 'await' y maneja la promesa correctamente
+      return formData.estado;
     } catch (error) {
       throw new Error("Hubo un problema al guardar la cotización");
     }
@@ -40,34 +53,20 @@ class EstadoCotizacionStrategy {
   canBeDeleted() {
     return true;
   }
-  getFormValidationRules() {
-    return {};
-  }
+  // getFormValidationRules() {
+  //   return {};
+  // }
 }
 
-export class EstadoBorradorStrategy extends EstadoCotizacionStrategy {
+export class EstadoInicialStrategy extends EstadoCotizacionStrategy {
   constructor() {
     super();
     this.colorBadge = "gray";
-    this.nombre = ESTADOS_COTIZACIONES.BORRADOR;
-  }
-
-  async submitBorrador(formData, id) {
-    try {
-      return await super.submit(formData, id);
-    } catch (error) {
-      throw error;
-    } // Lógica para guardar el borrador
+    this.nombre = ESTADOS_COTIZACIONES.INICIAL;
   }
 
   displayButtons() {
     return [
-      {
-        id: "guardarBorrador",
-        text: "Guardar Borrador",
-        action: (formData, id) => this.submitBorrador(formData, id),
-        color: "gray",
-      },
       {
         id: "guardarCotizacion",
         text: "Guardar Cotización",
@@ -77,12 +76,8 @@ export class EstadoBorradorStrategy extends EstadoCotizacionStrategy {
     ];
   }
 
-  getFormValidationRules() {
-    // Define las validaciones para el estado Borrador
-    return {
-      cliente: { required: true },
-      // Añade más reglas según sea necesario
-    };
+  getValidationRules() {
+    return super.getFormValidationRules();
   }
 }
 export class EstadoGeneradoStrategy extends EstadoCotizacionStrategy {
@@ -102,23 +97,23 @@ export class EstadoGeneradoStrategy extends EstadoCotizacionStrategy {
       },
       {
         id: "descargarPDF",
-        text: "descargar PDF",
+        text: "Descargar PDF",
         action: (formData, id) => super.downloadPDF(formData),
-        color: "blue",
+        color: "dark",
       },
     ];
   }
 
-  getFormValidationRules() {
-    // Define las validaciones para el estado Borrador
-    return {
-      cliente: { required: true },
-      materia: { required: true },
-      planes: { required: true },
-      actividades: { required: true },
-      // Añade más reglas según sea necesario
-    };
-  }
+  // getFormValidationRules() {
+  //   // Define las validaciones para el estado Borrador
+  //   return {
+  //     cliente: { required: true },
+  //     materia: { required: true },
+  //     planes: { required: true },
+  //     actividades: { required: true },
+  //     // Añade más reglas según sea necesario
+  //   };
+  // }
   canBeDeleted() {
     return false; // No se puede eliminar si está aprobada
   }
