@@ -37,6 +37,7 @@ function CotizacionForm() {
     fecha: "",
     cliente: null,
     items: [],
+    subtotal: 0,
     total: 0,
     estado: null,
     divisionPagos: [],
@@ -81,12 +82,13 @@ function CotizacionForm() {
       setEstadosCotizaciones(estadosCotizacionesRes.data);
 
       const descuentosRes = await descuentoService.getDescuentos();
+
       setDescuentos(descuentosRes.data);
 
       if (id) {
         const { data } = await cotizacionService.getCotizacionById(id);
         // const cotizacionData = cotizacionRes.data;
-
+        console.log("data id fetchData CotizacionComponent", data);
         setEstado(data.estado);
 
         // Mapeo de actividades para que cada ítem tenga su lista de actividades correspondiente
@@ -116,21 +118,58 @@ function CotizacionForm() {
     }
   };
 
-  const calculateRowTotal = (row) => {
-    let totalRow = 0;
-    if (row.plan) {
-      const plan = planes.find((plan) => plan._id === row.plan.value);
-      totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
-    }
+  const formatFormData = () => {
+    console.log("formData formatFormData CotizacionesComponent", formData);
+    // Formateamos los datos con validación
+    const formattedItems = formData.items.map((item) => ({
+      ...item,
+      materia: item.materia.value || item.materia,
+      plan: item.plan.value || item.plan,
+      planSubtotal: item.planSubtotal.value || item.planSubtotal,
+      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
+      descuento: item.descuento.value || item.descuento,
+      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
+      actividades: item.actividades
+        ? item.actividades.map((act) => act.value)
+        : [],
+    }));
 
-    if (row.descuento) {
-      const descuentoAplicable = descuentos.find(
-        (descuento) => descuento._id === row.descuento.value
-      );
-      if (descuentoAplicable) {
-        totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
-      }
-    }
+    console.log(
+      "formattedItems formatFormData CotizacionesComponent",
+      formattedItems
+    );
+
+    const formattedFormData = {
+      ...formData,
+      fecha: currentDate,
+      cliente: formData.cliente ? formData.cliente.value : null,
+      estado,
+      items: formattedItems,
+      divisionPagos: formData.divisionPagos.map((division) => ({
+        numeroDivision: division.numeroDivision,
+        monto: division.monto,
+        fechaLimite: division.fechaLimite,
+      })),
+    };
+
+    return formattedFormData;
+  };
+
+  const calculateRowTotal = (subtotal) => {
+    let totalRow = 0;
+    // if (row.plan) {
+    //   const plan = planes.find((plan) => plan._id === row.plan.value);
+    //   totalRow += Number(plan?.precio || 0); // Asumimos que el precio del plan está almacenado en la propiedad 'precio'
+    // }
+
+    // if (row.descuento) {
+    //   const descuentoAplicable = descuentos.find(
+    //     (descuento) => descuento._id === row.descuento.value
+    //   );
+    //   if (descuentoAplicable) {
+    //     totalRow -= totalRow * (descuentoAplicable.porcentaje / 100);
+    //   }
+    // }
 
     return totalRow;
   };
@@ -146,47 +185,16 @@ function CotizacionForm() {
   };
 
   // Calcula el total sin descuentos
-  const calculateTotal = () => {
-    return formData.items.reduce((accum, item) => {
-      return accum + calculateRowSubtotal(item); // Aquí se llama a la función que calcula el subtotal de cada fila
+  const calculateSubtotal = (items) => {
+    return items.reduce((accum, item) => {
+      return Number(accum) + Number(item.planSubtotal); // Aquí se llama a la función que calcula el subtotal de cada fila
     }, 0);
   };
 
-  const calculateTotalConDescuento = () => {
-    return formData.items.reduce((accum, item) => {
-      return accum + calculateRowTotal(item); // Asume que calculateRowTotal devuelve el total de la fila con descuento aplicado
+  const calculateTotalConDescuento = (items) => {
+    return items.reduce((accum, item) => {
+      return Number(accum) + Number(item.planTotal); // Aquí se llama a la función que calcula el subtotal de cada fila
     }, 0);
-  };
-
-  const formatFormData = () => {
-    console.log("formData formatFormData CotizacionesComponent", formData);
-    // Formateamos los datos con validación
-    const formattedItems = formData.items.map((item) => ({
-      materia: item.materia ? item.materia.value : null,
-      plan: item.plan ? item.plan.value : null,
-      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
-      descuento: item.descuento ? item.descuento.value : null,
-      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
-      actividades: item.actividades
-        ? item.actividades.map((act) => act.value)
-        : [],
-    }));
-
-    const formattedFormData = {
-      fecha: currentDate,
-      cliente: formData.cliente ? formData.cliente.value : null,
-      estado,
-      items: formattedItems,
-      subtotal: calculateTotal(),
-      total: calculateTotal(),
-      divisionPagos: formData.divisionPagos.map((division) => ({
-        numeroDivision: division.numeroDivision,
-        monto: division.monto,
-        fechaLimite: division.fechaLimite,
-      })),
-    };
-
-    return formattedFormData;
   };
 
   // Asegúrate de que handleSubmit maneje la acción pendiente después de la validación
@@ -290,11 +298,14 @@ function CotizacionForm() {
       ...updatedFilas[rowIndex],
       actividades: actividadesRelacionadas,
       planSubtotal: planPrice,
+      planTotal: planPrice,
     };
 
     // Actualiza el estado del formulario con las filas actualizadas
     setFormData((prevData) => ({
       ...prevData,
+      subtotal: calculateSubtotal(updatedFilas),
+      total: calculateTotalConDescuento(updatedFilas),
       items: updatedFilas,
     }));
     // También puedes actualizar las actividades del plan aquí si es necesario
@@ -304,8 +315,30 @@ function CotizacionForm() {
   const handleDescuentoChange = (selectedOption, rowIndex) => {
     const updatedFilas = [...formData.items];
     updatedFilas[rowIndex].descuento = selectedOption;
+    let total = updatedFilas[rowIndex].planSubtotal;
+    const descuentoAplicable = descuentos.find(
+      (descuento) => descuento._id === selectedOption.value
+    );
+
+    console.log(
+      "descuentoAplicable handleDescuentoChange CotizacionComponent",
+      descuentoAplicable
+    );
+
+    if (descuentoAplicable) {
+      total -= total * (descuentoAplicable.porcentaje / 100);
+    }
+
+    console.log("total handleDescuentoChange CotizacionComponent", total);
+
+    updatedFilas[rowIndex] = {
+      ...updatedFilas[rowIndex],
+      planTotal: total,
+    };
+
     setFormData((prevData) => ({
       ...prevData,
+      total: calculateTotalConDescuento(updatedFilas),
       items: updatedFilas,
     }));
   };
@@ -319,13 +352,6 @@ function CotizacionForm() {
     }));
   };
 
-  const handleEstadoChange = (selectedOption) => {
-    setFormData((prevData) => ({
-      ...prevData,
-      estado: selectedOption,
-    }));
-  };
-
   const addRow = () => {
     setFormData((prevData) => ({
       ...prevData,
@@ -333,6 +359,16 @@ function CotizacionForm() {
         ...prevData.items,
         { materia: null, plan: null, actividades: [], descuento: null }, // Asegúrate de que el objeto tenga la estructura correcta
       ],
+    }));
+  };
+  const removeRow = (index) => {
+    const updatedFilas = [...formData.items];
+    updatedFilas.splice(index, 1);
+    setFormData((prevData) => ({
+      ...prevData,
+      total: calculateTotalConDescuento(updatedFilas),
+      subtotal: calculateSubtotal(updatedFilas),
+      items: updatedFilas,
     }));
   };
 
@@ -361,15 +397,6 @@ function CotizacionForm() {
       }
       return prevData; // No hay cambios
     });
-  };
-
-  const removeRow = (index) => {
-    const updatedFilas = [...formData.items];
-    updatedFilas.splice(index, 1);
-    setFormData((prevData) => ({
-      ...prevData,
-      items: updatedFilas,
-    }));
   };
 
   const goBack = () => {
@@ -479,20 +506,22 @@ function CotizacionForm() {
                 <td>{fila.planSubtotal ? fila.planSubtotal : "N/A"} COP</td>
                 <td>
                   <Select
-                    options={[
-                      { label: "Sin descuento", value: null },
-                      ...descuentos.map((descuento) => ({
-                        label: `${descuento.descripcion} (${descuento.porcentaje}%)`,
+                    options={descuentos.map((descuento) => ({
+                      label: `${descuento.descripcion} (${descuento.porcentaje}%)`,
+                      value: descuento._id,
+                    }))}
+                    value={descuentos
+                      .map((descuento) => ({
+                        label: descuento.descripcion,
                         value: descuento._id,
-                      })),
-                    ]}
-                    value={fila.descuento}
+                      }))
+                      .find((option) => option.value === fila.descuento)}
                     onChange={(selectedOption) =>
                       handleDescuentoChange(selectedOption, index)
                     }
                   />
                 </td>
-                <td>{calculateRowTotal(fila)} COP</td>
+                <td>{fila.planTotal} COP</td>
                 <td>
                   <Button color="danger" onClick={() => removeRow(index)}>
                     Eliminar
@@ -504,10 +533,8 @@ function CotizacionForm() {
         </Table>
 
         <div className="text-center">
-          <p>Total: {calculateTotal()} COP</p>
-          {formData.items.some((fila) => fila.descuento) && (
-            <p>Total con Descuento: {calculateTotalConDescuento()} COP</p>
-          )}
+          <p>Subtotal: {formData.subtotal} COP</p>
+          <p>Total: {formData.total} COP</p>
         </div>
         <Button color="success" onClick={addRow}>
           Agregar Fila +
