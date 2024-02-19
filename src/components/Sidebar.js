@@ -177,12 +177,13 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   >
                     <li className="ml-5">
                       <NavLink to="/cotizaciones">Cotizaciones</NavLink>
-                    </li>
-                    <li className="ml-5">
+                    </li>{" "}
+                    {/* <li className="ml-5">
                       <NavLink to="/estadosCotizaciones">
                         Estados Cotizaciones
                       </NavLink>
                     </li>
+                    */}
                     {/* Other sub-options for "Actividades" */}
                   </CollapsibleDropdown>
                 </li>
@@ -202,9 +203,9 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   <li className="ml-5">
                     <NavLink to="/cursosv2">Cursos</NavLink>
                   </li>
-                  <li className="ml-5">
+                  {/* <li className="ml-5">
                     <NavLink to="/estadosCursosv2">Estados Cursos</NavLink>
-                  </li>
+                  </li> */}
                   {/* Other sub-options for "Actividades" */}
                 </CollapsibleDropdown>
               </li>
@@ -225,7 +226,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                 </li>
               )}
             </ul>
-            <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
+            {/* <ul className="pt-5 mt-5 space-y-2 border-t border-gray-200 dark:border-gray-700">
               {isAdmin && (
                 <li>
                   <CollapsibleDropdown
@@ -240,7 +241,7 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-            </ul>
+            </ul> */}
           </div>
         </aside>
       )}

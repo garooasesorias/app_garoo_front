@@ -4,6 +4,10 @@ import ESTADOS_COTIZACIONES from "../constants/CotizacionesStates";
 import {
   EstadoInicialStrategy,
   EstadoGeneradoStrategy,
+  EstadoAprobadoStrategy,
+  EstadoAprobadoConCursoStrategy,
+  EstadoCerradoStrategy,
+  EstadoRechazadoStrategy,
 } from "../strategies/EstadoCotizacionStrategy";
 
 const CotizacionContext = createContext();
@@ -21,6 +25,14 @@ export const CotizacionProvider = ({ children }) => {
       // Implement cases for other states
       case ESTADOS_COTIZACIONES.GENERADO:
         return new EstadoGeneradoStrategy();
+      case ESTADOS_COTIZACIONES.APROBADO:
+        return new EstadoAprobadoStrategy();
+      case ESTADOS_COTIZACIONES.APROBADO_CON_CURSO:
+        return new EstadoAprobadoConCursoStrategy();
+      case ESTADOS_COTIZACIONES.CERRADO:
+        return new EstadoCerradoStrategy();
+      case ESTADOS_COTIZACIONES.RECHAZADO:
+        return new EstadoRechazadoStrategy();
       default:
         throw new Error(`Unhandled state: ${estado}`);
     }
