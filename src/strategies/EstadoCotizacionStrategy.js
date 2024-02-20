@@ -2,6 +2,8 @@ import ESTADOS_COTIZACIONES from "../constants/CotizacionesStates";
 import asignamientoService from "../services/asignamientoService";
 import cotizacionService from "../services/cotizacionService";
 import cursoService from "../services/cursoService";
+import generatePDF from "../utils/pdfGenerator";
+
 
 class EstadoCotizacionStrategy {
   constructor() {
@@ -64,9 +66,9 @@ class EstadoCotizacionStrategy {
   }
 
   downloadPDF(formData) {
-    console.log("generando PDF...");
+    generatePDF(formData);
   }
-
+ 
   displayButtons() {}
   canBeDeleted() {
     return true;
