@@ -4,6 +4,8 @@ import clienteService from '../services/clienteService';
 import planesService from '../services/planesService';
 import descuentosService from '../services/descuentosService';
 import materiasService from '../services/materiasService';
+import actividadesService from '../services/actividadesService';
+
 
 // Función de ayuda para obtener la etiqueta de un ítem dado
 async function getItemLabel(service, itemId, labelName) {
@@ -112,14 +114,22 @@ const generatePDF = async (formData) => {
   console.log("formdata Cliente", formData)
   const clienteNombre = await getItemLabel(clienteService.getClienteById, formData.cliente, 'nombre');
 
-  // Procesar cada item (desde el primer bloque de código)
   const items = await Promise.all(formData.items.map(async (item) => {
     const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
     const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
     const descuentoLabel = await getItemLabel(descuentosService.getDescuentoById, item.descuento, 'descripcion');
     const descuentoPorcentaje = parseFloat(item.descuento?.porcentaje) || 0;
-    const actividadesLabel = (item.actividades || []).map(act => act.label).join(", ") || 'N/A';
-
+    
+    // Resuelve los nombres de las actividades de forma asíncrona
+    const actividadesLabels = await Promise.all(item.actividades.map(async (actividadId) => {
+      // Suponiendo que tienes una función similar para obtener el nombre de la actividad
+      const actividadLabel = await getItemLabel(actividadesService.getActividadById, actividadId, 'nombre');
+      return actividadLabel; // Esto debería devolver el nombre de la actividad
+    }));
+  
+    // Une los nombres de las actividades con coma
+    const actividadesLabel = actividadesLabels.join(", ") || 'N/A';
+  
     return [
       materialLabel,
       planLabel,
@@ -129,6 +139,7 @@ const generatePDF = async (formData) => {
       `$${calculateRowTotal(item, descuentoPorcentaje)}`,
     ];
   }));
+  
 
   const styles = {
     title: { fontSize: 36, font: 'helvetica', fontStyle: 'bold' },
@@ -184,8 +195,6 @@ const generatePDF = async (formData) => {
   applyStyle(styles.subtitlebold, "*Recuerda que el precio de esta cotización expira en las próximas 24 horas*", 180, currentY, { align: 'right' });
 
   currentY += 10; // Ajusta este valor según sea necesario
-
-
 
   doc.autoTable({
     startY: currentY,
