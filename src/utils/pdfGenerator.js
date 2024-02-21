@@ -218,20 +218,39 @@ const generatePDF = async (formData) => {
     // Puedes agregar aquí más personalizaciones si es necesario
   });
 
+  const divisionPagos = formData.divisionPagos;
+
+  // Función para formatear las fechas en el formato deseado
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  // Función para formatear los montos de dinero
+  const formatCurrency = (amount) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  // Convertir la división de pagos a un formato adecuado para autoTable
+  const cuotasDinamicas = divisionPagos.map((pago, index) => [
+    `${index + 1}`, // Número de cuota
+    formatDate(pago.fechaLimite), // Fecha de pago
+    formatCurrency(pago.monto), // Valor
+  ]);
+
   // Calcular dónde empieza la próxima tabla, después de la anterior
-  let startY = doc.autoTable.previous.finalY + 10;
+  let startY = doc.autoTable.previous ? doc.autoTable.previous.finalY + 10 : 10;
 
-  // Datos estáticos para la tabla de cuotas
-  const cuotas = [
-    ["1", "19/10/2023", "$180.00"],
-    ["2", "26/10/2023", "$180.00"]
-  ];
-
-  // Añadir la tabla de cuotas al PDF
+  // Añadir la tabla de cuotas al PDF con los datos dinámicos
   doc.autoTable({
     head: [['No. Cuota', 'Fecha de Pago', 'Valor']],
-    body: cuotas,
+    body: cuotasDinamicas,
     startY: startY,
+
     theme: 'grid',
     styles: {
       lineColor: [0, 0, 0],

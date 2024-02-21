@@ -170,23 +170,24 @@ function CotizacionForm() {
 
     console.log("FormDataCliente", formData.cliente);
     console.log("Cliente", clientes);
-    const formattedFormData = {
-      ...formData,
-      fecha: currentDate,
-      // cliente: formData.cliente ? formData.cliente.value : null,
-      cliente: clientes.find(cliente => cliente._id === (formData.cliente.value || formData.cliente)),
-      estado,
-      items: formattedItems,
-      divisionPagos: formData.divisionPagos.map((division) => ({
-        numeroDivision: division.numeroDivision,
-        monto: division.monto,
-        fechaLimite: division.fechaLimite,
-      })),
-    };
-
-    console.log("Console PDF NUEVO", formattedFormData);
-    return formattedFormData;
+  // Intenta encontrar el cliente basado en el ID. Si no se encuentra, usa un valor predeterminado.
+  const formattedFormData = {
+    ...formData,
+    fecha: currentDate,
+    cliente: formData.cliente, // Aquí ya tienes el objeto cliente completo
+    estado,
+    items: formattedItems,
+    divisionPagos: formData.divisionPagos.map((division) => ({
+      numeroDivision: division.numeroDivision,
+      monto: division.monto,
+      fechaLimite: division.fechaLimite,
+    })),
   };
+
+  console.log("Console PDF NUEVO", formattedFormData);
+  return formattedFormData;
+};
+
 
 
   // Calcula el total sin descuentos
