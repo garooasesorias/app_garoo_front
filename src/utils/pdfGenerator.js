@@ -9,12 +9,14 @@ import materiasService from '../services/materiasService';
 async function getItemLabel(service, itemId, labelName) {
   try {
     const response = await service(itemId);
+    console.log(`Response from ${service.name}:`, response);
     return response.data?.[labelName] || 'N/A';
   } catch (error) {
     console.error(`Error al obtener datos de ${labelName}:`, error);
     return 'N/A';
   }
 }
+
 
 // Función de ayuda para calcular el total de la fila
 function calculateRowTotal(row, descuentoPorcentaje) {
@@ -107,10 +109,10 @@ const generatePDF = async (formData) => {
     },
   ];
   const doc = new jsPDF();
-
+  console.log("formdata Cliente", formData)
   const clienteNombre = await getItemLabel(clienteService.getClienteById, formData.cliente, 'nombre');
 
-    // Procesar cada item (desde el primer bloque de código)
+  // Procesar cada item (desde el primer bloque de código)
   const items = await Promise.all(formData.items.map(async (item) => {
     const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
     const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
@@ -127,7 +129,7 @@ const generatePDF = async (formData) => {
       `$${calculateRowTotal(item, descuentoPorcentaje)}`,
     ];
   }));
-  
+
   const styles = {
     title: { fontSize: 36, font: 'helvetica', fontStyle: 'bold' },
     subtitle: { fontSize: 14, font: 'helvetica', fontStyle: 'normal' },

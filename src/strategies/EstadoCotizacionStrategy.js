@@ -119,7 +119,7 @@ export class EstadoGeneradoStrategy extends EstadoCotizacionStrategy {
       {
         id: "descargarPDF",
         text: "Descargar PDF",
-        module: "cotizaciones",
+        module: "PDF",
         action: (formData, id) => super.downloadPDF(formData),
         color: "dark",
       },
@@ -156,7 +156,7 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
       },
       {
         id: "descargarPDF",
-        module: "cotizaciones",
+        module: "PDF",
         text: "Descargar PDF",
         action: (formData, id) => super.downloadPDF(formData),
         color: "dark",
@@ -237,7 +237,7 @@ export class EstadoAprobadoConCursoStrategy extends EstadoCotizacionStrategy {
       },
       {
         id: "descargarPDF",
-        module: "cotizaciones",
+        module: "PDF",
         text: "Descargar PDF",
         action: (formData, id) => super.downloadPDF(formData),
         color: "dark",
@@ -263,7 +263,7 @@ export class EstadoCerradoStrategy extends EstadoCotizacionStrategy {
     return [
       {
         id: "descargarPDF",
-        module: "cotizaciones",
+        module: "PDF",
         text: "Descargar PDF",
         action: (formData, id) => super.downloadPDF(formData),
         color: "dark",

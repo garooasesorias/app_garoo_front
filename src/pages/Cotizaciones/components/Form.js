@@ -63,6 +63,7 @@ function CotizacionForm() {
     fetchData();
   }, [id]);
 
+  console.log("Fomrulario cotizaciones", formData);
   const fetchData = async () => {
     setEstado(ESTADOS_COTIZACIONES.INICIAL);
 
@@ -152,6 +153,42 @@ function CotizacionForm() {
     return formattedFormData;
   };
 
+  const formatDataPDF = () => {
+    // Formateamos los datos con validación
+    const formattedItems = formData.items.map((item) => ({
+      ...item,
+      materia: item.materia?.value || item.materia,
+      plan: item.plan?.value || item.plan,
+      planSubtotal: item.planSubtotal?.value || item.planSubtotal,
+      // Asegúrate de que el descuento exista y tenga un valor antes de intentar acceder a `value`
+      descuento: item.descuento?.value || item.descuento,
+      // Asegúrate de que la actividad sea un arreglo no vacío antes de mapear
+      actividades: item.actividades
+        ? item.actividades.map((act) => act.value)
+        : [],
+    }));
+
+    console.log("FormDataCliente", formData.cliente);
+    console.log("Cliente", clientes);
+    const formattedFormData = {
+      ...formData,
+      fecha: currentDate,
+      // cliente: formData.cliente ? formData.cliente.value : null,
+      cliente: clientes.find(cliente => cliente._id === (formData.cliente.value || formData.cliente)),
+      estado,
+      items: formattedItems,
+      divisionPagos: formData.divisionPagos.map((division) => ({
+        numeroDivision: division.numeroDivision,
+        monto: division.monto,
+        fechaLimite: division.fechaLimite,
+      })),
+    };
+
+    console.log("Console PDF NUEVO", formattedFormData);
+    return formattedFormData;
+  };
+
+
   // Calcula el total sin descuentos
   const calculateSubtotal = (items) => {
     return items.reduce((accum, item) => {
@@ -175,6 +212,10 @@ function CotizacionForm() {
 
     if (buttonStrategy.module === "cotizaciones") {
       formatedData = formatDataCotizaciones(formData);
+    }
+
+    if (buttonStrategy.module === "PDF") {
+      formatedData = formatDataPDF();
     }
 
     try {
@@ -532,12 +573,12 @@ function CotizacionForm() {
                     value={
                       division.fechaLimite
                         ? format(
-                            utcToZonedTime(
-                              parseISO(division.fechaLimite),
-                              "UTC"
-                            ),
-                            "yyyy-MM-dd"
-                          )
+                          utcToZonedTime(
+                            parseISO(division.fechaLimite),
+                            "UTC"
+                          ),
+                          "yyyy-MM-dd"
+                        )
                         : ""
                     }
                     onChange={(e) => {
