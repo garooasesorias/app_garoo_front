@@ -167,8 +167,8 @@ function CotizacionForm() {
         : [],
     }));
 
-    console.log("FormDataCliente", formData.cliente);
-    console.log("Cliente", clientes);
+    // console.log("FormDataCliente", formData.cliente);
+    // console.log("Cliente", clientes);
   // Intenta encontrar el cliente basado en el ID. Si no se encuentra, usa un valor predeterminado.
   const formattedFormData = {
     ...formData,
@@ -182,8 +182,6 @@ function CotizacionForm() {
       fechaLimite: division.fechaLimite,
     })),
   };
-
-  console.log("Console PDF NUEVO", formattedFormData);
   return formattedFormData;
 };
 
@@ -227,11 +225,14 @@ function CotizacionForm() {
         );
         alert("Éxito");
 
-        if (response.id) {
+        if (response && response.id) {
           setIdCotizacion(response.id);
         }
-        setEstado(response.estado);
-        setProcessing(false);
+        
+        if (response && response.hasOwnProperty('estado')) {
+          setEstado(response.estado);
+        }
+                setProcessing(false);
 
         // fetchData();
       }

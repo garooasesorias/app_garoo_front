@@ -11,7 +11,7 @@ import actividadesService from '../services/actividadesService';
 async function getItemLabel(service, itemId, labelName) {
   try {
     const response = await service(itemId);
-    console.log(`Response from ${service.name}:`, response);
+    // console.log(`Response from ${service.name}:`, response);
     return response.data?.[labelName] || 'N/A';
   } catch (error) {
     console.error(`Error al obtener datos de ${labelName}:`, error);
