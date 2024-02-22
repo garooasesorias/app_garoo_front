@@ -5,7 +5,7 @@ import ESTADOS_COTIZACIONES from "../../../constants/CotizacionesStates";
 
 import { useCotizacion } from "../../../context/CotizacionContext";
 
-import { Badge, Button, Label, Table, TextInput } from "flowbite-react";
+import { Badge, Button, Label, Table, TextInput, Toast } from "flowbite-react";
 import Select from "react-select";
 import PdfButton from "./PdfButton";
 
@@ -20,6 +20,7 @@ import cursoService from "../../../services/cursoService";
 import asignamientoService from "../../../services/asignamientoService";
 import { format, parseISO } from "date-fns";
 import { utcToZonedTime } from "date-fns-tz";
+import { HiCheck } from "react-icons/hi";
 
 // Otros componentes o servicios que puedas necesita
 function CotizacionForm() {
@@ -48,6 +49,9 @@ function CotizacionForm() {
   const [inputDivisionValue, setInputDivisionValue] = useState(); // Initial state set to 0 or whatever you want
   const [processing, setProcessing] = useState(false); // Initial state set to 0 or whatever you want
   const [idCotizacion, setIdCotizacion] = useState(id);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('success'); // Puedes usar esto para cambiar el estilo del toast según sea éxito o error.
 
   const [formData, setFormData] = useState({
     fecha: "",
@@ -169,21 +173,21 @@ function CotizacionForm() {
 
     // console.log("FormDataCliente", formData.cliente);
     // console.log("Cliente", clientes);
-  // Intenta encontrar el cliente basado en el ID. Si no se encuentra, usa un valor predeterminado.
-  const formattedFormData = {
-    ...formData,
-    fecha: currentDate,
-    cliente: formData.cliente, // Aquí ya tienes el objeto cliente completo
-    estado,
-    items: formattedItems,
-    divisionPagos: formData.divisionPagos.map((division) => ({
-      numeroDivision: division.numeroDivision,
-      monto: division.monto,
-      fechaLimite: division.fechaLimite,
-    })),
+    // Intenta encontrar el cliente basado en el ID. Si no se encuentra, usa un valor predeterminado.
+    const formattedFormData = {
+      ...formData,
+      fecha: currentDate,
+      cliente: formData.cliente, // Aquí ya tienes el objeto cliente completo
+      estado,
+      items: formattedItems,
+      divisionPagos: formData.divisionPagos.map((division) => ({
+        numeroDivision: division.numeroDivision,
+        monto: division.monto,
+        fechaLimite: division.fechaLimite,
+      })),
+    };
+    return formattedFormData;
   };
-  return formattedFormData;
-};
 
 
 
@@ -223,22 +227,30 @@ function CotizacionForm() {
           formatedData,
           idCotizacion
         );
-        alert("Éxito");
+        setToastMessage("Cotización guardada con éxito.");
+        setToastType('success');
+        setShowToast(true);
+
+        setTimeout(() => {
+          setShowToast(false);
+        }, 3000);        
 
         if (response && response.id) {
           setIdCotizacion(response.id);
         }
-        
+
         if (response && response.hasOwnProperty('estado')) {
           setEstado(response.estado);
         }
-                setProcessing(false);
+        setProcessing(false);
 
         // fetchData();
       }
     } catch (error) {
       console.log(error);
-      alert(error.message);
+      setToastMessage(error.message);
+      setToastType('error');
+      setShowToast(true);
     }
   };
 
@@ -621,6 +633,20 @@ function CotizacionForm() {
       >
         Volver
       </Button>
+
+      {showToast && (
+        <Toast className={`Toast ${toastType}`} onDismiss={() => setShowToast(false)}>
+          <div className="inline-flex items-center justify-center rounded-lg bg-cyan-100 text-cyan-500">
+            {/* El ícono puede cambiar según el tipo de mensaje */}
+            {toastType === 'success' ? <HiCheck className="h-5 w-5" /> : <HiX className="h-5 w-5" />}
+          </div>
+          <div className="ml-3 text-sm font-normal">
+            {toastMessage}
+          </div>
+          <Toast.Toggle onDismiss={() => setShowToast(false)} />
+        </Toast>
+      )}
+
     </>
   );
 }
