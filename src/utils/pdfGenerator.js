@@ -111,35 +111,34 @@ const generatePDF = async (formData) => {
     },
   ];
   const doc = new jsPDF();
-  console.log("formdata Cliente", formData)
+  // console.log("formdata Cliente", formData)
   const clienteNombre = await getItemLabel(clienteService.getClienteById, formData.cliente, 'nombre');
 
   const items = await Promise.all(formData.items.map(async (item) => {
     const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
     const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
     const descuentoLabel = await getItemLabel(descuentosService.getDescuentoById, item.descuento, 'descripcion');
-    const descuentoPorcentaje = parseFloat(item.descuento?.porcentaje) || 0;
     
-    // Resuelve los nombres de las actividades de forma asíncrona
+    // Resuelve los nombres de las actividades de forma asíncrona, si es necesario
     const actividadesLabels = await Promise.all(item.actividades.map(async (actividadId) => {
-      // Suponiendo que tienes una función similar para obtener el nombre de la actividad
       const actividadLabel = await getItemLabel(actividadesService.getActividadById, actividadId, 'nombre');
       return actividadLabel; // Esto debería devolver el nombre de la actividad
     }));
   
     // Une los nombres de las actividades con coma
     const actividadesLabel = actividadesLabels.join(", ") || 'N/A';
-  
+    
+    // Usa directamente planSubtotal y planTotal de cada ítem
     return [
       materialLabel,
       planLabel,
       actividadesLabel,
-      `$${item.planSubtotal || 0}`,
+      `$${item.planSubtotal || 0}`, // Usa directamente el valor de planSubtotal
       descuentoLabel,
-      `$${calculateRowTotal(item, descuentoPorcentaje)}`,
+      `$${item.planTotal || 0}`, // Usa directamente el valor de planTotal
     ];
   }));
-  
+    
 
   const styles = {
     title: { fontSize: 36, font: 'helvetica', fontStyle: 'bold' },

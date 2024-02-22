@@ -63,7 +63,6 @@ function CotizacionForm() {
     fetchData();
   }, [id]);
 
-  console.log("Fomrulario cotizaciones", formData);
   const fetchData = async () => {
     setEstado(ESTADOS_COTIZACIONES.INICIAL);
 
