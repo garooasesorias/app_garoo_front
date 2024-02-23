@@ -577,7 +577,7 @@ function CotizacionForm() {
             {formData.divisionPagos.map((division, index) => (
               <tr key={index}>
                 <td>{division.numeroDivision}</td>
-                <td>{division.monto}</td>
+                <td>{division.monto} COP</td>
                 <td>
                   <input
                     type="date"
