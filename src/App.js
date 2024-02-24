@@ -36,21 +36,24 @@ import Login from "./pages/Login";
 import Administradores from "./pages/Administradores";
 import Form from "./pages/Administradores/components/Form";
 import AuthGuard from "./utils/AuthGuard";
+import { CotizacionProvider } from "./context/CotizacionContext";
 
 function App() {
   return (
     <NotificacionesProvider>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route
-          path="/*"
-          element={
-            <AuthGuard>
-              <LayoutWithSidebar />
-            </AuthGuard>
-          }
-        />
-      </Routes>
+      <CotizacionProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/*"
+            element={
+              <AuthGuard>
+                <LayoutWithSidebar />
+              </AuthGuard>
+            }
+          />
+        </Routes>
+      </CotizacionProvider>
     </NotificacionesProvider>
   );
 }

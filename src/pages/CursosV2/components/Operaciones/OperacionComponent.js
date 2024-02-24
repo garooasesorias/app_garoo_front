@@ -125,7 +125,6 @@ export default function OperacionComponent({
       objectToSend
     );
 
-    console.log(updateResponse);
     fetchData().then(() => setLoading(false));
 
     // Aquí puedes agregar la lógica para actualizar el item
@@ -188,7 +187,7 @@ export default function OperacionComponent({
                   {item.comentarios || "Sin Comentarios"}
                 </td>
                 <td className="px-4 py-2">
-                  {estadosAdm.find((estado) => estado._id === item.estado?._id)
+                  {estadosAdm.find((estado) => estado._id === item.estado)
                     ?.nombre || "Sin Estado"}
                 </td>
                 <td className="px-4 py-2">

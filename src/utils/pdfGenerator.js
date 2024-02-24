@@ -4,17 +4,21 @@ import clienteService from '../services/clienteService';
 import planesService from '../services/planesService';
 import descuentosService from '../services/descuentosService';
 import materiasService from '../services/materiasService';
+import actividadesService from '../services/actividadesService';
+
 
 // Función de ayuda para obtener la etiqueta de un ítem dado
 async function getItemLabel(service, itemId, labelName) {
   try {
     const response = await service(itemId);
+    // console.log(`Response from ${service.name}:`, response);
     return response.data?.[labelName] || 'N/A';
   } catch (error) {
     console.error(`Error al obtener datos de ${labelName}:`, error);
     return 'N/A';
   }
 }
+
 
 // Función de ayuda para calcular el total de la fila
 function calculateRowTotal(row, descuentoPorcentaje) {
@@ -107,12 +111,39 @@ const generatePDF = async (formData) => {
     },
   ];
   const doc = new jsPDF();
-
+  // console.log("formdata Cliente", formData)
   const clienteNombre = await getItemLabel(clienteService.getClienteById, formData.cliente, 'nombre');
 
+  const items = await Promise.all(formData.items.map(async (item) => {
+    const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
+    const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
+    const descuentoLabel = await getItemLabel(descuentosService.getDescuentoById, item.descuento, 'descripcion');
+    
+    // Resuelve los nombres de las actividades de forma asíncrona, si es necesario
+    const actividadesLabels = await Promise.all(item.actividades.map(async (actividadId) => {
+      const actividadLabel = await getItemLabel(actividadesService.getActividadById, actividadId, 'nombre');
+      return actividadLabel; // Esto debería devolver el nombre de la actividad
+    }));
+  
+    // Une los nombres de las actividades con coma
+    const actividadesLabel = actividadesLabels.join(", ") || 'N/A';
+    
+    // Usa directamente planSubtotal y planTotal de cada ítem
+    return [
+      materialLabel,
+      planLabel,
+      actividadesLabel,
+      `$${item.planSubtotal || 0}`, // Usa directamente el valor de planSubtotal
+      descuentoLabel,
+      `$${item.planTotal || 0}`, // Usa directamente el valor de planTotal
+    ];
+  }));
+    
+
   const styles = {
-    title: { fontSize: 18, font: 'helvetica', fontStyle: 'bold' },
+    title: { fontSize: 36, font: 'helvetica', fontStyle: 'bold' },
     subtitle: { fontSize: 14, font: 'helvetica', fontStyle: 'normal' },
+    subtitlebold: { fontSize: 12, font: 'helvetica', fontStyle: 'bold' },
     content: { fontSize: 12, font: 'helvetica', fontStyle: 'normal' },
     footer: { fontSize: 10, font: 'helvetica', fontStyle: 'normal' },
   };
@@ -132,7 +163,9 @@ const generatePDF = async (formData) => {
 
   // Página de bienvenida
   doc.addImage(images[12].base64, "JPEG", 40, 30, 120, 80);
+  doc.setTextColor(200, 200, 200);
   centeredText(styles.title, "Bienvenido", 140);
+  doc.setTextColor(0, 0, 0);
   centeredText(styles.content, `Cliente: ${clienteNombre}`, 165);
   // doc.text(`Cliente: ${clienteNombre}`, 10, 50);
 
@@ -144,8 +177,9 @@ const generatePDF = async (formData) => {
   // Página con el contenido del formulario
   doc.addPage();
 
-  const text2 = "Cotización para: " + clienteNombre;
-  centeredText(styles.subtitle, text2, 40, { align: 'center' });  // Encabezado centrado
+  doc.addImage(images[12].base64, "JPEG", 10, 10, 24, 21);
+  const text2 = "Cotización de servicios para: " + clienteNombre;
+  centeredText(styles.subtitlebold, text2, 40, { align: 'center' });  // Encabezado centrado
   applyStyle(styles.footer, "" + new Date(formData.fecha).toLocaleDateString(), 160, 30);  // Fecha
   applyStyle(styles.content, "Apreciado usuario,", 10, 50);  // Saludo
 
@@ -157,49 +191,100 @@ const generatePDF = async (formData) => {
   });
 
   let currentY = 60 + (splitText.length * 7) + 10;
-  applyStyle(styles.subtitle, "*Recuerda que el precio de esta cotización expira en las próximas 24 horas*", 180, currentY, { align: 'right' });
+  applyStyle(styles.subtitlebold, "*Recuerda que el precio de esta cotización expira en las próximas 24 horas*", 180, currentY, { align: 'right' });
 
   currentY += 10; // Ajusta este valor según sea necesario
 
-  // Procesar cada item (desde el primer bloque de código)
-  const items = await Promise.all(formData.items.map(async (item) => {
-    const materialLabel = await getItemLabel(materiasService.getMateriaById, item.materia, 'nombre');
-    const planLabel = await getItemLabel(planesService.getPlanById, item.plan, 'nombre');
-    const descuentoLabel = await getItemLabel(descuentosService.getDescuentoById, item.descuento, 'descripcion');
-    const descuentoPorcentaje = parseFloat(item.descuento?.porcentaje) || 0;
-    const actividadesLabel = (item.actividades || []).map(act => act.label).join(", ") || 'N/A';
-
-    return [
-      materialLabel,
-      planLabel,
-      actividadesLabel,
-      `$${item.planSubtotal || 0}`,
-      descuentoLabel,
-      `$${calculateRowTotal(item, descuentoPorcentaje)}`,
-    ];
-  }));
-
-  // Añadir la tabla de items al PDF (ajustado desde el segundo bloque de código)
   doc.autoTable({
     startY: currentY,
     head: [['Materia', 'Plan', 'Actividades', 'Subtotal', 'Descuento', 'Total']],
     body: items,
+    theme: 'grid',
+    styles: {
+      lineColor: [0, 0, 0],
+      lineWidth: 0.1,
+      valign: 'middle',
+      halign: 'left',
+    },
+    headStyles: {
+      fillColor: [150, 150, 150], // Color de fondo gris para la cabecera
+      textColor: [0, 0, 0], // Color de texto para la cabecera
+      fontStyle: 'bold', // Estilo de fuente para la cabecera
+    },
+    bodyStyles: {
+      fillColor: [240, 240, 240], // Color de fondo para las filas
+      textColor: [0, 0, 0], // Color de texto para las filas
+    },
+    alternateRowStyles: {
+      fillColor: [255, 255, 255], // Color de fondo para las filas alternas
+    },
+    columnStyles: {
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto' },
+      // ... configura el resto de las columnas según sea necesario
+    },
+    // Puedes agregar aquí más personalizaciones si es necesario
   });
 
+  const divisionPagos = formData.divisionPagos;
+
+  // Función para formatear las fechas en el formato deseado
+  const formatDate = (date) => {
+    const d = new Date(date);
+    return d.toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    });
+  };
+
+  // Función para formatear los montos de dinero
+  const formatCurrency = (amount) => {
+    return `$${amount.toFixed(2)}`;
+  };
+
+  // Convertir la división de pagos a un formato adecuado para autoTable
+  const cuotasDinamicas = divisionPagos.map((pago, index) => [
+    `${index + 1}`, // Número de cuota
+    formatDate(pago.fechaLimite), // Fecha de pago
+    formatCurrency(pago.monto), // Valor
+  ]);
+
   // Calcular dónde empieza la próxima tabla, después de la anterior
-  let startY = doc.autoTable.previous.finalY + 10;
+  let startY = doc.autoTable.previous ? doc.autoTable.previous.finalY + 10 : 10;
 
-  // Datos estáticos para la tabla de cuotas
-  const cuotas = [
-    ["1", "19/10/2023", "$180.00"],
-    ["2", "26/10/2023", "$180.00"]
-  ];
-
-  // Añadir la tabla de cuotas al PDF
+  // Añadir la tabla de cuotas al PDF con los datos dinámicos
   doc.autoTable({
     head: [['No. Cuota', 'Fecha de Pago', 'Valor']],
-    body: cuotas,
-    startY: startY
+    body: cuotasDinamicas,
+    startY: startY,
+
+    theme: 'grid',
+    styles: {
+      lineColor: [0, 0, 0],
+      lineWidth: 0.1,
+      valign: 'middle',
+      halign: 'left',
+    },
+    headStyles: {
+      fillColor: [150, 150, 150], // Gris claro para el fondo de la cabecera
+      textColor: [0, 0, 0], // Texto en negro para la cabecera
+      fontStyle: 'bold', // Texto en negrita para la cabecera
+    },
+    bodyStyles: {
+      fillColor: [240, 240, 240], // Gris muy claro para el fondo de las filas
+      textColor: [0, 0, 0], // Texto en negro para las filas
+    },
+    alternateRowStyles: {
+      fillColor: [255, 255, 255], // Blanco para las filas alternas, si deseas efecto zebra
+    },
+    columnStyles: {
+      0: { cellWidth: 'auto' },
+      1: { cellWidth: 'auto' },
+      2: { cellWidth: 'auto' },
+      // ... configura el resto de las columnas según sea necesario
+    },
+    // Puedes agregar aquí más personalizaciones si es necesario
   });
 
   // Calcular dónde colocar el total
@@ -208,18 +293,19 @@ const generatePDF = async (formData) => {
   // Añadir el total
   doc.text(`Total: $${formData.total || 0}`, 10, startY);
 
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
-  doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
+  doc.setFontSize(9);
+  doc.text('GarooAsesoríasAcadémicas', 83, 270);  // Ajusta las coordenadas (90, 265) según sea necesario
+  doc.text('www.garooasesoriasacademicas.com', 75, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
+  doc.text('3194110798', 95, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
+  doc.addImage(images[14].base64, "JPEG", 88, 281, 6, 6);
 
   // Añadir una nueva página para "MEDIOS DE PAGO"
   doc.addPage();
 
   const margin = 10; // Asegúrate de que esta variable está definida con el valor que necesitas
 
-  applyStyle(styles.title, "MEDIOS DE PAGO", margin, 20);
+  doc.addImage(images[12].base64, "JPEG", 10, 10, 24, 21);
+  applyStyle(styles.subtitlebold, "MEDIOS DE PAGO", 10, 35);
 
   const mediosPagoText = "Las transacciones interbancarias tienen un costo de $3.000 pesos y los depósitos en entidades bancarias fuera de Bogotá, distintas a PAC Bancolombia tienen un costo de $13.000, los cuales debes asumir en caso de usar estos medios de pago.";
 
@@ -227,13 +313,17 @@ const generatePDF = async (formData) => {
   const maxWidth = pageWidth - (margin * 2);
 
   // Añade un rectángulo amarillo
-  const startYRect = 30; // La posición Y donde comienza el rectángulo, ajusta según sea necesario
-  const rectHeight = 30; // Ajusta esto según sea necesario para el contenido
-  doc.setFillColor(255, 255, 0); // Color amarillo
-  doc.rect(margin, startYRect, maxWidth, rectHeight, 'F');
+  const startYRect = 40; // La posición Y donde comienza el rectángulo, ajusta según sea necesario
+  const rectHeight = 40; // Ajusta esto según sea necesario para el contenido
+  doc.setFillColor(255, 235, 150); // Amarillo más suave
+  // Dibuja el rectángulo con relleno y borde
+  doc.rect(margin, startYRect, maxWidth, rectHeight, 'FD');
 
-  // Añade el texto dentro del rectángulo amarillo
-  applyStyle(styles.subtitle, "Ten en cuenta:", margin, startYRect + 10);
+  // Añade el texto en negrita dentro del rectángulo amarillo
+  doc.setFont("helvetica", "bold");
+  applyStyle(styles.subtitlebold, "Ten en cuenta:", margin, startYRect + 10);
+
+  // Añade el texto descriptivo dentro del rectángulo amarillo
   doc.setFontSize(styles.content.fontSize);
   doc.setFont(styles.content.font, styles.content.fontStyle);
   doc.text(mediosPagoText, margin, startYRect + 20, { maxWidth: maxWidth });
@@ -283,7 +373,27 @@ const generatePDF = async (formData) => {
     startY: startYTabla,
     head: mediosHeaders,
     body: mediosBody,
-    rowHeight: 30,
+    theme: 'grid', // Aplica el tema de cuadrícula
+    styles: {
+      lineColor: [0, 0, 0], // Color de las líneas, puede ser negro para una cuadrícula tradicional
+      lineWidth: 0.1, // El grosor de las líneas de la cuadrícula
+      cellPadding: 5, // Ajusta el relleno dentro de las celdas si es necesario
+      valign: 'middle', // Alinea verticalmente el contenido de la celda en el medio
+      halign: 'left', // Alinea horizontalmente el contenido de la celda a la izquierda
+    },
+    headStyles: {
+      fillColor: [220, 220, 220], // Color de fondo para las celdas del encabezado
+      textColor: [0, 0, 0], // Color del texto para las celdas del encabezado
+      fontStyle: 'bold' // Estilo de fuente para las celdas del encabezado
+    },
+    bodyStyles: {
+      fillColor: [255, 255, 255], // Color de fondo para las celdas del cuerpo
+      textColor: [0, 0, 0], // Color del texto para las celdas del cuerpo
+    },
+    columnStyles: {
+      0: { halign: 'center' }, // Alineación centrada para la columna de los logos, si es necesario
+      // ... configura el resto de las columnas según sea necesario
+    },
     willDrawCell: function (data) {
       if (data.column.index === 0 && data.cell.section === "body") {
         let image = images.find((img) => img.nombre === data.cell.raw);
@@ -307,17 +417,20 @@ const generatePDF = async (formData) => {
   });
 
   // Ajusta las coordenadas para el texto y la imagen al final de la página
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
-  doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
+  doc.setFontSize(9);
+  doc.text('GarooAsesoríasAcadémicas', 83, 270);  // Ajusta las coordenadas (90, 265) según sea necesario
+  doc.text('www.garooasesoriasacademicas.com', 75, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
+  doc.text('3194110798', 95, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
+  doc.addImage(images[14].base64, "JPEG", 88, 281, 6, 6);
 
   // Nueva página para "TÉRMINOS Y CONDICIONES"
   doc.addPage();
 
+  doc.addImage(images[12].base64, "JPEG", 10, 10, 24, 21);
   doc.setFontSize(16);
-  doc.text("TÉRMINOS Y CONDICIONES", 10, 20);  // Titulo para la sección
+  doc.setFont("helvetica", "bold");
+  doc.text("TÉRMINOS Y CONDICIONES", 10, 35);  // Titulo para la sección
+  doc.setFont("helvetica", "normal");
 
   doc.setFontSize(10);
 
@@ -350,22 +463,28 @@ const generatePDF = async (formData) => {
   10. En caso de quepor cualquier motivo necesites cancelar tu agendamiento solo cuentas con un plazo de
   24 horas para informar al equipo; NO se realizarán devoluciones de dinero posterior a este tiempo y
   se procederá a entregar el trabajo en el tiempo acordado
-  11. Si sigues estas indicaciones nos facilitarás el trabajo y podremos garantizarte los mejores resultados.Si tienes alguna inquietud con respecto a esta información no dudes consultarnos, por medio de nuestro chat de Whatsapp 31941107980 o a nuestro correo electrónico garooasesorias@gmail.com.
+  11. Si sigues estas indicaciones nos facilitarás el trabajo y podremos garantizarte los mejores resultados.
   `;
   //Este es un cambio
   const maxWidth3 = 180;
   const lineHeight3 = 7;
   const splitText3 = doc.splitTextToSize(termsText, maxWidth3);
   const startX3 = 10;
-  const startY3 = 20;  // Ajusta según donde quieras comenzar
+  const startY3 = 40;  // Ajusta según donde quieras comenzar
   splitText3.forEach((line, index) => {
     doc.text(line, startX3, startY3 + index * lineHeight3);
   });
-  doc.setFontSize(12);
-  doc.text('GarooAsesoríasAcadémicas', 75, 265);  // Ajusta las coordenadas (90, 265) según sea necesario
-  doc.text('www.garooasesoriasacademicas.com', 65, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
-  doc.text('3194110798', 90, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
-  doc.addImage(images[14].base64, "JPEG", 78, 278, 10, 10);
+
+  doc.setFontSize(9);
+  doc.text('Si tienes alguna inquietud con respecto a esta información no dudes consultarnos, por medio de', 10, 245);  // Ajusta las coordenadas (90, 265) según sea necesario
+  doc.text('nuestro chat de Whatsapp 31941107980 o a nuestro correo electrónico garooasesorias@gmail.com.', 10, 250);  // Ajusta las coordenadas (90, 265) según sea necesario
+
+
+  doc.setFontSize(9);
+  doc.text('GarooAsesoríasAcadémicas', 83, 270);  // Ajusta las coordenadas (90, 265) según sea necesario
+  doc.text('www.garooasesoriasacademicas.com', 75, 275);  // Ajusta las coordenadas (90, 275) según sea necesario
+  doc.text('3194110798', 95, 285);  // Ajusta las coordenadas (90, 285) según sea necesario
+  doc.addImage(images[14].base64, "JPEG", 88, 281, 6, 6);
 
 
   // Guardar el PDF

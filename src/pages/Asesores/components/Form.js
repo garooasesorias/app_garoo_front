@@ -643,7 +643,7 @@ function Form() {
             )}
           </div>
           <div className="ml-3 text-sm font-normal">
-            Cliente {action}{" "}
+            Asesor {action}{" "}
             {/* Aquí se usa el estado `action` para mostrar el mensaje */}
           </div>
           <Toast.Toggle onDismiss={() => setShowToast(false)} />
