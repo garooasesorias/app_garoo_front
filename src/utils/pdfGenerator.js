@@ -243,12 +243,21 @@ const generatePDF = async (formData) => {
     return `$${amount.toFixed(2)}`;
   };
 
-  // Convertir la división de pagos a un formato adecuado para autoTable
-  const cuotasDinamicas = divisionPagos.map((pago, index) => [
-    `${index + 1}`, // Número de cuota
-    formatDate(pago.fechaLimite), // Fecha de pago
-    formatCurrency(pago.monto), // Valor
-  ]);
+  const cuotasDinamicas = divisionPagos.map((pago, index) => {
+    // Asegúrate de que pago.monto es un número.
+    const monto = Number(pago.monto);
+    if (isNaN(monto)) {
+      // Manejar el caso en que monto no es un número.
+      // Podrías lanzar un error o decidir un flujo alternativo.
+      throw new Error('El monto de la división de pagos debe ser un número.');
+    }
+    return [
+      `${index + 1}`,
+      formatDate(pago.fechaLimite),
+      formatCurrency(monto), // Asegurándose de que monto es un número.
+    ];
+  });
+  
 
   // Calcular dónde empieza la próxima tabla, después de la anterior
   let startY = doc.autoTable.previous ? doc.autoTable.previous.finalY + 10 : 10;
