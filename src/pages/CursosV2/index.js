@@ -83,6 +83,7 @@ function Cursos() {
                     >
                       {curso.materia &&
                         `${curso.materia.nombre} - ${curso.cliente.nombre}`}
+                      <hr style={{ borderTop: "1px solid #bbb" }}></hr>
                     </li>
                   ))}
               </ul>
