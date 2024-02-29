@@ -3,6 +3,7 @@ import asignamientoService from "../services/asignamientoService";
 import cotizacionService from "../services/cotizacionService";
 import cursoService from "../services/cursoService";
 import generatePDF from "../utils/pdfGenerator";
+import ventaService from "../services/ventasService"
 
 
 class EstadoCotizacionStrategy {
@@ -169,6 +170,14 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
           super.submitCotizacion(formData, id, ESTADOS_COTIZACIONES.RECHAZADO),
         color: "failure",
       },
+      {
+        id: "crearVenta",
+        module: "ventas",
+        text: "Crear Venta",
+        action: (formData, id) => this.submitVenta(formData, id),
+        color: "success",
+      },
+
     ];
   }
 
@@ -214,10 +223,55 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
     return { estado: ESTADOS_COTIZACIONES.APROBADO_CON_CURSO };
   }
 
+  async submitVenta(formData, id) {
+    const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
+
+    // Verificar si formData tiene divisionPagos
+    // Crear un objeto con los datos que necesitas para la venta
+    for (const item of formData.items) {
+      const ventaData = {
+        cotizacion: id,
+        fecha: currentDate,
+        materia: item.materia?.value || item.materia,
+        cliente: formData.cliente?.value || formData.cliente,
+        actividades: item.actividades
+          ? item.actividades.map((act) => act.value)
+          : [],
+      };
+
+      // Verificar si formData tiene divisionPagos
+      // Crear un objeto con los datos que necesitas para la venta
+      if (formData.divisionPagos) {
+        ventaData.divisionPagos = formData.divisionPagos.map((divisionPago) => ({
+          numeroDivision: divisionPago.numeroDivision,
+          monto: divisionPago.monto,
+          fechaLimite: divisionPago.fechaLimite,
+        }));
+      }
+
+      try {
+        // Insertar la venta en la base de datos
+        const response = await ventaService.insertVenta(ventaData);
+        return { estado: ESTADOS_COTIZACIONES.APROBADO_CON_VENTA, id: response.data._id };
+      } catch (error) {
+        console.error("Error al insertar venta:", error);
+        // Manejo de errores, por ejemplo, mostrar un mensaje al usuario
+        throw error;
+      }
+    }
+  }
+
+
+
+
+
+
+
   canBeDeleted() {
     return false; // No se puede eliminar si está aprobada
   }
 }
+
 export class EstadoAprobadoConCursoStrategy extends EstadoCotizacionStrategy {
   constructor() {
     super();
@@ -252,6 +306,35 @@ export class EstadoAprobadoConCursoStrategy extends EstadoCotizacionStrategy {
     return false; // No se puede eliminar si está aprobada
   }
 }
+
+export class EstadoAprobadoConVentaStrategy extends EstadoCotizacionStrategy {
+  constructor() {
+    super();
+    this.colorBadge = "success";
+    this.nombre = ESTADOS_COTIZACIONES.APROBADO_CON_VENTA;
+  }
+
+  displayButtons() {
+    return [
+      {
+        id: "cerrarCotizacion",
+        module: "cotizaciones",
+        text: "Cerrar Cotizacion",
+        action: (formData, id) =>
+          super.submitCotizacion(formData, id, ESTADOS_COTIZACIONES.CERRADO),
+        color: "gray",
+      },
+      {
+        id: "descargarPDF",
+        module: "PDF",
+        text: "Descargar PDF",
+        action: (formData, id) => super.downloadPDF(formData),
+        color: "dark",
+      },
+    ];
+  }
+}
+
 export class EstadoCerradoStrategy extends EstadoCotizacionStrategy {
   constructor() {
     super();

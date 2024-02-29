@@ -8,6 +8,7 @@ import {
   FaPercentage,
   FaGraduationCap,
   FaChartLine,
+  FaCoins
 } from "react-icons/fa";
 import { NotificacionesContext } from "../context/NotificacionesContext";
 import { IoPeopleSharp, IoSettingsSharp } from "react-icons/io5";
@@ -188,7 +189,21 @@ function Sidebar({ isOpen, toggle, isMinimized, setIsMinimized }) {
                   </CollapsibleDropdown>
                 </li>
               )}
-
+              <li>
+              <Link to="/ventas">
+                    <button
+                      type="button"
+                      className="flex items-center p-2 w-full text-base font-normal text-gray-900 rounded-lg transition duration-75 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700"
+                      aria-controls="dropdown-pages"
+                      data-collapse-toggle="dropdown-pages"
+                    >
+                      <FaCoins className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white" />
+                      <span className="flex-1 ml-3 text-left whitespace-nowrap">
+                        <b>Ventas</b>
+                      </span>
+                    </button>
+                  </Link>
+              </li>
               <li>
                 <CollapsibleDropdown
                   buttonText={<b>CursosV2</b>}

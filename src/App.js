@@ -37,6 +37,7 @@ import Administradores from "./pages/Administradores";
 import Form from "./pages/Administradores/components/Form";
 import AuthGuard from "./utils/AuthGuard";
 import { CotizacionProvider } from "./context/CotizacionContext";
+import Ventas from "./pages/Ventas";
 
 function App() {
   return (
@@ -79,6 +80,7 @@ function LayoutWithSidebar() {
           path="/formEspecialidades/:id"
           element={<FormEspecialidades />}
         />
+        <Route path="/ventas" element={<Ventas />} />
         <Route path="/clientes" element={<Clientes />} />
         <Route path="/actividades" element={<Actividades />} />
         <Route path="/tipoActividades" element={<TipoActividades />} />

@@ -8,6 +8,7 @@ import {
   EstadoAprobadoConCursoStrategy,
   EstadoCerradoStrategy,
   EstadoRechazadoStrategy,
+  EstadoAprobadoConVentaStrategy
 } from "../strategies/EstadoCotizacionStrategy";
 
 const CotizacionContext = createContext();
@@ -17,7 +18,8 @@ export const useCotizacion = () => useContext(CotizacionContext);
 export const CotizacionProvider = ({ children }) => {
   const [estado, setEstado] = useState(ESTADOS_COTIZACIONES.INICIAL);
 
-  // Aquí iría cualquier lógica para manejar las cotizaciones
+  const ESTADOS_COTIZACIONES_APROBADO_CON_VENTA = "APROBADO_CON_VENTA";
+
   const getEstadoStrategy = () => {
     switch (estado) {
       case ESTADOS_COTIZACIONES.INICIAL:
@@ -33,6 +35,8 @@ export const CotizacionProvider = ({ children }) => {
         return new EstadoCerradoStrategy();
       case ESTADOS_COTIZACIONES.RECHAZADO:
         return new EstadoRechazadoStrategy();
+      case ESTADOS_COTIZACIONES.APROBADO_CON_VENTA:
+        return new EstadoAprobadoConVentaStrategy();
       default:
         throw new Error(`Unhandled state: ${estado}`);
     }
