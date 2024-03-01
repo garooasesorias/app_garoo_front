@@ -5,7 +5,7 @@ import Loader from '../../components/Loader.js';
 import ventasService from '../../services/ventasService.js';
 
 // Descomenta este código cuando tengas el componente SeguimientosComponent
-// import SeguimientosComponent from "./components/Seguimientos/SeguimientosComponent.js";
+import SeguimientosComponent from './components/Seguimientos/SeguimientosComponent.js';
 
 function Ventas() {
   const [ventas, setVentas] = useState([]);
@@ -85,11 +85,11 @@ function Ventas() {
               {selectedVenta?.fecha && (
                 <Tabs.Group aria-label="Tabs with underline" style="underline">
                   <Tabs.Item title="Seguimientos">
-                    {/* <SeguimientosComponent
+                    <SeguimientosComponent
                       data={selectedVenta}
-                      notifyOperacionesUpdate={notifyOperacionesUpdate}
-                      notifyCalificacionesUpdate={notifyCalificacionesUpdate}
-                    ></SeguimientosComponent> */}
+                      materia={selectedVenta.materia}
+                      divisionPagos={selectedVenta.divisionPagos}
+                    />
                   </Tabs.Item>
                   {/* Añadir más pestañas para otros componentes de venta */}
                 </Tabs.Group>
