@@ -1,38 +1,103 @@
 import React, { useState, useEffect } from 'react';
-import { ESTADOS_COTIZACIONES } from '../../strategies/EstadoCotizacionStrategy'; // Importa los estados de cotizaciones
-import ventaService from '../../services/ventasService';
+import { Tabs } from 'flowbite-react';
+import Select from 'react-select';
+import Loader from '../../components/Loader.js';
+import ventasService from '../../services/ventasService.js';
+
+// Descomenta este código cuando tengas el componente SeguimientosComponent
+// import SeguimientosComponent from "./components/Seguimientos/SeguimientosComponent.js";
 
 function Ventas() {
   const [ventas, setVentas] = useState([]);
+  const [selectedVenta, setSelectedVenta] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    async function fetchVentas() {
+    const fetchData = async () => {
+      setLoading(true);
+      setErrorMessage('');
       try {
-        // Obtén las ventas desde la base de datos o de donde estén almacenadas
-        // Aquí puedes utilizar el servicio ventaService o cualquier otro método que obtenga los datos de ventas
-        const response = await ventaService.getVentas();
-        const ventasData = response.data; // Suponiendo que response.data contiene los datos de las ventas
-        setVentas(ventasData);
-      } catch (error) {
-        console.error('Error al obtener las ventas:', error);
+        const response = await ventasService.getVentas();
+        if (!response.ok) {
+          const errorData = await response;
+          setErrorMessage(errorData.message || 'Error al cargar las ventas.');
+        } else {
+          const data = await response;
+          if (data.ok) {
+            setVentas(data.data);
+          } else {
+            setErrorMessage(data.message || 'Error desconocido');
+          }
+        }
+      } catch (err) {
+        setErrorMessage(
+          `${err.response.data.message || err.message || 'Error desconocido'}`
+        );
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    fetchVentas();
-  }, []); // Se ejecuta solo una vez, al montar el componente
+    fetchData();
+  }, []);
 
   return (
-    <div>
-      <h1>Lista de Ventas</h1>
-      <ul>
-        {ventas.map((venta, index) => (
-          <li key={index}>
-            <p>Cotización: {venta.cotizacion}</p>
-            <p>Fecha: {venta.fecha}</p>
-            {/* Agrega aquí el resto de la información de venta que desees mostrar */}
-          </li>
-        ))}
-      </ul>
+    <div className="container p-6">
+      <h1 className="PagesTitles">Ventas</h1>
+      {errorMessage && (
+        <div className="alert alert-danger" role="alert">
+          {errorMessage}
+        </div>
+      )}
+      {loading && (
+        <div className="LoaderContainer mt-4">
+          <Loader />
+        </div>
+      )}
+      {!loading && !errorMessage && (
+        <>
+          <div className="flex">
+            <aside className="p-3 shadow mr-3">
+              <h2 className="text-xl mb-3 font-semibold text-gray-600">
+                Lista de Ventas
+              </h2>
+              <ul className="space-y-2">
+                {ventas.length > 0 &&
+                  ventas.map((venta, index) => (
+                    <div key={venta._id}>
+                      <li
+                        className="cursor-pointer hover:text-blue-600"
+                        onClick={() => setSelectedVenta(venta)}
+                      >
+                        {venta.cliente && <strong>Cliente:</strong>} {venta.cliente && venta.cliente.nombre}
+                        <br />
+                        {venta.fecha && <strong>Fecha:</strong>} {venta.fecha && new Date(venta.fecha).toLocaleDateString()}
+                        {/* Agregar más información aquí */}
+                      </li>
+                      {index < ventas.length - 1 && <hr style={{ borderWidth: '1px', borderColor: 'gray' }} />} {/* Agrega una línea solo si no es el último elemento */}
+                    </div>
+                  ))}
+              </ul>
+            </aside>
+
+            <main className="w-full">
+              {selectedVenta?.fecha && (
+                <Tabs.Group aria-label="Tabs with underline" style="underline">
+                  <Tabs.Item title="Seguimientos">
+                    {/* <SeguimientosComponent
+                      data={selectedVenta}
+                      notifyOperacionesUpdate={notifyOperacionesUpdate}
+                      notifyCalificacionesUpdate={notifyCalificacionesUpdate}
+                    ></SeguimientosComponent> */}
+                  </Tabs.Item>
+                  {/* Añadir más pestañas para otros componentes de venta */}
+                </Tabs.Group>
+              )}
+            </main>
+          </div>
+        </>
+      )}
     </div>
   );
 }
