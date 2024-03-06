@@ -68,20 +68,7 @@ function Clientes() {
         setSelectedClientId(null); // Limpia el ID almacenado
       });
     }
-    // if (selectedClientId) {
-    //   setDeleting(true);
-    //   google.script.run
-    //     .withSuccessHandler((response) => {
-    //       console.log(response);
-    //       setClientes((prevClientes) =>
-    //         prevClientes.filter((cliente) => cliente._id !== selectedClientId)
-    //       );
-    //       setDeleting(false);
-    //       setOpenModal(false);
-    //       setSelectedClientId(null); // Limpia el ID almacenado
-    //     })
-    //     .deleteClienteById(selectedClientId);
-    // }
+   
   };
   const passClientId = (clientId) => {
     // Tomamos el Id del cliente que viene del botón borrar
