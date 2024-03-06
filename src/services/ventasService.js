@@ -34,16 +34,14 @@ const ventaService = {
 
   updateVentaById: async (id, data) => {
     try {
-      const response = await api.put("/ventas/updateVentaById", {
-        id,
-        data,
-      });
-      return response.data; // Respuesta de la API tras insertar el curso
+      const response = await api.put(`/ventas/updateVentaById/${id}`, data);
+      return response.data; // Respuesta de la API tras actualizar la venta
     } catch (error) {
       console.error("Error al actualizar la venta:", error);
       throw error;
     }
   },
+  
   deleteVentaById: async (id) => {
     console.log(id);
     try {

@@ -3,9 +3,7 @@ import { Tabs } from 'flowbite-react';
 import Select from 'react-select';
 import Loader from '../../components/Loader.js';
 import ventasService from '../../services/ventasService.js';
-
-// Descomenta este código cuando tengas el componente SeguimientosComponent
-import SeguimientosComponent from './components/Seguimientos/SeguimientosComponent.js';
+import SeguimientosComponent from './components/Seguimientos/SeguimientosComponent.js'; // Importamos el componente SeguimientosComponent
 
 function Ventas() {
   const [ventas, setVentas] = useState([]);
@@ -41,6 +39,18 @@ function Ventas() {
 
     fetchData();
   }, []);
+
+  // Función para actualizar los datos de la venta después de la actualización exitosa
+  const handleVentaDataChange = (updatedData) => {
+    setVentas((prevVentas) => {
+      return prevVentas.map((venta) => {
+        if (venta._id === updatedData._id) {
+          return updatedData;
+        }
+        return venta;
+      });
+    });
+  };
 
   return (
     <div className="container p-6">
@@ -87,8 +97,9 @@ function Ventas() {
                   <Tabs.Item title="Seguimientos">
                     <SeguimientosComponent
                       data={selectedVenta}
-                      materia={selectedVenta.materia}
-                      divisionPagos={selectedVenta.divisionPagos}
+                      materia={selectedVenta.materia} // Mantenemos esta línea
+                      divisionPagos={selectedVenta.divisionPagos} // Mantenemos esta línea
+                      onDataChange={handleVentaDataChange}
                     />
                   </Tabs.Item>
                   {/* Añadir más pestañas para otros componentes de venta */}

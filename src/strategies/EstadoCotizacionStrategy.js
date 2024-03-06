@@ -225,7 +225,7 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
 
   async submitVenta(formData, id) {
     const currentDate = new Date().toISOString(); // Obtener la fecha actual en formato ISO
-
+  
     // Verificar si formData tiene divisionPagos
     // Crear un objeto con los datos que necesitas para la venta
     for (const item of formData.items) {
@@ -238,7 +238,7 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
           ? item.actividades.map((act) => act.value)
           : [],
       };
-
+  
       // Verificar si formData tiene divisionPagos
       // Crear un objeto con los datos que necesitas para la venta
       if (formData.divisionPagos) {
@@ -246,9 +246,11 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
           numeroDivision: divisionPago.numeroDivision,
           monto: divisionPago.monto,
           fechaLimite: divisionPago.fechaLimite,
+          estadoVenta: false, // Establecer el valor predeterminado como false
+          url: divisionPago.url || '' // Agregar la propiedad url o un valor por defecto si no está definida en el formData
         }));
       }
-
+  
       try {
         // Insertar la venta en la base de datos
         const response = await ventaService.insertVenta(ventaData);
@@ -260,6 +262,9 @@ export class EstadoAprobadoStrategy extends EstadoCotizacionStrategy {
       }
     }
   }
+  
+  
+  
 
 
 
